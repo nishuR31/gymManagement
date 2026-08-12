@@ -1,0 +1,34 @@
+import { z } from "zod";
+
+process.loadEnvFile?.();
+
+const envSchema = z.object({
+  NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
+  DATABASE_URL: z.string().url(),
+  REDIS_URL: z.string().url(),
+  JWT_ACCESS_SECRET: z.string().min(32),
+  JWT_ACCESS_EXPIRES_IN: z.string().default("15m"),
+  REFRESH_TOKEN_TTL_DAYS: z.coerce.number().int().positive().default(30),
+  PASSWORD_RESET_TOKEN_TTL_MINUTES: z.coerce.number().int().positive().default(30),
+  CORS_ORIGIN: z
+    .string()
+    .min(1)
+    .refine(
+      (value) =>
+        value
+          .split(",")
+          .map((origin) => origin.trim())
+          .filter(Boolean)
+          .every((origin) => z.string().url().safeParse(origin).success),
+      "CORS_ORIGIN must be a URL or comma-separated list of URLs"
+    )
+    .default("http://localhost:5173"),
+  COOKIE_SECURE: z.coerce.boolean().default(false),
+  API_PORT: z.coerce.number().int().positive().default(4000)
+});
+
+export type Env = z.infer<typeof envSchema>;
+
+export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
+  return envSchema.parse(source);
+}

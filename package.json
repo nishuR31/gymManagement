@@ -1,0 +1,46 @@
+{
+  "name": "single-gym-management",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Production-grade single-tenant gym management system built incrementally.",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev:api & npm run dev:web",
+    "dev:api": "npm run dev --workspace @gym/api",
+    "dev:web": "npm run dev --workspace @gym/web",
+    "build": "npm run build --workspace @gym/shared && npm run build --workspace @gym/api && npm run build --workspace @gym/web",
+    "build:api": "npm run build --workspace @gym/shared && npm run build --workspace @gym/api",
+    "build:web": "npm run build --workspace @gym/shared && npm run build --workspace @gym/web",
+    "start:api": "npm run start --workspace @gym/api",
+    "start:api:prod": "npm run start:prod --workspace @gym/api",
+    "preview:web": "npm run preview --workspace @gym/web",
+    "test": "npm run test:api && npm run test:web",
+    "test:api": "npm run test --workspace @gym/api",
+    "test:web": "npm run test --workspace @gym/web",
+    "lint": "npm run lint:api && npm run lint:web",
+    "lint:api": "npm run lint --workspace @gym/api",
+    "lint:web": "npm run lint --workspace @gym/web",
+    "typecheck": "npm run lint",
+    "prisma:generate": "npx prisma generate --schema apps/api/prisma/schema.prisma",
+    "prisma:migrate": "npx prisma migrate dev --schema apps/api/prisma/schema.prisma",
+    "prisma:deploy": "npx prisma migrate deploy --schema apps/api/prisma/schema.prisma",
+    "prisma:push": "npx prisma db push --schema apps/api/prisma/schema.prisma",
+    "prisma:seed": "npm run prisma:seed --workspace @gym/api",
+    "db:generate": "npm run prisma:generate",
+    "db:migrate": "npm run prisma:migrate",
+    "db:deploy": "npm run prisma:deploy",
+    "db:push": "npm run prisma:push",
+    "db:seed": "npm run prisma:seed",
+    "db": "npm run db:generate && npm run db:push && npm run db:seed",
+    "docker:up": "docker compose up --build",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f",
+    "smoke:browser": "node scripts/browser-smoke.mjs"
+  },
+  "engines": {
+    "node": ">=20.11.0"
+  }
+}

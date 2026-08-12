@@ -1,0 +1,11 @@
+node_modules
+dist
+coverage
+.env
+.env.local
+apps/*/.env
+apps/*/.env.local
+*.log
+*.tsbuildinfo
+apps/web/vite.config.d.ts
+apps/api/prisma/migrations/dev.db

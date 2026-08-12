@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#9a6b2f" />
+    <meta name="description" content="Premium gym management platform — members, memberships, attendance & billing in one place." />
+    <title>GymOS — Management Platform</title>
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <script>
+      try {
+        const theme = localStorage.getItem("gymos-theme");
+        document.documentElement.classList.toggle("light", theme === "light");
+        document.documentElement.classList.toggle("dark", theme !== "light");
+      } catch {
+        document.documentElement.classList.add("dark");
+      }
+    </script>
+
+    <!-- Critical inline styles for initial loader -->
+    <style>
+      #root-loader {
+        position: fixed; inset: 0; z-index: 9999;
+        display: flex; align-items: center; justify-content: center;
+        background: #f7f3ea;
+        font-family: Inter, system-ui, sans-serif;
+        transition: opacity 0.4s ease;
+      }
+      #root-loader.hidden { opacity: 0; pointer-events: none; visibility: hidden; }
+      @media (prefers-color-scheme: dark) {
+        #root-loader { background: #181816; }
+      }
+      ._loader-ring {
+        width: 48px; height: 48px; border-radius: 50%;
+        border: 3px solid #d8d1c2; border-top-color: #9a6b2f;
+        animation: _spin 0.8s linear infinite;
+      }
+      @keyframes _spin { to { transform: rotate(360deg); } }
+    </style>
+  </head>
+  <body>
+    <div id="root-loader"><div class="_loader-ring"></div></div>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

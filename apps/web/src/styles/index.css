@@ -1,0 +1,175 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================
+   THEME TOKENS
+   ============================================ */
+:root {
+  /* Iron & Chalk */
+  --color-ink: #f7f3ea;
+  --color-ink-muted: #c9c0af;
+  --color-ink-faint: #978f81;
+
+  /* Surfaces */
+  --color-line: #3a3833;
+  --color-line-faint: #272622;
+  --color-panel: #24231f;
+  --color-surface: #181816;
+  --color-backdrop: #0f0f0e;
+
+  /* Brand */
+  --color-brand: #d2ad73;
+  --color-brand-light: #ead2a8;
+  --color-brand-dark: #9a6b2f;
+
+  /* Semantic */
+  --color-accent: #e08b79;
+  --color-accent-soft: #4a2924;
+  --color-success: #92bd87;
+  --color-success-soft: #263826;
+  --color-warning: #e6bf73;
+  --color-warning-soft: #46381d;
+
+  /* Shadow */
+  --shadow-color: rgba(0, 0, 0, 0.3);
+
+  color-scheme: dark;
+}
+
+.light {
+  --color-ink: #1f1f1d;
+  --color-ink-muted: #5f5a52;
+  --color-ink-faint: #8f8778;
+
+  --color-line: #d8d1c2;
+  --color-line-faint: #ebe5d8;
+  --color-panel: #fffdf7;
+  --color-surface: #f7f3ea;
+  --color-backdrop: #1f1f1d;
+
+  --color-brand: #9a6b2f;
+  --color-brand-light: #d2ad73;
+  --color-brand-dark: #6f471d;
+
+  --color-accent: #b5432f;
+  --color-accent-soft: #f2ddd8;
+  --color-success: #3f7d4a;
+  --color-success-soft: #dfeadc;
+  --color-warning: #b47a1f;
+  --color-warning-soft: #f1e4c9;
+
+  --shadow-color: rgba(31, 31, 29, 0.08);
+
+  color-scheme: light;
+}
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
+@layer base {
+  * {
+    @apply border-line;
+  }
+
+  html {
+    @apply scroll-smooth antialiased;
+  }
+
+  body {
+    @apply m-0 min-h-screen bg-surface text-ink font-sans;
+    background:
+      linear-gradient(135deg, var(--color-backdrop) 0%, color-mix(in srgb, var(--color-backdrop) 82%, var(--color-brand-dark)) 42%, color-mix(in srgb, var(--color-surface) 92%, var(--color-accent-soft)) 100%);
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  button, input, select, textarea {
+    font: inherit;
+  }
+
+  input:not([type="checkbox"]):not([type="radio"]), select, textarea {
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  img, svg, video, canvas {
+    max-width: 100%;
+  }
+
+  table {
+    border-collapse: collapse;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--color-brand) 20%, transparent);
+    color: var(--color-ink);
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-full;
+    background: color-mix(in srgb, var(--color-ink-faint) 30%, transparent);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in srgb, var(--color-ink-faint) 50%, transparent);
+  }
+}
+
+/* ============================================
+   COMPONENT UTILITIES
+   ============================================ */
+@layer components {
+  .focus-ring {
+    @apply outline-none ring-2 ring-offset-2 ring-offset-panel;
+    --tw-ring-color: color-mix(in srgb, var(--color-brand) 30%, transparent);
+  }
+
+  .app-gradient {
+    background:
+      linear-gradient(145deg, color-mix(in srgb, var(--color-brand-dark) 34%, var(--color-backdrop)) 0%, var(--color-backdrop) 34%, color-mix(in srgb, var(--color-backdrop) 72%, var(--color-accent-soft)) 68%, color-mix(in srgb, var(--color-surface) 88%, var(--color-brand-dark)) 100%);
+  }
+
+  .surface-gradient {
+    background:
+      linear-gradient(145deg, color-mix(in srgb, var(--color-panel) 86%, var(--color-brand-dark)) 0%, var(--color-panel) 46%, color-mix(in srgb, var(--color-surface) 86%, var(--color-brand)) 100%);
+  }
+
+  .panel-gradient {
+    background:
+      linear-gradient(150deg, color-mix(in srgb, var(--color-panel) 82%, var(--color-brand-dark)) 0%, var(--color-panel) 45%, color-mix(in srgb, var(--color-surface) 82%, var(--color-accent-soft)) 100%);
+  }
+
+  .gold-gradient {
+    background:
+      linear-gradient(135deg, var(--color-brand-light) 0%, var(--color-brand) 48%, var(--color-brand-dark) 100%);
+  }
+
+  .dark-band-gradient {
+    background:
+      linear-gradient(90deg, color-mix(in srgb, var(--color-backdrop) 98%, var(--color-brand-dark)) 0%, color-mix(in srgb, var(--color-backdrop) 78%, var(--color-brand-dark)) 50%, color-mix(in srgb, var(--color-backdrop) 86%, var(--color-accent-soft)) 100%);
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .numeric {
+    @apply font-mono tabular-nums;
+  }
+}
+
+/* ============================================
+   KEYFRAMES
+   ============================================ */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
