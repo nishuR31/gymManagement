@@ -214,23 +214,23 @@ export function MembershipsPage() {
 
   return (
     <section className="grid max-w-7xl min-w-0 gap-6 animate-fade-in">
-      <div className="panel-gradient rounded-lg border border-line p-4 shadow-soft">
-        <p className="text-xs font-black uppercase tracking-[0.18em] text-brand">Plan Control</p>
-        <h2 className="mt-2 text-3xl font-black text-ink">Memberships</h2>
-        <p className="mt-1 text-sm font-semibold text-ink-muted">Create plans, assign subscriptions, and review member history.</p>
+      <div className="bg-card rounded-lg border border-border p-4 shadow-sm">
+        <p className="text-xs font-black uppercase tracking-[0.18em] text-primary">Plan Control</p>
+        <h2 className="mt-2 text-3xl font-black text-foreground">Memberships</h2>
+        <p className="mt-1 text-sm font-semibold text-muted-foreground">Create plans, assign subscriptions, and review member history.</p>
       </div>
 
       <div className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(360px,420px)]">
-        <section className="min-w-0 overflow-hidden rounded-lg border border-line bg-panel shadow-soft">
-          <div className="border-b border-line px-4 py-3">
+        <section className="min-w-0 overflow-hidden rounded-lg border border-border bg-card shadow-sm">
+          <div className="border-b border-border px-4 py-3">
             <h3 className="text-base font-bold">Plans</h3>
           </div>
           <div className="divide-y divide-line">
             {plans.map((plan) => (
               <div key={plan.id} className="flex min-w-0 flex-wrap items-center justify-between gap-3 px-4 py-3">
                 <div className="min-w-0">
-                  <p className="font-bold text-ink">{plan.name}</p>
-                  <p className="text-sm text-ink-muted">
+                  <p className="font-bold text-foreground">{plan.name}</p>
+                  <p className="text-sm text-muted-foreground">
                     <span className="numeric">{plan.durationDays}</span> days · <span className="numeric">{formatCents(plan.priceCents)}</span>
                   </p>
                 </div>
@@ -251,7 +251,7 @@ export function MembershipsPage() {
         </section>
 
         <div className="grid gap-4">
-          <section className="min-w-0 rounded-lg border border-line bg-panel p-4 shadow-soft">
+          <section className="min-w-0 rounded-lg border border-border bg-card p-4 shadow-sm">
             <div className="mb-4 flex items-center justify-between gap-3">
               <h3 className="text-base font-bold">{editingPlan ? "Edit Plan" : "New Plan"}</h3>
               {editingPlan ? (
@@ -279,33 +279,33 @@ export function MembershipsPage() {
                 <Input label="Guest passes" type="number" {...planForm.register("guestPassesIncluded")} />
                 <Input label="Grace days" type="number" {...planForm.register("gracePeriodDays")} />
               </div>
-              <label className="flex items-center gap-2 text-sm font-semibold text-ink-muted">
-                <input className="h-4 w-4 rounded border-line bg-surface text-brand focus-visible:focus-ring" type="checkbox" {...planForm.register("ptIncluded")} />
+              <label className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
+                <input className="h-4 w-4 rounded border-border bg-background text-primary focus-visible:focus-ring" type="checkbox" {...planForm.register("ptIncluded")} />
                 PT included
               </label>
-              <label className="flex items-center gap-2 text-sm font-semibold text-ink-muted">
-                <input className="h-4 w-4 rounded border-line bg-surface text-brand focus-visible:focus-ring" type="checkbox" {...planForm.register("lockerIncluded")} />
+              <label className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
+                <input className="h-4 w-4 rounded border-border bg-background text-primary focus-visible:focus-ring" type="checkbox" {...planForm.register("lockerIncluded")} />
                 Locker included
               </label>
-              <label className="flex items-center gap-2 text-sm font-semibold text-ink-muted">
-                <input className="h-4 w-4 rounded border-line bg-surface text-brand focus-visible:focus-ring" type="checkbox" {...planForm.register("freezeAllowed")} />
+              <label className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
+                <input className="h-4 w-4 rounded border-border bg-background text-primary focus-visible:focus-ring" type="checkbox" {...planForm.register("freezeAllowed")} />
                 Freeze allowed
               </label>
               <Button type="submit">{editingPlan ? "Save Plan" : "Create Plan"}</Button>
             </form>
           </section>
 
-          <section className="min-w-0 rounded-lg border border-line bg-panel p-4 shadow-soft">
+          <section className="min-w-0 rounded-lg border border-border bg-card p-4 shadow-sm">
             <h3 className="mb-4 text-base font-bold">Assign Subscription</h3>
             <form className="grid gap-3" onSubmit={(event) => void assignForm.handleSubmit(assignSubscription)(event)}>
               <input type="hidden" {...assignForm.register("memberId")} />
               <div className="grid gap-2">
-                <label className="grid min-w-0 gap-2 text-sm font-semibold text-ink">
+                <label className="grid min-w-0 gap-2 text-sm font-semibold text-foreground">
                   <span>Search member</span>
                   <div className="relative">
-                    <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-faint" aria-hidden="true" />
+                    <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
                     <input
-                      className="h-11 w-full min-w-0 rounded-md border border-line bg-surface/70 pl-9 pr-3 text-sm text-ink outline-none transition placeholder:text-ink-faint hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25"
+                      className="h-11 w-full min-w-0 rounded-md border border-border bg-surface/70 pl-9 pr-3 text-sm text-foreground outline-none transition placeholder:text-muted-foreground hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25"
                       placeholder="Search by name, member ID, phone, or email"
                       value={memberSearch}
                       onChange={(event) => {
@@ -317,70 +317,70 @@ export function MembershipsPage() {
                   </div>
                 </label>
                 {assignForm.formState.errors.memberId?.message ? (
-                  <p className="text-xs font-semibold text-accent">{assignForm.formState.errors.memberId.message}</p>
+                  <p className="text-xs font-semibold text-destructive">{assignForm.formState.errors.memberId.message}</p>
                 ) : null}
                 {selectedMember ? (
                   <div className="flex min-w-0 items-center gap-3 rounded-md border border-brand/40 bg-line-faint p-3">
-                    <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-surface text-brand">
+                    <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-background text-primary">
                       <UserRound className="h-5 w-5" aria-hidden="true" />
                     </div>
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-black text-ink">{selectedMember.firstName} {selectedMember.lastName}</p>
-                      <p className="numeric truncate text-xs font-semibold text-ink-faint">{selectedMember.memberCode} · {selectedMember.phone}</p>
+                      <p className="truncate text-sm font-black text-foreground">{selectedMember.firstName} {selectedMember.lastName}</p>
+                      <p className="numeric truncate text-xs font-semibold text-muted-foreground">{selectedMember.memberCode} · {selectedMember.phone}</p>
                     </div>
                   </div>
                 ) : null}
                 {memberSearch.trim().length >= 2 && memberResults.length > 0 ? (
-                  <div className="max-h-64 overflow-y-auto rounded-md border border-line bg-surface shadow-soft">
+                  <div className="max-h-64 overflow-y-auto rounded-md border border-border bg-background shadow-sm">
                     {memberResults.map((member) => (
                       <button
                         key={member.id}
                         type="button"
-                        className="flex w-full min-w-0 items-center gap-3 border-b border-line px-3 py-2 text-left transition last:border-b-0 hover:bg-line-faint focus-visible:focus-ring"
+                        className="flex w-full min-w-0 items-center gap-3 border-b border-border px-3 py-2 text-left transition last:border-b-0 hover:bg-line-faint focus-visible:focus-ring"
                         onClick={() => selectMemberForAssignment(member)}
                       >
-                        <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-line-faint text-brand">
+                        <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-line-faint text-primary">
                           <UserRound className="h-4 w-4" aria-hidden="true" />
                         </div>
                         <div className="min-w-0">
-                          <p className="truncate text-sm font-bold text-ink">{member.firstName} {member.lastName}</p>
-                          <p className="numeric truncate text-xs font-semibold text-ink-faint">{member.memberCode} · {member.phone}</p>
+                          <p className="truncate text-sm font-bold text-foreground">{member.firstName} {member.lastName}</p>
+                          <p className="numeric truncate text-xs font-semibold text-muted-foreground">{member.memberCode} · {member.phone}</p>
                         </div>
                       </button>
                     ))}
                   </div>
                 ) : null}
                 {memberSearch.trim().length >= 2 && !isSearchingMembers && memberResults.length === 0 && !selectedMember ? (
-                  <div className="rounded-md border border-line bg-surface p-3">
+                  <div className="rounded-md border border-border bg-background p-3">
                     <EmptyState title="No matching members" description="Try a name, member ID, phone, or email." />
                   </div>
                 ) : null}
-                {isSearchingMembers ? <p className="text-xs font-semibold text-ink-faint">Searching members...</p> : null}
+                {isSearchingMembers ? <p className="text-xs font-semibold text-muted-foreground">Searching members...</p> : null}
               </div>
               {lastMemberId ? (
-                <div className="rounded-lg border border-line bg-surface p-3">
+                <div className="rounded-lg border border-border bg-background p-3">
                   <div className="mb-3 flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="text-xs font-black uppercase tracking-[0.14em] text-brand">Current Subscription</p>
-                      <p className="mt-1 truncate text-sm font-bold text-ink">{lastMemberLabel || "Selected member"}</p>
+                      <p className="text-xs font-black uppercase tracking-[0.14em] text-primary">Current Subscription</p>
+                      <p className="mt-1 truncate text-sm font-bold text-foreground">{lastMemberLabel || "Selected member"}</p>
                     </div>
                     {currentSubscription ? <StatusBadge status={currentSubscription.status} /> : <StatusBadge status="EXPIRED" />}
                   </div>
                   {currentSubscription ? (
                     <div className="grid gap-2 text-sm">
                       <div className="flex justify-between gap-3">
-                        <span className="text-ink-faint">Plan</span>
-                        <span className="min-w-0 truncate font-bold text-ink">{currentSubscription.planName}</span>
+                        <span className="text-muted-foreground">Plan</span>
+                        <span className="min-w-0 truncate font-bold text-foreground">{currentSubscription.planName}</span>
                       </div>
                       <div className="flex justify-between gap-3">
-                        <span className="text-ink-faint">Period</span>
-                        <span className="numeric text-right font-semibold text-ink-muted">{currentSubscription.startDate} to {currentSubscription.endDate}</span>
+                        <span className="text-muted-foreground">Period</span>
+                        <span className="numeric text-right font-semibold text-muted-foreground">{currentSubscription.startDate} to {currentSubscription.endDate}</span>
                       </div>
                       <div className="flex justify-between gap-3">
-                        <span className="text-ink-faint">Payment</span>
+                        <span className="text-muted-foreground">Payment</span>
                         <span className="flex items-center gap-2">
                           {currentInvoice ? <StatusBadge status={currentInvoice.status} /> : <span className="text-xs font-bold text-warning">No invoice</span>}
-                          {currentInvoice ? <span className="numeric text-xs font-bold text-ink-muted">{formatCents(currentInvoice.remainingCents)} due</span> : null}
+                          {currentInvoice ? <span className="numeric text-xs font-bold text-muted-foreground">{formatCents(currentInvoice.remainingCents)} due</span> : null}
                         </span>
                       </div>
                     </div>
@@ -392,9 +392,9 @@ export function MembershipsPage() {
                   )}
                 </div>
               ) : null}
-              <label className="grid min-w-0 gap-2 text-sm font-semibold text-ink">
+              <label className="grid min-w-0 gap-2 text-sm font-semibold text-foreground">
                 <span>Plan</span>
-                <select className="h-11 w-full rounded-md border border-line bg-surface/70 px-3 text-sm outline-none transition hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25" {...assignForm.register("planId")}>
+                <select className="h-11 w-full rounded-md border border-border bg-surface/70 px-3 text-sm outline-none transition hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25" {...assignForm.register("planId")}>
                   <option value="">Select plan</option>
                   {plans
                     .filter((plan) => plan.isActive)
@@ -413,25 +413,25 @@ export function MembershipsPage() {
       </div>
 
       {lastMemberId ? (
-        <section className="min-w-0 overflow-hidden rounded-lg border border-line bg-panel shadow-soft">
-          <div className="border-b border-line px-4 py-3">
+        <section className="min-w-0 overflow-hidden rounded-lg border border-border bg-card shadow-sm">
+          <div className="border-b border-border px-4 py-3">
             <h3 className="text-base font-bold">Subscription History</h3>
-            <p className="mt-1 text-sm font-semibold text-ink-faint">{lastMemberLabel}</p>
+            <p className="mt-1 text-sm font-semibold text-muted-foreground">{lastMemberLabel}</p>
           </div>
           <div className="divide-y divide-line overflow-x-auto">
             {subscriptions.length === 0 ? <div className="p-4"><EmptyState title="No subscription history" /></div> : null}
             {subscriptions.map((subscription) => (
               <div key={subscription.id} className="grid min-w-[860px] items-center gap-3 px-4 py-3 text-sm md:grid-cols-[minmax(180px,1fr)_130px_220px_140px_150px_auto]">
-                <span className="font-bold text-ink">{subscription.planName}</span>
+                <span className="font-bold text-foreground">{subscription.planName}</span>
                 <span><StatusBadge status={subscription.status} /></span>
-                <span className="numeric text-ink-muted">
+                <span className="numeric text-muted-foreground">
                   {subscription.startDate} to {subscription.endDate}
                 </span>
-                <span className="numeric font-bold text-ink">{formatCents(subscription.priceAtPurchaseCents)}</span>
+                <span className="numeric font-bold text-foreground">{formatCents(subscription.priceAtPurchaseCents)}</span>
                 <span>{invoiceStatusForSubscription(invoices, subscription.id)}</span>
                 <span className="text-right">
                   {subscription.status === "ACTIVE" || subscription.status === "FROZEN" ? (
-                    <Button variant="secondary" className="h-9 px-3 text-accent" onClick={() => void cancelSubscription(subscription)}>
+                    <Button variant="secondary" className="h-9 px-3 text-destructive" onClick={() => void cancelSubscription(subscription)}>
                       <X className="h-4 w-4" aria-hidden="true" />
                       Cancel
                     </Button>
@@ -455,7 +455,7 @@ function invoiceStatusForSubscription(invoices: InvoiceDto[], subscriptionId: st
   return (
     <span className="inline-flex items-center gap-2">
       <StatusBadge status={invoice.status} />
-      <span className="numeric text-xs font-bold text-ink-muted">{formatCents(invoice.remainingCents)} due</span>
+      <span className="numeric text-xs font-bold text-muted-foreground">{formatCents(invoice.remainingCents)} due</span>
     </span>
   );
 }

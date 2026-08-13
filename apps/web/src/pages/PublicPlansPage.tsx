@@ -31,46 +31,26 @@ export function PublicPlansPage() {
   }, []);
 
   return (
-    <main
-      className="min-h-screen bg-surface text-ink"
+    <div
+      className="animate-fade-in w-full"
       style={{
         background:
-          "linear-gradient(180deg, color-mix(in srgb, var(--color-backdrop) 82%, var(--color-brand-dark)) 0%, color-mix(in srgb, var(--color-backdrop) 68%, var(--color-surface)) 290px, var(--color-surface) 620px)"
+          "linear-gradient(180deg, color-mix(in srgb, hsl(var(--background)) 82%, hsl(var(--primary))) 0%, color-mix(in srgb, hsl(var(--background)) 68%, hsl(var(--background))) 290px, hsl(var(--background)) 620px)"
       }}
     >
-      <header className="border-b border-line bg-backdrop/80 px-4 py-4 shadow-soft backdrop-blur md:px-6">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3">
-          <Link className="flex items-center gap-3 text-ink" to="/">
-            <span className="grid h-10 w-10 place-items-center rounded-md bg-brand text-panel">
-              <Dumbbell className="h-5 w-5" aria-hidden="true" />
-            </span>
-            <span className="text-lg font-black">ValorFitness</span>
-          </Link>
-          <div className="flex items-center gap-2">
-            <Link className="hidden h-10 items-center gap-2 rounded-md border border-line bg-panel/10 px-3 text-sm font-bold text-ink transition hover:border-brand md:inline-flex" to="/">
-              <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-              Home
-            </Link>
-            <Link className="h-10 rounded-md bg-brand px-3 py-2 text-sm font-black text-panel shadow-soft transition hover:-translate-y-0.5 hover:bg-brand-dark" to="/login">
-              Admin Login
-            </Link>
-          </div>
-        </div>
-      </header>
-
       <section className="mx-auto grid max-w-7xl gap-8 px-4 py-12 md:px-6">
-        <div className="grid gap-6 border-b border-line pb-7 lg:grid-cols-[minmax(0,1fr)_390px] lg:items-end">
+        <div className="grid gap-6 border-b border-border pb-7 lg:grid-cols-[minmax(0,1fr)_390px] lg:items-end">
           <div className="animate-slide-up">
-            <p className="inline-flex items-center gap-2 rounded-md border border-brand/35 bg-backdrop/70 px-3 py-2 text-xs font-black uppercase tracking-[0.18em] text-brand-light shadow-soft">
+            <p className="inline-flex items-center gap-2 rounded-md border border-brand/35 bg-backdrop/70 px-3 py-2 text-xs font-black uppercase tracking-[0.18em] text-primary-foreground shadow-sm">
               <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
               Live Plans
             </p>
-            <h1 className="mt-4 text-balance text-4xl font-black text-ink md:text-6xl">Memberships that keep training simple.</h1>
-            <p className="mt-4 max-w-2xl text-sm font-semibold leading-6 text-ink-muted md:text-base">
+            <h1 className="mt-4 text-balance text-4xl font-black text-foreground md:text-6xl">Memberships that keep training simple.</h1>
+            <p className="mt-4 max-w-2xl text-sm font-semibold leading-6 text-muted-foreground md:text-base">
               Plans are pulled directly from the active membership catalog, so the public site stays aligned with the front desk.
             </p>
           </div>
-          <div className="grid gap-3 rounded-lg border border-line bg-panel/80 p-4 shadow-soft">
+          <div className="grid gap-3 rounded-lg border border-border bg-panel/80 p-4 shadow-sm">
             <ProofLine icon={BadgeCheck} text="Active plans only" />
             <ProofLine icon={CalendarDays} text="Durations shown in days" />
             <ProofLine icon={LockKeyhole} text="Purchases stay staff-assisted for now" />
@@ -84,16 +64,16 @@ export function PublicPlansPage() {
             <Card key={`${plan.name}-${plan.durationDays}`} title={plan.name} className="group overflow-hidden hover:-translate-y-1 hover:border-brand">
               <div className="grid gap-4">
                 <div className="flex items-start justify-between gap-3">
-                  <div className="grid h-12 w-12 place-items-center rounded-md bg-brand text-panel shadow-soft transition group-hover:scale-105">
+                  <div className="grid h-12 w-12 place-items-center rounded-md bg-primary text-panel shadow-sm transition group-hover:scale-105">
                     <CreditCard className="h-5 w-5" aria-hidden="true" />
                   </div>
-                  <span className="rounded-md border border-line bg-surface px-2.5 py-1 font-mono text-xs font-black text-ink-muted">
+                  <span className="rounded-md border border-border bg-background px-2.5 py-1 font-mono text-xs font-black text-muted-foreground">
                     {plan.durationDays}D
                   </span>
                 </div>
-                <p className="font-mono text-3xl font-black text-ink">{formatCents(plan.priceCents)}</p>
-                <p className="font-mono text-sm font-bold text-ink-faint">{plan.durationDays} days of access</p>
-                <p className="text-sm leading-6 text-ink-muted">
+                <p className="font-mono text-3xl font-black text-foreground">{formatCents(plan.priceCents)}</p>
+                <p className="font-mono text-sm font-bold text-muted-foreground">{plan.durationDays} days of access</p>
+                <p className="text-sm leading-6 text-muted-foreground">
                   {plan.description ?? "Strength floor access, front-desk membership support, and eligibility tracking through the gym system."}
                 </p>
                 <Button disabled title="Member purchase flow is outside the current frontend phase">Staff-assisted enrollment</Button>
@@ -102,15 +82,15 @@ export function PublicPlansPage() {
           ))}
         </div>
       </section>
-    </main>
+    </div>
   );
 }
 
 function ProofLine({ icon: Icon, text }: { icon: LucideIcon; text: string }) {
   return (
-    <div className="flex items-center gap-3 rounded-md border border-line bg-surface/70 px-3 py-2">
-      <Icon className="h-4 w-4 text-brand" aria-hidden="true" />
-      <span className="text-sm font-bold text-ink">{text}</span>
+    <div className="flex items-center gap-3 rounded-md border border-border bg-surface/70 px-3 py-2">
+      <Icon className="h-4 w-4 text-primary" aria-hidden="true" />
+      <span className="text-sm font-bold text-foreground">{text}</span>
     </div>
   );
 }

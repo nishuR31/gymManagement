@@ -50,10 +50,10 @@ export function ActivityLogsPage() {
 
   return (
     <section className="grid max-w-7xl gap-6 animate-fade-in">
-      <div className="panel-gradient rounded-lg border border-line p-4 shadow-soft">
-        <p className="text-xs font-black uppercase tracking-[0.18em] text-brand">Audit Trail</p>
-        <h2 className="mt-2 text-3xl font-black text-ink">Activity Logs</h2>
-        <p className="mt-1 text-sm text-ink-muted">Audit trail across auth, members, payments, inventory, and settings</p>
+      <div className="bg-card rounded-lg border border-border p-4 shadow-sm">
+        <p className="text-xs font-black uppercase tracking-[0.18em] text-primary">Audit Trail</p>
+        <h2 className="mt-2 text-3xl font-black text-foreground">Activity Logs</h2>
+        <p className="mt-1 text-sm text-muted-foreground">Audit trail across auth, members, payments, inventory, and settings</p>
       </div>
 
       <Card title="Filters">
@@ -74,7 +74,7 @@ export function ActivityLogsPage() {
         {!loading && (logs?.data.length ?? 0) === 0 ? <EmptyState title="No activity found" /> : null}
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="text-xs uppercase text-ink-faint">
+            <thead className="text-xs uppercase text-muted-foreground">
               <tr>
                 <th className="px-3 py-2">Action</th>
                 <th className="px-3 py-2">Entity</th>
@@ -106,22 +106,22 @@ function ActivityRow({ log, expanded, onToggle }: { log: AuditLogDto; expanded: 
       <tr className="transition hover:bg-line-faint/35">
         <td className="px-3 py-3">
           <div className="flex items-center gap-2">
-            <span className="grid h-8 w-8 place-items-center rounded-md bg-line-faint text-brand">
+            <span className="grid h-8 w-8 place-items-center rounded-md bg-line-faint text-primary">
               <ClipboardList className="h-4 w-4" aria-hidden="true" />
             </span>
-            <span className="font-bold text-ink">{log.action}</span>
+            <span className="font-bold text-foreground">{log.action}</span>
           </div>
         </td>
-        <td className="px-3 py-3 text-ink-muted">
+        <td className="px-3 py-3 text-muted-foreground">
           {log.entity ?? "System"}
-          {log.entityId ? <span className="numeric block max-w-48 truncate text-xs text-ink-faint">{log.entityId}</span> : null}
+          {log.entityId ? <span className="numeric block max-w-48 truncate text-xs text-muted-foreground">{log.entityId}</span> : null}
         </td>
-        <td className="numeric px-3 py-3 text-xs text-ink-muted">{log.userId ?? "system"}</td>
-        <td className="px-3 py-3 text-ink-muted">
+        <td className="numeric px-3 py-3 text-xs text-muted-foreground">{log.userId ?? "system"}</td>
+        <td className="px-3 py-3 text-muted-foreground">
           <span title={formatDateTime(log.createdAt)}>{formatRelativeTime(log.createdAt)}</span>
         </td>
         <td className="px-3 py-3 text-right">
-          <button className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-line bg-surface text-ink-muted transition hover:border-brand hover:text-ink focus-visible:focus-ring" onClick={onToggle} aria-label={expanded ? "Hide activity details" : "Show activity details"}>
+          <button className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition hover:border-brand hover:text-foreground focus-visible:focus-ring" onClick={onToggle} aria-label={expanded ? "Hide activity details" : "Show activity details"}>
             <ChevronDown className={`h-4 w-4 transition ${expanded ? "rotate-180" : ""}`} aria-hidden="true" />
           </button>
         </td>
@@ -129,14 +129,14 @@ function ActivityRow({ log, expanded, onToggle }: { log: AuditLogDto; expanded: 
       {expanded ? (
         <tr>
           <td colSpan={5} className="px-3 pb-3">
-            <div className="grid gap-3 rounded-md border border-line bg-surface p-3 text-xs text-ink-muted md:grid-cols-2">
+            <div className="grid gap-3 rounded-md border border-border bg-background p-3 text-xs text-muted-foreground md:grid-cols-2">
               <div>
-                <p className="font-bold uppercase text-ink-faint">Request Context</p>
+                <p className="font-bold uppercase text-muted-foreground">Request Context</p>
                 <p className="numeric mt-2 break-all">IP: {log.ipAddress ?? "none"}</p>
                 <p className="mt-1 break-all">Agent: {log.userAgent ?? "none"}</p>
               </div>
               <div>
-                <p className="font-bold uppercase text-ink-faint">Metadata</p>
+                <p className="font-bold uppercase text-muted-foreground">Metadata</p>
                 <pre className="numeric mt-2 max-h-40 overflow-auto whitespace-pre-wrap break-all rounded bg-line-faint p-2">{JSON.stringify(log.metadata ?? {}, null, 2)}</pre>
               </div>
             </div>
@@ -149,7 +149,7 @@ function ActivityRow({ log, expanded, onToggle }: { log: AuditLogDto; expanded: 
 
 function Pagination({ page, totalPages, onPage }: { page: number; totalPages: number; onPage: (page: number) => void }) {
   return (
-    <div className="mt-4 flex items-center justify-between gap-3 border-t border-line pt-4 text-sm text-ink-muted">
+    <div className="mt-4 flex items-center justify-between gap-3 border-t border-border pt-4 text-sm text-muted-foreground">
       <span>
         Page {page} of {Math.max(1, totalPages)}
       </span>

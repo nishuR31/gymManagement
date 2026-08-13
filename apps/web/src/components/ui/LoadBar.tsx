@@ -10,15 +10,15 @@ export function LoadBar({ value, max, label, maxLabel, tone }: LoadBarProps) {
   const percent = max <= 0 ? 100 : Math.min(100, Math.max(0, (value / max) * 100));
   const resolvedTone = tone ?? (value <= max ? "warning" : "brand");
   const toneClass = {
-    brand: "bg-brand",
+    brand: "bg-primary",
     success: "bg-success",
     warning: "bg-warning",
-    danger: "bg-accent"
+    danger: "bg-destructive"
   }[resolvedTone];
 
   return (
     <div className="grid gap-1">
-      <div className="flex justify-between text-xs font-semibold text-ink-muted">
+      <div className="flex justify-between text-xs font-semibold text-muted-foreground">
         <span>{label ?? `${value}`}</span>
         <span className="font-mono tabular-nums">{maxLabel ?? max}</span>
       </div>

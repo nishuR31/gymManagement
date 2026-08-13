@@ -76,11 +76,11 @@ export function StaffPage() {
 
   return (
     <section className="grid max-w-7xl gap-6 animate-fade-in">
-      <div className="panel-gradient flex flex-wrap items-end justify-between gap-3 rounded-lg border border-line p-4 shadow-soft">
+      <div className="bg-card flex flex-wrap items-end justify-between gap-3 rounded-lg border border-border p-4 shadow-sm">
         <div>
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-brand">People Ops</p>
-          <h2 className="mt-2 text-3xl font-black text-ink">Staff & Trainers</h2>
-          <p className="mt-1 text-sm text-ink-muted">Profiles, attendance, and leave requests</p>
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-primary">People Ops</p>
+          <h2 className="mt-2 text-3xl font-black text-foreground">Staff & Trainers</h2>
+          <p className="mt-1 text-sm text-muted-foreground">Profiles, attendance, and leave requests</p>
         </div>
         {canAdmin ? <Button onClick={() => setProfileOpen(true)}><UserRound className="h-4 w-4" aria-hidden="true" />New Profile</Button> : null}
       </div>
@@ -91,7 +91,7 @@ export function StaffPage() {
           {!loading && profiles.length === 0 ? <EmptyState title="No staff profiles" /> : null}
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
-              <thead className="text-xs uppercase text-ink-faint">
+              <thead className="text-xs uppercase text-muted-foreground">
                 <tr>
                   <th className="px-3 py-2">User</th>
                   <th className="px-3 py-2">Role</th>
@@ -103,7 +103,7 @@ export function StaffPage() {
                 {profiles.map((profile) => (
                   <tr key={profile.id}>
                     <td className="px-3 py-3">
-                      <p className="numeric font-bold text-ink">{profile.userId}</p>
+                      <p className="numeric font-bold text-foreground">{profile.userId}</p>
                       <StatusBadge status={profile.isActive ? "ACTIVE" : "CANCELLED"} />
                     </td>
                     <td className="px-3 py-3"><StatusBadge status={profile.role} /></td>
@@ -122,11 +122,11 @@ export function StaffPage() {
           {selected ? (
             <div className="grid gap-4">
               <div>
-                <div className="mb-3 grid h-12 w-12 place-items-center rounded-full bg-line-faint text-brand">
+                <div className="mb-3 grid h-12 w-12 place-items-center rounded-full bg-line-faint text-primary">
                   <ShieldCheck className="h-5 w-5" aria-hidden="true" />
                 </div>
                 <StatusBadge status={selected.role} />
-                <p className="numeric mt-2 break-all text-base font-bold text-ink">{selected.userId}</p>
+                <p className="numeric mt-2 break-all text-base font-bold text-foreground">{selected.userId}</p>
               </div>
               <div className="flex flex-wrap gap-2">
                 {(canAdmin || selected.id === ownProfile?.id) ? (
@@ -137,8 +137,8 @@ export function StaffPage() {
                   </>
                 ) : null}
               </div>
-              <div className="rounded-md border border-dashed border-line bg-surface p-4 text-sm text-ink-faint">
-                <CalendarClock className="mb-3 h-5 w-5 text-brand" aria-hidden="true" />
+              <div className="rounded-md border border-dashed border-border bg-background p-4 text-sm text-muted-foreground">
+                <CalendarClock className="mb-3 h-5 w-5 text-primary" aria-hidden="true" />
                 Attendance history endpoint is not available yet; current backend exposes check-in/check-out only.
               </div>
             </div>
@@ -152,13 +152,13 @@ export function StaffPage() {
         {leaveRequests.length === 0 ? <EmptyState title="No leave requests" /> : null}
         <div className="grid gap-2">
           {leaveRequests.map((request) => (
-            <div key={request.id} className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-line bg-surface p-3 text-sm">
+            <div key={request.id} className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-border bg-background p-3 text-sm">
               <div>
-                <p className="font-bold text-ink">{request.reason}</p>
-                <p className="text-xs text-ink-faint">
+                <p className="font-bold text-foreground">{request.reason}</p>
+                <p className="text-xs text-muted-foreground">
                   {request.startDate.slice(0, 10)} to {request.endDate.slice(0, 10)} · <span className="numeric">{request.staffProfileId}</span>
                 </p>
-                {request.reviewedAt ? <p className="text-xs text-ink-faint">Reviewed {formatDateTime(request.reviewedAt)}</p> : null}
+                {request.reviewedAt ? <p className="text-xs text-muted-foreground">Reviewed {formatDateTime(request.reviewedAt)}</p> : null}
               </div>
               <div className="flex items-center gap-2">
                 <StatusBadge status={request.status} />
@@ -200,9 +200,9 @@ function ProfileModal({ open, onClose, onSaved }: { open: boolean; onClose: () =
     <Modal title="New Staff Profile" open={open} onClose={onClose}>
       <div className="grid gap-3">
         <Input label="User ID" value={userId} onChange={(event) => setUserId(event.target.value)} />
-        <label className="grid gap-2 text-sm font-medium text-ink">
+        <label className="grid gap-2 text-sm font-medium text-foreground">
           <span>Profile role</span>
-          <select className="h-11 rounded-md border border-line bg-surface/70 px-3 outline-none transition hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25" value={role} onChange={(event) => setRole(event.target.value as StaffProfileRole)}>
+          <select className="h-11 rounded-md border border-border bg-surface/70 px-3 outline-none transition hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25" value={role} onChange={(event) => setRole(event.target.value as StaffProfileRole)}>
             {staffProfileRoles.map((item) => <option key={item} value={item}>{item}</option>)}
           </select>
         </label>

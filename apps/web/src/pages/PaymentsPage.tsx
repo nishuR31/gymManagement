@@ -138,17 +138,17 @@ export function PaymentsPage() {
 
   return (
     <section className="grid max-w-7xl min-w-0 gap-6 animate-fade-in">
-      <div className="panel-gradient grid gap-4 rounded-lg border border-line p-4 shadow-soft lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+      <div className="bg-card grid gap-4 rounded-lg border border-border p-4 shadow-sm lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
         <div className="min-w-0">
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-brand">Revenue Desk</p>
-          <h2 className="mt-2 text-3xl font-black text-ink">Payments</h2>
-          <p className="mt-1 text-sm font-semibold text-ink-muted">Invoices, refunds, and revenue analytics</p>
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-primary">Revenue Desk</p>
+          <h2 className="mt-2 text-3xl font-black text-foreground">Payments</h2>
+          <p className="mt-1 text-sm font-semibold text-muted-foreground">Invoices, refunds, and revenue analytics</p>
         </div>
-        <div className="flex max-w-full overflow-x-auto rounded-md border border-line bg-surface p-1">
+        <div className="flex max-w-full overflow-x-auto rounded-md border border-border bg-background p-1">
           {paymentAnalyticsRanges.map((item) => (
             <button
               key={item}
-              className={`h-9 shrink-0 rounded px-3 text-sm font-bold capitalize ${range === item ? "bg-brand text-panel" : "text-ink-muted hover:text-ink"}`}
+              className={`h-9 shrink-0 rounded px-3 text-sm font-bold capitalize ${range === item ? "bg-primary text-panel" : "text-muted-foreground hover:text-foreground"}`}
               onClick={() => setRange(item)}
             >
               {item}
@@ -161,19 +161,19 @@ export function PaymentsPage() {
         <Card title="Revenue">
           {isAdminRole(role) ? (
             <>
-              <p className="numeric text-4xl font-black text-brand-light">{formatCents(total)}</p>
+              <p className="numeric text-4xl font-black text-primary-foreground">{formatCents(total)}</p>
               <div className="mt-4 h-72">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={analytics?.buckets ?? []}>
-                    <CartesianGrid stroke="var(--color-line)" strokeOpacity={0.45} strokeDasharray="3 3" />
-                    <XAxis dataKey="label" tick={{ fontSize: 11, fill: "var(--color-ink-muted)" }} axisLine={{ stroke: "var(--color-line)" }} tickLine={{ stroke: "var(--color-line)" }} />
-                    <YAxis tick={{ fontSize: 11, fill: "var(--color-ink-muted)" }} axisLine={{ stroke: "var(--color-line)" }} tickLine={{ stroke: "var(--color-line)" }} tickFormatter={(value) => formatCents(Number(value)).replace(".00", "")} width={72} />
+                    <CartesianGrid stroke="hsl(var(--border))" strokeOpacity={0.45} strokeDasharray="3 3" />
+                    <XAxis dataKey="label" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={{ stroke: "hsl(var(--border))" }} tickLine={{ stroke: "hsl(var(--border))" }} />
+                    <YAxis tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={{ stroke: "hsl(var(--border))" }} tickLine={{ stroke: "hsl(var(--border))" }} tickFormatter={(value) => formatCents(Number(value)).replace(".00", "")} width={72} />
                     <Tooltip
-                      cursor={{ fill: "color-mix(in srgb, var(--color-brand) 8%, transparent)" }}
-                      contentStyle={{ background: "var(--color-surface)", border: "1px solid var(--color-line)", borderRadius: "8px", color: "var(--color-ink)" }}
+                      cursor={{ fill: "color-mix(in srgb, hsl(var(--primary)) 8%, transparent)" }}
+                      contentStyle={{ background: "hsl(var(--background))", border: "1px solid hsl(var(--border))", borderRadius: "8px", color: "hsl(var(--foreground))" }}
                       formatter={(value) => formatCents(Number(value))}
                     />
-                    <Bar dataKey="revenueCents" fill="var(--color-brand)" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="revenueCents" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -195,10 +195,10 @@ export function PaymentsPage() {
                   setSelectedMember(null);
                 }}
               />
-              <Search className="pointer-events-none absolute right-3 top-10 h-4 w-4 text-ink-faint" aria-hidden="true" />
+              <Search className="pointer-events-none absolute right-3 top-10 h-4 w-4 text-muted-foreground" aria-hidden="true" />
               {(memberResults.length > 0 || isSearchingMembers) && (
-                <div className="absolute z-20 mt-2 max-h-72 w-full overflow-auto rounded-md border border-line bg-panel p-2 shadow-soft">
-                  {isSearchingMembers ? <p className="px-3 py-2 text-sm font-semibold text-ink-muted">Searching...</p> : null}
+                <div className="absolute z-20 mt-2 max-h-72 w-full overflow-auto rounded-md border border-border bg-card p-2 shadow-sm">
+                  {isSearchingMembers ? <p className="px-3 py-2 text-sm font-semibold text-muted-foreground">Searching...</p> : null}
                   {memberResults.map((member) => (
                     <button
                       key={member.id}
@@ -206,12 +206,12 @@ export function PaymentsPage() {
                       className="flex w-full min-w-0 items-center gap-3 rounded-md px-3 py-2 text-left transition hover:bg-surface-hover focus-visible:focus-ring"
                       onClick={() => selectMember(member)}
                     >
-                      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-surface-hover text-brand-light">
+                      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-surface-hover text-primary-foreground">
                         <UserRound className="h-4 w-4" aria-hidden="true" />
                       </span>
                       <span className="min-w-0">
-                        <span className="block truncate text-sm font-bold text-ink">{member.firstName} {member.lastName}</span>
-                        <span className="numeric block truncate text-xs font-semibold text-ink-faint">{member.memberCode} · {member.phone}</span>
+                        <span className="block truncate text-sm font-bold text-foreground">{member.firstName} {member.lastName}</span>
+                        <span className="numeric block truncate text-xs font-semibold text-muted-foreground">{member.memberCode} · {member.phone}</span>
                       </span>
                     </button>
                   ))}
@@ -221,17 +221,17 @@ export function PaymentsPage() {
 
             {selectedMember ? (
               <div className="rounded-md border border-brand/40 bg-brand/10 p-3">
-                <p className="text-xs font-black uppercase tracking-[0.16em] text-brand-light">Selected member</p>
-                <p className="mt-1 font-bold text-ink">{selectedMember.firstName} {selectedMember.lastName}</p>
-                <p className="numeric text-xs font-semibold text-ink-muted">{selectedMember.memberCode}</p>
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-primary-foreground">Selected member</p>
+                <p className="mt-1 font-bold text-foreground">{selectedMember.firstName} {selectedMember.lastName}</p>
+                <p className="numeric text-xs font-semibold text-muted-foreground">{selectedMember.memberCode}</p>
               </div>
             ) : (
-              <div className="rounded-md border border-line bg-surface/70 p-3 text-sm font-semibold text-ink-muted">
+              <div className="rounded-md border border-border bg-surface/70 p-3 text-sm font-semibold text-muted-foreground">
                 Search and select a member to load pending dues and payment history.
               </div>
             )}
 
-            <div className="grid gap-3 border-t border-line pt-4">
+            <div className="grid gap-3 border-t border-border pt-4">
               <Input label="Invoice ID lookup" placeholder="Optional direct invoice ID" value={invoiceId} onChange={(event) => setInvoiceId(event.target.value)} />
               <Button variant="secondary" onClick={() => void loadInvoice()}>
                 Load Invoice
@@ -246,7 +246,7 @@ export function PaymentsPage() {
           title="Pending Dues"
           action={
             selectedMember ? (
-              <span className="numeric text-sm font-black text-brand-light">{formatCents(totalPendingCents)}</span>
+              <span className="numeric text-sm font-black text-primary-foreground">{formatCents(totalPendingCents)}</span>
             ) : null
           }
         >
@@ -328,10 +328,10 @@ function InvoicePanel({ invoice, canRefund, onRefund }: { invoice: InvoiceDto; c
 
   return (
       <div className="grid min-w-0 gap-4">
-      <div className="rounded-md border border-line bg-surface/80 p-3">
+      <div className="rounded-md border border-border bg-surface/80 p-3">
         <div className="mb-2 flex items-center justify-between gap-3">
           <StatusBadge status={invoice.status} />
-          <span className="numeric text-xs font-bold text-ink-muted">{formatCents(invoice.amountPaidCents)} / {formatCents(invoice.amountDueCents)}</span>
+          <span className="numeric text-xs font-bold text-muted-foreground">{formatCents(invoice.amountPaidCents)} / {formatCents(invoice.amountDueCents)}</span>
         </div>
         <LoadBar value={progress} max={Math.max(1, invoice.amountDueCents)} label="Payment progress" maxLabel={formatCents(invoice.amountDueCents)} tone={tone} />
       </div>
@@ -340,7 +340,7 @@ function InvoicePanel({ invoice, canRefund, onRefund }: { invoice: InvoiceDto; c
         <Metric label="Paid" value={formatCents(invoice.amountPaidCents)} />
         <Metric label="Remaining" value={formatCents(invoice.remainingCents)} />
         <div>
-          <p className="text-xs font-semibold uppercase text-ink-faint">Status</p>
+          <p className="text-xs font-semibold uppercase text-muted-foreground">Status</p>
           <div className="mt-1"><StatusBadge status={invoice.status} /></div>
         </div>
       </div>
@@ -357,24 +357,24 @@ function PendingInvoiceCard({ invoice, onView, onPay }: { invoice: InvoiceDto; o
   const progress = invoice.amountDueCents <= 0 ? 100 : Math.min(invoice.amountDueCents, invoice.amountPaidCents);
 
   return (
-    <div className="rounded-md border border-line bg-surface/85 p-4 shadow-soft transition hover:-translate-y-0.5 hover:border-brand/70">
+    <div className="rounded-md border border-border bg-surface/85 p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-brand/70">
       <div className="flex min-w-0 items-start justify-between gap-3">
         <div className="flex min-w-0 gap-3">
-          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-md bg-brand/15 text-brand-light">
+          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-md bg-brand/15 text-primary-foreground">
             <Receipt className="h-5 w-5" aria-hidden="true" />
           </span>
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
               <StatusBadge status={invoice.status} />
-              <span className="numeric truncate text-xs font-bold text-ink-faint">{invoice.id.slice(0, 8)}</span>
+              <span className="numeric truncate text-xs font-bold text-muted-foreground">{invoice.id.slice(0, 8)}</span>
             </div>
-            <p className="mt-2 text-xs font-semibold uppercase text-ink-faint">Remaining due</p>
-            <p className="numeric text-2xl font-black text-brand-light">{formatCents(invoice.remainingCents)}</p>
+            <p className="mt-2 text-xs font-semibold uppercase text-muted-foreground">Remaining due</p>
+            <p className="numeric text-2xl font-black text-primary-foreground">{formatCents(invoice.remainingCents)}</p>
           </div>
         </div>
         <div className="text-right">
-          <p className="text-xs font-semibold uppercase text-ink-faint">Due date</p>
-          <p className="numeric text-sm font-bold text-ink-muted">{new Date(invoice.dueDate).toLocaleDateString()}</p>
+          <p className="text-xs font-semibold uppercase text-muted-foreground">Due date</p>
+          <p className="numeric text-sm font-bold text-muted-foreground">{new Date(invoice.dueDate).toLocaleDateString()}</p>
         </div>
       </div>
       <div className="mt-4">
@@ -396,11 +396,11 @@ function PendingInvoiceCard({ invoice, onView, onPay }: { invoice: InvoiceDto; o
 
 function PaymentRow({ payment, canRefund, onRefund }: { payment: PaymentDto; canRefund: boolean; onRefund: () => void }) {
   return (
-    <div className="min-w-0 rounded-md border border-line bg-surface p-3 transition hover:border-brand">
+    <div className="min-w-0 rounded-md border border-border bg-background p-3 transition hover:border-brand">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="min-w-0">
-          <p className="numeric font-bold text-ink">{formatCents(payment.amountCents)}</p>
-          <p className="truncate text-xs font-semibold text-ink-faint">{payment.method} · {formatDateTime(payment.paidAt)}</p>
+          <p className="numeric font-bold text-foreground">{formatCents(payment.amountCents)}</p>
+          <p className="truncate text-xs font-semibold text-muted-foreground">{payment.method} · {formatDateTime(payment.paidAt)}</p>
         </div>
         {canRefund && payment.refundableCents > 0 ? (
           <Button variant="secondary" className="h-9 px-3" onClick={onRefund}>
@@ -409,7 +409,7 @@ function PaymentRow({ payment, canRefund, onRefund }: { payment: PaymentDto; can
         ) : null}
       </div>
       {payment.refunds.length > 0 ? (
-        <div className="mt-3 grid gap-2 text-xs text-ink-muted">
+        <div className="mt-3 grid gap-2 text-xs text-muted-foreground">
           {payment.refunds.map((refund) => (
             <div key={refund.id} className="flex justify-between gap-2">
               <span>{refund.reason}</span>
@@ -455,10 +455,10 @@ function RecordPaymentModal({ invoice, open, onClose, onSaved }: { invoice: Invo
     <Modal title="Record Payment" open={open && !!invoice} onClose={onClose}>
       <div className="grid gap-3">
         {invoice ? (
-          <div className="rounded-md border border-line bg-surface p-3">
-            <p className="text-xs font-semibold uppercase text-ink-faint">Remaining balance</p>
-            <p className="numeric mt-1 text-3xl font-black text-brand-light">{formatCents(invoice.remainingCents)}</p>
-            <p className={`numeric mt-2 text-sm font-bold ${exceedsRemaining ? "text-accent" : "text-ink-muted"}`}>
+          <div className="rounded-md border border-border bg-background p-3">
+            <p className="text-xs font-semibold uppercase text-muted-foreground">Remaining balance</p>
+            <p className="numeric mt-1 text-3xl font-black text-primary-foreground">{formatCents(invoice.remainingCents)}</p>
+            <p className={`numeric mt-2 text-sm font-bold ${exceedsRemaining ? "text-destructive" : "text-muted-foreground"}`}>
               After this payment: {formatCents(Math.max(0, remainingAfterPayment))}
             </p>
             {clearsBalance ? (
@@ -470,9 +470,9 @@ function RecordPaymentModal({ invoice, open, onClose, onSaved }: { invoice: Invo
           </div>
         ) : null}
         <Input label="Amount" type="number" step="0.01" value={amount} onChange={(event) => setAmount(event.target.value)} />
-        <label className="grid min-w-0 gap-2 text-sm font-semibold text-ink">
+        <label className="grid min-w-0 gap-2 text-sm font-semibold text-foreground">
           <span>Method</span>
-          <select className="h-11 w-full rounded-md border border-line bg-surface/70 px-3 outline-none transition hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25" value={method} onChange={(event) => setMethod(event.target.value as PaymentMethod)}>
+          <select className="h-11 w-full rounded-md border border-border bg-surface/70 px-3 outline-none transition hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25" value={method} onChange={(event) => setMethod(event.target.value as PaymentMethod)}>
             {paymentMethods.map((item) => <option key={item} value={item}>{item}</option>)}
           </select>
         </label>
@@ -507,9 +507,9 @@ function RefundModal({ payment, onClose, onSaved }: { payment: PaymentDto | null
   return (
     <Modal title="Refund Payment" open={!!payment} onClose={onClose}>
       <div className="grid gap-3">
-        <div className="rounded-md border border-line bg-surface p-3">
-          <p className="text-xs font-semibold uppercase text-ink-faint">Refundable</p>
-          <p className="numeric mt-1 text-2xl font-black text-brand-light">{formatCents(payment?.refundableCents ?? 0)}</p>
+        <div className="rounded-md border border-border bg-background p-3">
+          <p className="text-xs font-semibold uppercase text-muted-foreground">Refundable</p>
+          <p className="numeric mt-1 text-2xl font-black text-primary-foreground">{formatCents(payment?.refundableCents ?? 0)}</p>
         </div>
         <Input label="Amount" type="number" step="0.01" max={payment ? payment.refundableCents / 100 : undefined} value={amount} onChange={(event) => setAmount(event.target.value)} />
         <Input label="Reason" value={reason} onChange={(event) => setReason(event.target.value)} />
@@ -524,8 +524,8 @@ function RefundModal({ payment, onClose, onSaved }: { payment: PaymentDto | null
 function Metric({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-xs font-semibold uppercase text-ink-faint">{label}</p>
-      <p className="numeric mt-1 font-bold text-ink">{value}</p>
+      <p className="text-xs font-semibold uppercase text-muted-foreground">{label}</p>
+      <p className="numeric mt-1 font-bold text-foreground">{value}</p>
     </div>
   );
 }

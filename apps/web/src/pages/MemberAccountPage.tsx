@@ -59,24 +59,24 @@ export function MemberAccountPage({ mode }: { mode: MemberAccountMode }) {
   const membershipStatus = useMemo(() => membershipState(activeSubscription), [activeSubscription]);
 
   if (loading) {
-    return <div className="rounded-lg border border-line bg-panel p-6 text-sm font-bold text-ink-muted shadow-soft">Loading account</div>;
+    return <div className="rounded-lg border border-border bg-card p-6 text-sm font-bold text-muted-foreground shadow-sm">Loading account</div>;
   }
 
   return (
     <section className="grid max-w-7xl gap-6 animate-fade-in">
-      <div className="panel-gradient rounded-lg border border-line p-4 shadow-soft">
-        <p className="text-xs font-black uppercase tracking-[0.18em] text-brand">{mode === "membership" ? "My Membership" : mode === "payments" ? "My Payments" : mode === "plans" ? "My Plans" : "My Profile"}</p>
-        <h2 className="mt-2 text-3xl font-black text-ink">{member ? `${member.firstName} ${member.lastName}` : "Member Account"}</h2>
-        <p className="numeric mt-1 text-sm font-black text-brand">{member?.memberCode}</p>
+      <div className="bg-card rounded-lg border border-border p-4 shadow-sm">
+        <p className="text-xs font-black uppercase tracking-[0.18em] text-primary">{mode === "membership" ? "My Membership" : mode === "payments" ? "My Payments" : mode === "plans" ? "My Plans" : "My Profile"}</p>
+        <h2 className="mt-2 text-3xl font-black text-foreground">{member ? `${member.firstName} ${member.lastName}` : "Member Account"}</h2>
+        <p className="numeric mt-1 text-sm font-black text-primary">{member?.memberCode}</p>
       </div>
 
       {mode === "membership" ? (
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
-          <section className="surface-gradient rounded-lg border border-line p-4 shadow-soft">
+          <section className="bg-card rounded-lg border border-border p-4 shadow-sm">
             <div className="mb-4 flex items-center justify-between gap-3">
               <div>
-                <h3 className="text-xl font-black text-ink">Current Membership</h3>
-                <p className="mt-1 text-sm font-semibold text-ink-muted">Plan dates and renewal state</p>
+                <h3 className="text-xl font-black text-foreground">Current Membership</h3>
+                <p className="mt-1 text-sm font-semibold text-muted-foreground">Plan dates and renewal state</p>
               </div>
               <StatusBadge status={membershipStatus.status} />
             </div>
@@ -93,14 +93,14 @@ export function MemberAccountPage({ mode }: { mode: MemberAccountMode }) {
               <EmptyState icon={WalletCards} title="No active membership" description="Contact the front desk to activate a plan." />
             )}
           </section>
-          <section className="surface-gradient rounded-lg border border-line p-4 shadow-soft">
-            <h3 className="text-xl font-black text-ink">Recent Orders</h3>
+          <section className="bg-card rounded-lg border border-border p-4 shadow-sm">
+            <h3 className="text-xl font-black text-foreground">Recent Orders</h3>
             <div className="mt-4 grid gap-2">
               {orders.length === 0 ? <EmptyState icon={CalendarClock} title="No orders yet" /> : null}
               {orders.slice(0, 4).map((order) => (
-                <div key={order.id} className="rounded-md border border-line bg-surface p-3">
-                  <p className="font-bold text-ink">{order.productName}</p>
-                  <p className="numeric mt-1 text-xs text-ink-faint">{order.orderCode} · {formatCents(order.amountCents)}</p>
+                <div key={order.id} className="rounded-md border border-border bg-background p-3">
+                  <p className="font-bold text-foreground">{order.productName}</p>
+                  <p className="numeric mt-1 text-xs text-muted-foreground">{order.orderCode} · {formatCents(order.amountCents)}</p>
                 </div>
               ))}
             </div>
@@ -109,14 +109,14 @@ export function MemberAccountPage({ mode }: { mode: MemberAccountMode }) {
       ) : null}
 
       {mode === "payments" ? (
-        <section className="rounded-lg border border-line bg-panel shadow-soft">
-          <div className="border-b border-line p-4">
-            <h3 className="text-xl font-black text-ink">Payment History</h3>
+        <section className="rounded-lg border border-border bg-card shadow-sm">
+          <div className="border-b border-border p-4">
+            <h3 className="text-xl font-black text-foreground">Payment History</h3>
           </div>
           {payments.length === 0 ? <div className="p-4"><EmptyState icon={CreditCard} title="No payments recorded" description="Offline payments recorded by admin will appear here." /></div> : null}
           <div className="overflow-x-auto">
             <table className="min-w-[760px] w-full text-left text-sm">
-              <thead className="bg-surface text-xs uppercase text-ink-faint">
+              <thead className="bg-background text-xs uppercase text-muted-foreground">
                 <tr>
                   <th className="px-4 py-3">Payment</th>
                   <th className="px-4 py-3">Date</th>
@@ -128,10 +128,10 @@ export function MemberAccountPage({ mode }: { mode: MemberAccountMode }) {
               <tbody className="divide-y divide-line">
                 {payments.map((payment) => (
                   <tr key={payment.id}>
-                    <td className="numeric px-4 py-3 font-black text-brand">{payment.id.slice(0, 8)}</td>
-                    <td className="px-4 py-3 text-ink-muted">{formatDateTime(payment.paidAt)}</td>
-                    <td className="numeric px-4 py-3 text-ink">{formatCents(payment.amountCents)}</td>
-                    <td className="px-4 py-3 text-ink-muted">{payment.method}</td>
+                    <td className="numeric px-4 py-3 font-black text-primary">{payment.id.slice(0, 8)}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{formatDateTime(payment.paidAt)}</td>
+                    <td className="numeric px-4 py-3 text-foreground">{formatCents(payment.amountCents)}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{payment.method}</td>
                     <td className="px-4 py-3"><StatusBadge status="PAID" /></td>
                   </tr>
                 ))}
@@ -143,14 +143,14 @@ export function MemberAccountPage({ mode }: { mode: MemberAccountMode }) {
 
       {mode === "plans" ? (
         <div className="grid gap-4 lg:grid-cols-2">
-          <section className="surface-gradient rounded-lg border border-line p-4 shadow-soft">
-            <h3 className="flex items-center gap-2 text-xl font-black text-ink"><Dumbbell className="h-5 w-5 text-brand" aria-hidden="true" />Workout Plans</h3>
+          <section className="bg-card rounded-lg border border-border p-4 shadow-sm">
+            <h3 className="flex items-center gap-2 text-xl font-black text-foreground"><Dumbbell className="h-5 w-5 text-primary" aria-hidden="true" />Workout Plans</h3>
             <div className="mt-4 grid gap-3">
               {workouts.length === 0 ? <EmptyState icon={Dumbbell} title="No workout plans assigned" description="Assigned workout plans will appear here." /> : null}
               {workouts.map((plan) => (
-                <div key={plan.id} className="rounded-md border border-line bg-surface p-3">
-                  <p className="font-bold text-ink">Starts {formatDateTime(plan.startDate)}</p>
-                  <div className="mt-3 grid gap-2 text-sm text-ink-muted">
+                <div key={plan.id} className="rounded-md border border-border bg-background p-3">
+                  <p className="font-bold text-foreground">Starts {formatDateTime(plan.startDate)}</p>
+                  <div className="mt-3 grid gap-2 text-sm text-muted-foreground">
                     {plan.exercises.map((exercise, index) => (
                       <div key={`${plan.id}-${index}`} className="flex justify-between gap-3">
                         <span>{exercise.name}</span>
@@ -162,14 +162,14 @@ export function MemberAccountPage({ mode }: { mode: MemberAccountMode }) {
               ))}
             </div>
           </section>
-          <section className="surface-gradient rounded-lg border border-line p-4 shadow-soft">
-            <h3 className="flex items-center gap-2 text-xl font-black text-ink"><Beef className="h-5 w-5 text-brand" aria-hidden="true" />Diet Plans</h3>
+          <section className="bg-card rounded-lg border border-border p-4 shadow-sm">
+            <h3 className="flex items-center gap-2 text-xl font-black text-foreground"><Beef className="h-5 w-5 text-primary" aria-hidden="true" />Diet Plans</h3>
             <div className="mt-4 grid gap-3">
               {diets.length === 0 ? <EmptyState icon={Beef} title="No diet plans assigned" description="Assigned diet plans will appear here." /> : null}
               {diets.map((plan) => (
-                <div key={plan.id} className="rounded-md border border-line bg-surface p-3">
-                  <p className="font-bold text-ink">Starts {formatDateTime(plan.startDate)}</p>
-                  <div className="mt-3 grid gap-2 text-sm text-ink-muted">
+                <div key={plan.id} className="rounded-md border border-border bg-background p-3">
+                  <p className="font-bold text-foreground">Starts {formatDateTime(plan.startDate)}</p>
+                  <div className="mt-3 grid gap-2 text-sm text-muted-foreground">
                     {plan.meals.map((meal, index) => (
                       <div key={`${plan.id}-${index}`} className="flex justify-between gap-3">
                         <span>{meal.name}</span>
@@ -186,8 +186,8 @@ export function MemberAccountPage({ mode }: { mode: MemberAccountMode }) {
 
       {mode === "profile" ? (
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_380px]">
-          <section className="surface-gradient rounded-lg border border-line p-4 shadow-soft">
-            <div className="mb-4 grid h-14 w-14 place-items-center rounded-full bg-line-faint text-brand">
+          <section className="bg-card rounded-lg border border-border p-4 shadow-sm">
+            <div className="mb-4 grid h-14 w-14 place-items-center rounded-full bg-line-faint text-primary">
               <UserRound className="h-6 w-6" aria-hidden="true" />
             </div>
             <div className="grid gap-4 md:grid-cols-2">
@@ -210,24 +210,24 @@ function GymInfoCard({ info }: { info: GymInfoDto | null }) {
   const hours = Object.entries(info?.businessHours ?? {});
 
   return (
-    <section className="surface-gradient rounded-lg border border-line p-4 shadow-soft">
-      <p className="text-xs font-black uppercase tracking-[0.18em] text-brand">Gym Info</p>
-      <h3 className="mt-2 text-xl font-black text-ink">{info?.name ?? "ValorFitness"}</h3>
+    <section className="bg-card rounded-lg border border-border p-4 shadow-sm">
+      <p className="text-xs font-black uppercase tracking-[0.18em] text-primary">Gym Info</p>
+      <h3 className="mt-2 text-xl font-black text-foreground">{info?.name ?? "ValorFitness"}</h3>
       <div className="mt-4 grid gap-3 text-sm">
         <InfoLine icon={MapPin} value={info?.address || "Address not set"} />
         <InfoLine icon={Phone} value={[info?.phone, info?.email].filter(Boolean).join(" · ") || "Contact not set"} />
       </div>
-      <div className="mt-4 rounded-md border border-line bg-surface p-3">
-        <p className="mb-2 flex items-center gap-2 text-sm font-bold text-ink">
-          <Clock3 className="h-4 w-4 text-brand" aria-hidden="true" />
+      <div className="mt-4 rounded-md border border-border bg-background p-3">
+        <p className="mb-2 flex items-center gap-2 text-sm font-bold text-foreground">
+          <Clock3 className="h-4 w-4 text-primary" aria-hidden="true" />
           Timings
         </p>
-        <div className="grid gap-1 text-xs font-semibold text-ink-muted">
+        <div className="grid gap-1 text-xs font-semibold text-muted-foreground">
           {hours.length === 0 ? <p>Hours not set</p> : null}
           {hours.map(([day, value]) => (
             <div key={day} className="flex justify-between gap-3">
               <span className="capitalize">{day}</span>
-              <span className="numeric text-ink">{value}</span>
+              <span className="numeric text-foreground">{value}</span>
             </div>
           ))}
         </div>
@@ -238,9 +238,9 @@ function GymInfoCard({ info }: { info: GymInfoDto | null }) {
 
 function InfoLine({ icon: Icon, value }: { icon: typeof MapPin; value: string }) {
   return (
-    <div className="flex gap-2 rounded-md border border-line bg-surface p-3">
-      <Icon className="mt-0.5 h-4 w-4 shrink-0 text-brand" aria-hidden="true" />
-      <span className="font-semibold leading-5 text-ink-muted">{value}</span>
+    <div className="flex gap-2 rounded-md border border-border bg-background p-3">
+      <Icon className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+      <span className="font-semibold leading-5 text-muted-foreground">{value}</span>
     </div>
   );
 }
@@ -248,8 +248,8 @@ function InfoLine({ icon: Icon, value }: { icon: typeof MapPin; value: string })
 function Detail({ label, value, numeric = false }: { label: string; value: string; numeric?: boolean }) {
   return (
     <div>
-      <p className="text-xs font-semibold uppercase text-ink-faint">{label}</p>
-      <p className={`mt-1 font-bold text-ink ${numeric ? "numeric" : ""}`}>{value}</p>
+      <p className="text-xs font-semibold uppercase text-muted-foreground">{label}</p>
+      <p className={`mt-1 font-bold text-foreground ${numeric ? "numeric" : ""}`}>{value}</p>
     </div>
   );
 }

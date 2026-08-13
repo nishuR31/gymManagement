@@ -64,14 +64,14 @@ export function InquiriesPage() {
 
   return (
     <section className="grid max-w-7xl gap-6">
-      <div className="flex flex-wrap items-end justify-between gap-3 border-b border-line pb-5">
+      <div className="flex flex-wrap items-end justify-between gap-3 border-b border-border pb-5">
         <div>
-          <h2 className="text-2xl font-bold text-ink">Inquiries</h2>
-          <p className="mt-1 text-sm text-ink-muted">Public contact form submissions from ValorFitness visitors</p>
+          <h2 className="text-2xl font-bold text-foreground">Inquiries</h2>
+          <p className="mt-1 text-sm text-muted-foreground">Public contact form submissions from ValorFitness visitors</p>
         </div>
-        <label className="grid gap-2 text-sm font-medium text-ink">
+        <label className="grid gap-2 text-sm font-medium text-foreground">
           <span>Status</span>
-          <select className="h-11 rounded-md border border-line bg-panel px-3" value={status} onChange={(event) => setStatus(event.target.value as InquiryStatus | "")}>
+          <select className="h-11 rounded-md border border-border bg-card px-3" value={status} onChange={(event) => setStatus(event.target.value as InquiryStatus | "")}>
             <option value="">All</option>
             {inquiryStatuses.map((item) => <option key={item} value={item}>{item}</option>)}
           </select>
@@ -83,16 +83,16 @@ export function InquiriesPage() {
         {!loading && (inquiries?.data.length ?? 0) === 0 ? <EmptyState title="No inquiries found" /> : null}
         <div className="grid gap-3">
           {inquiries?.data.map((inquiry) => (
-            <div key={inquiry.id} className="rounded-md border border-line bg-surface p-3">
+            <div key={inquiry.id} className="rounded-md border border-border bg-background p-3">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="mb-2 flex flex-wrap items-center gap-2">
-                    <p className="font-bold text-ink">{inquiry.name}</p>
+                    <p className="font-bold text-foreground">{inquiry.name}</p>
                     <StatusBadge status={inquiry.status} />
                   </div>
-                  <p className="font-mono text-xs font-semibold text-ink-faint">{inquiry.email} · {inquiry.phone}</p>
-                  <p className="mt-3 text-sm leading-6 text-ink-muted">{inquiry.message}</p>
-                  <p className="mt-2 text-xs font-semibold text-ink-faint">{formatDateTime(inquiry.createdAt)}</p>
+                  <p className="font-mono text-xs font-semibold text-muted-foreground">{inquiry.email} · {inquiry.phone}</p>
+                  <p className="mt-3 text-sm leading-6 text-muted-foreground">{inquiry.message}</p>
+                  <p className="mt-2 text-xs font-semibold text-muted-foreground">{formatDateTime(inquiry.createdAt)}</p>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {inquiry.status === "NEW" ? (
@@ -100,7 +100,7 @@ export function InquiriesPage() {
                       Mark Read
                     </Button>
                   ) : null}
-                  <Button variant="secondary" className="h-9 px-3 text-accent" onClick={() => void deleteInquiry(inquiry)}>
+                  <Button variant="secondary" className="h-9 px-3 text-destructive" onClick={() => void deleteInquiry(inquiry)}>
                     Delete
                   </Button>
                 </div>
@@ -108,7 +108,7 @@ export function InquiriesPage() {
             </div>
           ))}
         </div>
-        <div className="mt-4 flex items-center justify-between border-t border-line pt-4 text-sm text-ink-muted">
+        <div className="mt-4 flex items-center justify-between border-t border-border pt-4 text-sm text-muted-foreground">
           <span>
             Page {inquiries?.pagination.page ?? page} of {Math.max(1, inquiries?.pagination.totalPages ?? 1)}
           </span>

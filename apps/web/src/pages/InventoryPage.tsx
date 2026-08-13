@@ -81,11 +81,11 @@ export function InventoryPage() {
 
   return (
     <section className="grid max-w-7xl min-w-0 gap-6 animate-fade-in">
-      <div className="panel-gradient grid gap-4 rounded-lg border border-line p-4 shadow-soft md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
+      <div className="bg-card grid gap-4 rounded-lg border border-border p-4 shadow-sm md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
         <div className="min-w-0">
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-brand">Gym Vault</p>
-          <h2 className="mt-2 text-3xl font-black text-ink">Inventory</h2>
-          <p className="mt-1 text-sm font-semibold text-ink-muted">Products, stock movements, sales, and valuation</p>
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-primary">Gym Vault</p>
+          <h2 className="mt-2 text-3xl font-black text-foreground">Inventory</h2>
+          <p className="mt-1 text-sm font-semibold text-muted-foreground">Products, stock movements, sales, and valuation</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button variant="secondary" onClick={() => setAction("purchase")}>Purchase</Button>
@@ -96,24 +96,24 @@ export function InventoryPage() {
 
       <div className="grid gap-4 md:grid-cols-3">
         <Card title="Low Stock" className="hover:-translate-y-1 hover:border-brand">
-          <div className="mb-4 grid h-11 w-11 place-items-center rounded-md bg-accent-soft text-accent">
+          <div className="mb-4 grid h-11 w-11 place-items-center rounded-md bg-accent-soft text-destructive">
             <AlertTriangle className="h-5 w-5" aria-hidden="true" />
           </div>
-          <p className="numeric text-4xl font-black text-brand-light">{lowStock.length}</p>
-          <p className="mt-1 text-sm text-ink-faint">Products at or below threshold</p>
+          <p className="numeric text-4xl font-black text-primary-foreground">{lowStock.length}</p>
+          <p className="mt-1 text-sm text-muted-foreground">Products at or below threshold</p>
         </Card>
         <Card title="Valuation" className="hover:-translate-y-1 hover:border-brand">
-          <div className="mb-4 grid h-11 w-11 place-items-center rounded-md bg-line-faint text-brand">
+          <div className="mb-4 grid h-11 w-11 place-items-center rounded-md bg-line-faint text-primary">
             <IndianRupee className="h-5 w-5" aria-hidden="true" />
           </div>
-          <p className="numeric text-4xl font-black text-brand-light">{formatCents(valuation)}</p>
-          <p className="mt-1 text-sm text-ink-faint">Current stock at cost</p>
+          <p className="numeric text-4xl font-black text-primary-foreground">{formatCents(valuation)}</p>
+          <p className="mt-1 text-sm text-muted-foreground">Current stock at cost</p>
         </Card>
         <Card title="Reports" className="hover:-translate-y-1 hover:border-brand">
-          <div className="mb-4 grid h-11 w-11 place-items-center rounded-md bg-line-faint text-brand">
+          <div className="mb-4 grid h-11 w-11 place-items-center rounded-md bg-line-faint text-primary">
             <FileText className="h-5 w-5" aria-hidden="true" />
           </div>
-          <p className="text-sm font-semibold text-ink-faint">Coming in Batch 2 Reports</p>
+          <p className="text-sm font-semibold text-muted-foreground">Coming in Batch 2 Reports</p>
         </Card>
       </div>
 
@@ -123,15 +123,15 @@ export function InventoryPage() {
           action={<Button className="h-9 px-3" onClick={() => setEditing({} as ProductDto)}>New Product</Button>}
         >
           <div className="mb-4 flex flex-wrap items-center gap-3">
-            <label className="grid min-w-0 gap-1 text-sm font-semibold text-ink">
+            <label className="grid min-w-0 gap-1 text-sm font-semibold text-foreground">
               <span>Category</span>
-              <select className="h-10 w-full rounded-md border border-line bg-surface/70 px-3 outline-none transition hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25" value={category} onChange={(event) => setCategory(event.target.value as ProductCategory | "")}>
+              <select className="h-10 w-full rounded-md border border-border bg-surface/70 px-3 outline-none transition hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25" value={category} onChange={(event) => setCategory(event.target.value as ProductCategory | "")}>
                 <option value="">All</option>
                 {productCategories.map((item) => <option key={item} value={item}>{item}</option>)}
               </select>
             </label>
-            <label className="mt-6 flex items-center gap-2 text-sm font-semibold text-ink-muted">
-              <input className="h-4 w-4 rounded border-line bg-surface text-brand focus-visible:focus-ring" type="checkbox" checked={lowOnly} onChange={(event) => setLowOnly(event.target.checked)} />
+            <label className="mt-6 flex items-center gap-2 text-sm font-semibold text-muted-foreground">
+              <input className="h-4 w-4 rounded border-border bg-background text-primary focus-visible:focus-ring" type="checkbox" checked={lowOnly} onChange={(event) => setLowOnly(event.target.checked)} />
               Low stock only
             </label>
           </div>
@@ -139,7 +139,7 @@ export function InventoryPage() {
           {!loading && shownProducts.length === 0 ? <EmptyState title="No products found" /> : null}
           <div className="overflow-x-auto">
             <table className="min-w-[720px] w-full text-left text-sm">
-              <thead className="text-xs uppercase text-ink-faint">
+              <thead className="text-xs uppercase text-muted-foreground">
                 <tr>
                   <th className="px-3 py-2">Product</th>
                   <th className="px-3 py-2">Price</th>
@@ -151,8 +151,8 @@ export function InventoryPage() {
                 {shownProducts.map((product) => (
                   <tr key={product.id}>
                     <td className="px-3 py-3">
-                      <p className="font-bold text-ink">{product.name}</p>
-                      <p className="text-xs font-semibold text-ink-faint">{product.sku} · {product.category}</p>
+                      <p className="font-bold text-foreground">{product.name}</p>
+                      <p className="text-xs font-semibold text-muted-foreground">{product.sku} · {product.category}</p>
                     </td>
                     <td className="numeric px-3 py-3">{formatCents(product.priceCents)}</td>
                     <td className="min-w-40 px-3 py-3">
@@ -161,7 +161,7 @@ export function InventoryPage() {
                     <td className="px-3 py-3">
                       <div className="flex justify-end gap-2">
                         <Button variant="secondary" className="h-9 px-3" onClick={() => setEditing(product)}>Edit</Button>
-                        <Button variant="secondary" className="h-9 px-3 text-accent" onClick={() => setProductToDelete(product)}>Delete</Button>
+                        <Button variant="secondary" className="h-9 px-3 text-destructive" onClick={() => setProductToDelete(product)}>Delete</Button>
                       </div>
                     </td>
                   </tr>
@@ -175,15 +175,15 @@ export function InventoryPage() {
           {movements.length === 0 ? <EmptyState title="No movements yet" /> : null}
           <div className="grid max-h-[560px] gap-2 overflow-y-auto">
             {movements.map((movement) => (
-              <div key={movement.id} className="min-w-0 rounded-md border border-line bg-surface p-3 text-sm">
+              <div key={movement.id} className="min-w-0 rounded-md border border-border bg-background p-3 text-sm">
                 <div className="flex justify-between gap-2">
-                  <span className="font-bold text-ink">{movement.type}</span>
-                  <span className={movement.quantityDelta < 0 ? "numeric font-bold text-accent" : "numeric font-bold text-success"}>
+                  <span className="font-bold text-foreground">{movement.type}</span>
+                  <span className={movement.quantityDelta < 0 ? "numeric font-bold text-destructive" : "numeric font-bold text-success"}>
                     {movement.quantityDelta > 0 ? "+" : ""}{movement.quantityDelta}
                   </span>
                 </div>
-                <p className="numeric mt-1 truncate text-xs text-ink-faint">{movement.productId}</p>
-                <p className="mt-1 text-xs text-ink-faint">{formatDateTime(movement.createdAt)}</p>
+                <p className="numeric mt-1 truncate text-xs text-muted-foreground">{movement.productId}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{formatDateTime(movement.createdAt)}</p>
               </div>
             ))}
           </div>
@@ -194,11 +194,11 @@ export function InventoryPage() {
       <Modal title="Delete Product" open={!!productToDelete} onClose={() => setProductToDelete(null)}>
         {productToDelete ? (
           <div className="grid gap-4">
-            <div className="rounded-md border border-line bg-surface p-3">
-              <p className="font-bold text-ink">{productToDelete.name}</p>
-              <p className="numeric mt-1 text-xs font-semibold text-ink-faint">{productToDelete.sku}</p>
+            <div className="rounded-md border border-border bg-background p-3">
+              <p className="font-bold text-foreground">{productToDelete.name}</p>
+              <p className="numeric mt-1 text-xs font-semibold text-muted-foreground">{productToDelete.sku}</p>
             </div>
-            <p className="text-sm font-semibold leading-6 text-ink-muted">
+            <p className="text-sm font-semibold leading-6 text-muted-foreground">
               This product will be hidden from active inventory. Stock movement, sales, and audit history stay intact.
             </p>
             <div className="flex justify-end gap-2">
@@ -276,18 +276,18 @@ function ProductModal({ product, onClose, onSaved }: { product: ProductDto | nul
       <div className="grid gap-3">
         <Input label="Name" value={name} onChange={(event) => setName(event.target.value)} />
         <Input label="SKU" value={sku} onChange={(event) => setSku(event.target.value)} />
-        <label className="grid min-w-0 gap-2 text-sm font-semibold text-ink">
+        <label className="grid min-w-0 gap-2 text-sm font-semibold text-foreground">
           <span>Description</span>
           <textarea
-            className="min-h-24 w-full resize-y rounded-md border border-line bg-surface/70 px-3 py-2 text-sm text-ink outline-none transition placeholder:text-ink-faint hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25"
+            className="min-h-24 w-full resize-y rounded-md border border-border bg-surface/70 px-3 py-2 text-sm text-foreground outline-none transition placeholder:text-muted-foreground hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25"
             value={description}
             onChange={(event) => setDescription(event.target.value)}
           />
         </label>
         <Input label="Image URL" type="url" value={imageUrl} onChange={(event) => setImageUrl(event.target.value)} />
-        <label className="grid min-w-0 gap-2 text-sm font-semibold text-ink">
+        <label className="grid min-w-0 gap-2 text-sm font-semibold text-foreground">
           <span>Category</span>
-          <select className="h-11 w-full rounded-md border border-line bg-surface/70 px-3 outline-none transition hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25" value={category} onChange={(event) => setCategory(event.target.value as ProductCategory)}>
+          <select className="h-11 w-full rounded-md border border-border bg-surface/70 px-3 outline-none transition hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25" value={category} onChange={(event) => setCategory(event.target.value as ProductCategory)}>
             {productCategories.map((item) => <option key={item} value={item}>{item}</option>)}
           </select>
         </label>
@@ -372,17 +372,17 @@ function StockActionModal({
   return (
     <Modal title={action ? `${action.charAt(0).toUpperCase()}${action.slice(1)}` : "Stock"} open={!!action} onClose={onClose}>
       <div className="grid gap-3">
-        <label className="grid min-w-0 gap-2 text-sm font-semibold text-ink">
+        <label className="grid min-w-0 gap-2 text-sm font-semibold text-foreground">
           <span>Product</span>
-          <select className="h-11 w-full rounded-md border border-line bg-surface/70 px-3 outline-none transition hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25" value={productId} onChange={(event) => setProductId(event.target.value)}>
+          <select className="h-11 w-full rounded-md border border-border bg-surface/70 px-3 outline-none transition hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25" value={productId} onChange={(event) => setProductId(event.target.value)}>
             {products.map((product) => <option key={product.id} value={product.id}>{product.name}</option>)}
           </select>
         </label>
         <Input label="Quantity" type="number" value={quantity} onChange={(event) => setQuantity(event.target.value)} />
         {action === "purchase" ? (
-          <label className="grid min-w-0 gap-2 text-sm font-semibold text-ink">
+          <label className="grid min-w-0 gap-2 text-sm font-semibold text-foreground">
             <span>Supplier</span>
-            <select className="h-11 w-full rounded-md border border-line bg-surface/70 px-3 outline-none transition hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25" value={supplierId} onChange={(event) => setSupplierId(event.target.value)}>
+            <select className="h-11 w-full rounded-md border border-border bg-surface/70 px-3 outline-none transition hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25" value={supplierId} onChange={(event) => setSupplierId(event.target.value)}>
               <option value="">No supplier</option>
               {suppliers.map((supplier) => <option key={supplier.id} value={supplier.id}>{supplier.name}</option>)}
             </select>
@@ -391,9 +391,9 @@ function StockActionModal({
         {action === "sale" ? (
           <>
             <Input label="Member ID" value={memberId} onChange={(event) => setMemberId(event.target.value)} />
-            <label className="grid min-w-0 gap-2 text-sm font-semibold text-ink">
+            <label className="grid min-w-0 gap-2 text-sm font-semibold text-foreground">
               <span>Payment method</span>
-              <select className="h-11 w-full rounded-md border border-line bg-surface/70 px-3 outline-none transition hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25" value={method} onChange={(event) => setMethod(event.target.value as PaymentMethod)}>
+              <select className="h-11 w-full rounded-md border border-border bg-surface/70 px-3 outline-none transition hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25" value={method} onChange={(event) => setMethod(event.target.value as PaymentMethod)}>
                 {paymentMethods.map((item) => <option key={item} value={item}>{item}</option>)}
               </select>
             </label>

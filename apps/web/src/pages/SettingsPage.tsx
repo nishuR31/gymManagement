@@ -69,10 +69,10 @@ export function SettingsPage() {
 
   return (
     <section className="grid max-w-7xl gap-6 animate-fade-in">
-      <div className="panel-gradient rounded-lg border border-line p-4 shadow-soft">
-        <p className="text-xs font-black uppercase tracking-[0.18em] text-brand">Control Room</p>
-        <h2 className="mt-2 text-3xl font-black text-ink">Settings</h2>
-        <p className="mt-1 max-w-2xl text-sm font-semibold leading-6 text-ink-muted">Grouped gym details, business rules, receipts, and runtime configuration. Advanced values still save as JSON so the backend contract stays flexible.</p>
+      <div className="bg-card rounded-lg border border-border p-4 shadow-sm">
+        <p className="text-xs font-black uppercase tracking-[0.18em] text-primary">Control Room</p>
+        <h2 className="mt-2 text-3xl font-black text-foreground">Settings</h2>
+        <p className="mt-1 max-w-2xl text-sm font-semibold leading-6 text-muted-foreground">Grouped gym details, business rules, receipts, and runtime configuration. Advanced values still save as JSON so the backend contract stays flexible.</p>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[320px_minmax(0,1fr)]">
@@ -87,14 +87,14 @@ export function SettingsPage() {
               <button
                 key={key}
                 className={`flex items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-bold transition focus-visible:focus-ring ${
-                  selectedKey === key ? "bg-brand text-panel" : "border border-line bg-panel text-ink-muted hover:bg-line-faint"
+                  selectedKey === key ? "bg-primary text-panel" : "border border-border bg-card text-muted-foreground hover:bg-line-faint"
                 }`}
                 onClick={() => setSelectedKey(key)}
               >
                 <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
                 <span className="min-w-0">
                   <span className="block truncate">{readableStatus(key)}</span>
-                  <span className={`mt-0.5 block truncate text-xs ${selectedKey === key ? "text-panel/70" : "text-ink-faint"}`}>{descriptionForKey(key)}</span>
+                  <span className={`mt-0.5 block truncate text-xs ${selectedKey === key ? "text-panel/70" : "text-muted-foreground"}`}>{descriptionForKey(key)}</span>
                 </span>
               </button>
                 );
@@ -114,28 +114,28 @@ export function SettingsPage() {
           }
         >
           <div className="grid gap-3">
-            <div className="rounded-md border border-line bg-surface p-3">
-              <p className="text-xs font-black uppercase tracking-[0.16em] text-brand">Editing</p>
+            <div className="rounded-md border border-border bg-background p-3">
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-primary">Editing</p>
               <Input label="Key" value={selectedKey} onChange={(event) => setSelectedKey(event.target.value)} disabled={!isAdminRole(role)} />
               <Button variant="secondary" className="mt-3 h-9 px-3" onClick={() => setDraft(JSON.stringify(defaultValueForKey(selectedKey), null, 2))} disabled={!isAdminRole(role)}>
                 Use Template
               </Button>
             </div>
-            <label className="grid gap-2 text-sm font-medium text-ink">
+            <label className="grid gap-2 text-sm font-medium text-foreground">
               <span>Value JSON</span>
               <textarea
-                className="numeric min-h-80 w-full rounded-md border border-line bg-surface px-3 py-2 text-sm text-ink outline-none transition placeholder:text-ink-faint focus:border-brand focus:ring-2 focus:ring-brand/20"
+                className="numeric min-h-80 w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-brand focus:ring-2 focus:ring-brand/20"
                 value={draft}
                 onChange={(event) => setDraft(event.target.value)}
                 disabled={!isAdminRole(role)}
               />
             </label>
             {selected ? (
-              <p className="text-xs font-semibold text-ink-faint">
+              <p className="text-xs font-semibold text-muted-foreground">
                 Last updated {formatDateTime(selected.updatedAt)} by <span className="numeric">{selected.updatedBy ?? "system"}</span>
               </p>
             ) : (
-              <p className="text-xs font-semibold text-ink-faint">This key will be created when saved.</p>
+              <p className="text-xs font-semibold text-muted-foreground">This key will be created when saved.</p>
             )}
           </div>
         </Card>

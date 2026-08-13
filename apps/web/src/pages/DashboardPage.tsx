@@ -49,28 +49,28 @@ export function DashboardPage() {
 
   return (
     <section className="grid max-w-7xl min-w-0 gap-6 animate-fade-in">
-      <div className="overflow-hidden rounded-lg border border-line text-ink shadow-soft dark-band-gradient">
+      <div className="overflow-hidden rounded-lg border border-border text-foreground shadow-sm dark-band-gradient">
         <div
           className="p-5 md:p-6"
           style={{
             background:
-              "linear-gradient(135deg, color-mix(in srgb, var(--color-brand-dark) 34%, transparent) 0%, transparent 42%), linear-gradient(180deg, color-mix(in srgb, var(--color-panel) 9%, transparent) 0%, transparent 100%)"
+              "linear-gradient(135deg, color-mix(in srgb, hsl(var(--primary)) 34%, transparent) 0%, transparent 42%), linear-gradient(180deg, color-mix(in srgb, hsl(var(--card)) 9%, transparent) 0%, transparent 100%)"
           }}
         >
           <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-end">
             <div className="min-w-0">
-              <p className="inline-flex items-center gap-2 rounded-md border border-brand/35 bg-panel/10 px-3 py-2 text-xs font-black uppercase tracking-[0.18em] text-brand-light">
+              <p className="inline-flex items-center gap-2 rounded-md border border-brand/35 bg-panel/10 px-3 py-2 text-xs font-black uppercase tracking-[0.18em] text-primary-foreground">
                 <Dumbbell className="h-3.5 w-3.5" aria-hidden="true" />
                 Live Operations
               </p>
-              <h2 className="mt-4 text-3xl font-black leading-tight text-ink md:text-4xl">Dashboard</h2>
-              <p className="mt-2 max-w-2xl text-sm font-semibold leading-6 text-ink-muted">
+              <h2 className="mt-4 text-3xl font-black leading-tight text-foreground md:text-4xl">Dashboard</h2>
+              <p className="mt-2 max-w-2xl text-sm font-semibold leading-6 text-muted-foreground">
                 Live operational summary for the gym floor, front desk, revenue, dues, inventory, and recent activity.
               </p>
             </div>
-            <div className="w-fit rounded-lg border border-line bg-panel/10 px-4 py-3 xl:justify-self-end">
-              <p className="text-xs font-black uppercase tracking-[0.14em] text-brand-light">Refresh state</p>
-              <p className="mt-1 text-sm font-bold text-ink">{isLoading ? "Loading live metrics" : "Metrics synced"}</p>
+            <div className="w-fit rounded-lg border border-border bg-panel/10 px-4 py-3 xl:justify-self-end">
+              <p className="text-xs font-black uppercase tracking-[0.14em] text-primary-foreground">Refresh state</p>
+              <p className="mt-1 text-sm font-bold text-foreground">{isLoading ? "Loading live metrics" : "Metrics synced"}</p>
             </div>
           </div>
         </div>
@@ -88,11 +88,11 @@ export function DashboardPage() {
           {isLoading ? <SkeletonRows rows={2} /> : null}
           {!isLoading ? (
             <>
-              <div className="mb-4 grid h-11 w-11 place-items-center rounded-md bg-accent-soft text-accent">
+              <div className="mb-4 grid h-11 w-11 place-items-center rounded-md bg-accent-soft text-destructive">
                 <Receipt className="h-5 w-5" aria-hidden="true" />
               </div>
-              <p className="numeric text-3xl font-black text-ink">{formatCents(summary?.pendingDuesCents ?? 0)}</p>
-              <p className="mt-1 text-sm font-semibold text-ink-faint"><span className="numeric">{summary?.pendingDuesCount ?? 0}</span> open invoices</p>
+              <p className="numeric text-3xl font-black text-foreground">{formatCents(summary?.pendingDuesCents ?? 0)}</p>
+              <p className="mt-1 text-sm font-semibold text-muted-foreground"><span className="numeric">{summary?.pendingDuesCount ?? 0}</span> open invoices</p>
             </>
           ) : null}
         </Card>
@@ -103,8 +103,8 @@ export function DashboardPage() {
               <div className="mb-4 grid h-11 w-11 place-items-center rounded-md bg-warning-soft text-warning">
                 <CalendarClock className="h-5 w-5" aria-hidden="true" />
               </div>
-              <p className="numeric text-3xl font-black text-ink">{summary?.membershipsExpiringSoon.length ?? 0}</p>
-              <p className="mt-1 text-sm font-semibold text-ink-faint">Memberships inside 30 days</p>
+              <p className="numeric text-3xl font-black text-foreground">{summary?.membershipsExpiringSoon.length ?? 0}</p>
+              <p className="mt-1 text-sm font-semibold text-muted-foreground">Memberships inside 30 days</p>
             </>
           ) : null}
         </Card>
@@ -112,11 +112,11 @@ export function DashboardPage() {
           {isLoading ? <SkeletonRows rows={2} /> : null}
           {!isLoading ? (
             <>
-              <div className="mb-4 grid h-11 w-11 place-items-center rounded-md bg-accent-soft text-accent">
+              <div className="mb-4 grid h-11 w-11 place-items-center rounded-md bg-accent-soft text-destructive">
                 <AlertTriangle className="h-5 w-5" aria-hidden="true" />
               </div>
-              <p className="numeric text-3xl font-black text-ink">{summary?.lowStockAlerts.length ?? 0}</p>
-              <p className="mt-1 text-sm font-semibold text-ink-faint">Products at or below reorder point</p>
+              <p className="numeric text-3xl font-black text-foreground">{summary?.lowStockAlerts.length ?? 0}</p>
+              <p className="mt-1 text-sm font-semibold text-muted-foreground">Products at or below reorder point</p>
             </>
           ) : null}
         </Card>
@@ -202,14 +202,14 @@ function MemberDashboard({ userName }: { userName: string }) {
 
   return (
     <section className="grid max-w-7xl gap-6 animate-fade-in">
-      <div className="overflow-hidden rounded-lg border border-line text-ink shadow-soft dark-band-gradient">
+      <div className="overflow-hidden rounded-lg border border-border text-foreground shadow-sm dark-band-gradient">
         <div className="p-5 md:p-6">
-          <p className="inline-flex items-center gap-2 rounded-md border border-brand/35 bg-panel/10 px-3 py-2 text-xs font-black uppercase tracking-[0.18em] text-brand-light">
+          <p className="inline-flex items-center gap-2 rounded-md border border-brand/35 bg-panel/10 px-3 py-2 text-xs font-black uppercase tracking-[0.18em] text-primary-foreground">
             <Dumbbell className="h-3.5 w-3.5" aria-hidden="true" />
             Member Portal
           </p>
-          <h2 className="mt-4 text-3xl font-black text-ink md:text-5xl">Welcome, {userName}</h2>
-          <p className="mt-2 max-w-2xl text-sm font-semibold leading-6 text-ink-muted">Membership, payments, product bookings, and gym alerts in one place.</p>
+          <h2 className="mt-4 text-3xl font-black text-foreground md:text-5xl">Welcome, {userName}</h2>
+          <p className="mt-2 max-w-2xl text-sm font-semibold leading-6 text-muted-foreground">Membership, payments, product bookings, and gym alerts in one place.</p>
         </div>
       </div>
 
@@ -237,10 +237,10 @@ function MemberDashboard({ userName }: { userName: string }) {
       <div className="grid gap-4 xl:grid-cols-3">
         <Card title="Quick Actions">
           <div className="grid gap-2">
-            <a className="rounded-md border border-line bg-surface px-3 py-2 text-sm font-bold text-ink transition hover:border-brand focus-visible:focus-ring" href="/dashboard/products">View Products</a>
-            <a className="rounded-md border border-line bg-surface px-3 py-2 text-sm font-bold text-ink transition hover:border-brand focus-visible:focus-ring" href="/dashboard/my-membership">View Membership</a>
-            <a className="rounded-md border border-line bg-surface px-3 py-2 text-sm font-bold text-ink transition hover:border-brand focus-visible:focus-ring" href="/dashboard/my-orders">View Orders</a>
-            <a className="rounded-md border border-line bg-surface px-3 py-2 text-sm font-bold text-ink transition hover:border-brand focus-visible:focus-ring" href="/dashboard/my-payments">View Payments</a>
+            <a className="rounded-md border border-border bg-background px-3 py-2 text-sm font-bold text-foreground transition hover:border-brand focus-visible:focus-ring" href="/dashboard/products">View Products</a>
+            <a className="rounded-md border border-border bg-background px-3 py-2 text-sm font-bold text-foreground transition hover:border-brand focus-visible:focus-ring" href="/dashboard/my-membership">View Membership</a>
+            <a className="rounded-md border border-border bg-background px-3 py-2 text-sm font-bold text-foreground transition hover:border-brand focus-visible:focus-ring" href="/dashboard/my-orders">View Orders</a>
+            <a className="rounded-md border border-border bg-background px-3 py-2 text-sm font-bold text-foreground transition hover:border-brand focus-visible:focus-ring" href="/dashboard/my-payments">View Payments</a>
           </div>
         </Card>
         <Card title="Recent Orders">
@@ -248,9 +248,9 @@ function MemberDashboard({ userName }: { userName: string }) {
           {!loading && orders.length === 0 ? <EmptyState title="No orders yet" /> : null}
           <div className="grid gap-2">
             {orders.slice(0, 4).map((order) => (
-              <div key={order.id} className="rounded-md border border-line bg-surface p-3">
-                <p className="font-bold text-ink">{order.productName}</p>
-                <p className="numeric mt-1 text-xs text-ink-faint">{order.orderCode} · {formatCents(order.amountCents)}</p>
+              <div key={order.id} className="rounded-md border border-border bg-background p-3">
+                <p className="font-bold text-foreground">{order.productName}</p>
+                <p className="numeric mt-1 text-xs text-muted-foreground">{order.orderCode} · {formatCents(order.amountCents)}</p>
               </div>
             ))}
           </div>
@@ -260,9 +260,9 @@ function MemberDashboard({ userName }: { userName: string }) {
           {!loading && notifications.length === 0 ? <EmptyState title="No notifications" /> : null}
           <div className="grid gap-2">
             {notifications.slice(0, 4).map((notification) => (
-              <div key={notification.id} className="rounded-md border border-line bg-surface p-3">
-                <p className="font-bold text-ink">{notification.title}</p>
-                <p className="mt-1 text-xs text-ink-faint">{formatRelativeTime(notification.createdAt)}</p>
+              <div key={notification.id} className="rounded-md border border-border bg-background p-3">
+                <p className="font-bold text-foreground">{notification.title}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{formatRelativeTime(notification.createdAt)}</p>
               </div>
             ))}
           </div>
@@ -274,20 +274,20 @@ function MemberDashboard({ userName }: { userName: string }) {
 
 function PortalMetric({ icon: Icon, title, value, copy, tone }: { icon: LucideIcon; title: string; value: string; copy: string; tone: "brand" | "success" | "warning" | "danger" }) {
   const tones = {
-    brand: "bg-line-faint text-brand",
+    brand: "bg-line-faint text-primary",
     success: "bg-success-soft text-success",
     warning: "bg-warning-soft text-warning",
-    danger: "bg-accent-soft text-accent"
+    danger: "bg-accent-soft text-destructive"
   };
 
   return (
     <div>
-      <div className={`mb-4 grid h-11 w-11 place-items-center rounded-md shadow-soft ${tones[tone]}`}>
+      <div className={`mb-4 grid h-11 w-11 place-items-center rounded-md shadow-sm ${tones[tone]}`}>
         <Icon className="h-5 w-5" aria-hidden="true" />
       </div>
-      <p className="text-xs font-black uppercase tracking-[0.12em] text-ink-faint">{title}</p>
-      <h3 className="numeric mt-2 text-2xl font-black text-ink">{value}</h3>
-      <p className="mt-2 text-sm font-semibold leading-6 text-ink-muted">{copy}</p>
+      <p className="text-xs font-black uppercase tracking-[0.12em] text-muted-foreground">{title}</p>
+      <h3 className="numeric mt-2 text-2xl font-black text-foreground">{value}</h3>
+      <p className="mt-2 text-sm font-semibold leading-6 text-muted-foreground">{copy}</p>
     </div>
   );
 }
@@ -326,7 +326,7 @@ function MetricCard({
   const animated = useCountUp(value, !loading);
   const displayValue = formatter ? formatter(animated) : Math.round(animated).toString();
   const tones = {
-    brand: "bg-line-faint text-brand",
+    brand: "bg-line-faint text-primary",
     success: "bg-success-soft text-success",
     warning: "bg-warning-soft text-warning"
   };
@@ -335,11 +335,11 @@ function MetricCard({
     <Card className="group min-w-0 overflow-hidden hover:-translate-y-1 hover:border-brand">
       <div className="flex min-w-0 items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-xs font-black uppercase tracking-[0.12em] text-ink-faint sm:text-sm">{title}</p>
+          <p className="text-xs font-black uppercase tracking-[0.12em] text-muted-foreground sm:text-sm">{title}</p>
           {loading ? (
             <div className="mt-4"><SkeletonRows rows={2} /></div>
           ) : (
-            <p className={`mt-4 numeric break-words font-black leading-none text-ink ${primary ? "text-4xl md:text-5xl" : "text-3xl md:text-4xl"}`}>{displayValue}</p>
+            <p className={`mt-4 numeric break-words font-black leading-none text-foreground ${primary ? "text-4xl md:text-5xl" : "text-3xl md:text-4xl"}`}>{displayValue}</p>
           )}
         </div>
         <div className={`grid shrink-0 place-items-center rounded-md transition group-hover:scale-105 ${primary ? "h-14 w-14" : "h-11 w-11"} ${tones[tone]}`}>
@@ -386,13 +386,13 @@ function useCountUp(value: number, enabled: boolean) {
 
 function PaymentRow({ payment }: { payment: PaymentDto }) {
   return (
-    <div className="rounded-md border border-line bg-surface/80 p-3 transition hover:border-brand">
+    <div className="rounded-md border border-border bg-surface/80 p-3 transition hover:border-brand">
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
-          <p className="numeric font-bold text-ink">{formatCents(payment.amountCents)}</p>
-          <p className="truncate text-xs font-semibold text-ink-faint">{payment.method} · {formatRelativeTime(payment.paidAt)}</p>
+          <p className="numeric font-bold text-foreground">{formatCents(payment.amountCents)}</p>
+          <p className="truncate text-xs font-semibold text-muted-foreground">{payment.method} · {formatRelativeTime(payment.paidAt)}</p>
         </div>
-        <span className="numeric rounded-md bg-line-faint px-2 py-1 text-xs text-ink-faint">{payment.invoiceId.slice(0, 8)}</span>
+        <span className="numeric rounded-md bg-line-faint px-2 py-1 text-xs text-muted-foreground">{payment.invoiceId.slice(0, 8)}</span>
       </div>
     </div>
   );
@@ -400,10 +400,10 @@ function PaymentRow({ payment }: { payment: PaymentDto }) {
 
 function LowStockRow({ product }: { product: LowStockProductDto }) {
   return (
-    <div className="rounded-md border border-line bg-surface/80 p-3 transition hover:border-brand">
+    <div className="rounded-md border border-border bg-surface/80 p-3 transition hover:border-brand">
       <div className="mb-2 flex justify-between gap-2 text-sm">
-        <span className="inline-flex items-center gap-2 font-bold text-ink"><Boxes className="h-4 w-4 text-brand" aria-hidden="true" />{product.name}</span>
-        <span className="numeric font-semibold text-ink-muted">{product.currentStock} left</span>
+        <span className="inline-flex items-center gap-2 font-bold text-foreground"><Boxes className="h-4 w-4 text-primary" aria-hidden="true" />{product.name}</span>
+        <span className="numeric font-semibold text-muted-foreground">{product.currentStock} left</span>
       </div>
       <LoadBar value={product.currentStock} max={Math.max(1, product.reorderThreshold)} tone="danger" />
     </div>
@@ -412,11 +412,11 @@ function LowStockRow({ product }: { product: LowStockProductDto }) {
 
 function SubscriptionRow({ subscription }: { subscription: MembershipSubscriptionDto }) {
   return (
-    <div className="rounded-md border border-line bg-surface/80 p-3 transition hover:border-brand">
+    <div className="rounded-md border border-border bg-surface/80 p-3 transition hover:border-brand">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="min-w-0">
-          <p className="truncate font-bold text-ink">{subscription.planName}</p>
-          <p className="text-xs font-semibold text-ink-faint">
+          <p className="truncate font-bold text-foreground">{subscription.planName}</p>
+          <p className="text-xs font-semibold text-muted-foreground">
             Member <span className="numeric">{subscription.memberId.slice(0, 8)}</span> · Ends {formatDateTime(subscription.endDate)}
           </p>
         </div>
@@ -428,12 +428,12 @@ function SubscriptionRow({ subscription }: { subscription: MembershipSubscriptio
 
 function ActivityRow({ activity }: { activity: AuditLogDto }) {
   return (
-    <div className="rounded-md border border-line bg-surface/80 p-3 transition hover:border-brand">
+    <div className="rounded-md border border-border bg-surface/80 p-3 transition hover:border-brand">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="font-bold text-ink">{activity.action}</p>
-        <p className="inline-flex items-center gap-1.5 text-xs font-semibold text-ink-faint"><Clock3 className="h-3.5 w-3.5" aria-hidden="true" />{formatRelativeTime(activity.createdAt)}</p>
+        <p className="font-bold text-foreground">{activity.action}</p>
+        <p className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground"><Clock3 className="h-3.5 w-3.5" aria-hidden="true" />{formatRelativeTime(activity.createdAt)}</p>
       </div>
-      <p className="mt-1 truncate text-xs text-ink-muted">{activity.entity ?? "System"} {activity.entityId ? <span className="numeric">· {activity.entityId}</span> : ""}</p>
+      <p className="mt-1 truncate text-xs text-muted-foreground">{activity.entity ?? "System"} {activity.entityId ? <span className="numeric">· {activity.entityId}</span> : ""}</p>
     </div>
   );
 }

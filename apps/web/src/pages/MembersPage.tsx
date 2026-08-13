@@ -149,7 +149,7 @@ export function MembersPage() {
       columnHelper.accessor("memberCode", {
         header: "Member ID",
         cell: (info) => (
-          <span className="numeric font-semibold text-ink">
+          <span className="numeric font-semibold text-foreground">
             {info.getValue()}
           </span>
         ),
@@ -371,13 +371,13 @@ export function MembersPage() {
 
   return (
     <section className="grid max-w-7xl min-w-0 gap-6 animate-fade-in">
-      <div className="panel-gradient grid gap-4 rounded-lg border border-line p-4 shadow-soft md:grid-cols-[minmax(0,1fr)_minmax(280px,auto)] md:items-end">
+      <div className="bg-card grid gap-4 rounded-lg border border-border p-4 shadow-sm md:grid-cols-[minmax(0,1fr)_minmax(280px,auto)] md:items-end">
         <div className="min-w-0">
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-brand">
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-primary">
             Member Operations
           </p>
-          <h2 className="mt-2 text-3xl font-black text-ink">Members</h2>
-          <p className="mt-1 text-sm font-semibold text-ink-muted">
+          <h2 className="mt-2 text-3xl font-black text-foreground">Members</h2>
+          <p className="mt-1 text-sm font-semibold text-muted-foreground">
             {members.length} shown
           </p>
         </div>
@@ -393,10 +393,10 @@ export function MembersPage() {
             value={search}
             onChange={(event) => setSearch(event.target.value)}
           />
-          <label className="grid min-w-0 gap-2 text-sm font-semibold text-ink">
+          <label className="grid min-w-0 gap-2 text-sm font-semibold text-foreground">
             <span>Status</span>
             <select
-              className="h-11 w-full rounded-md border border-line bg-surface/70 px-3 text-sm outline-none transition hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25"
+              className="h-11 w-full rounded-md border border-border bg-surface/70 px-3 text-sm outline-none transition hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25"
               value={status}
               onChange={(event) =>
                 setStatus(event.target.value as MemberStatus | "")
@@ -417,22 +417,22 @@ export function MembersPage() {
       </div>
 
       <div className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(360px,420px)]">
-        <div className="min-w-0 rounded-lg border border-line bg-panel shadow-soft">
+        <div className="min-w-0 rounded-lg border border-border bg-card shadow-sm">
           <div className="grid gap-3 p-3 md:hidden">
             {members.map((member) => (
               <div
                 key={member.id}
-                className="rounded-md border border-line bg-surface/80 p-3"
+                className="rounded-md border border-border bg-surface/80 p-3"
               >
                 <div className="flex min-w-0 items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="numeric text-xs font-black text-brand">
+                    <p className="numeric text-xs font-black text-primary">
                       {member.memberCode}
                     </p>
-                    <p className="mt-1 truncate text-base font-black text-ink">
+                    <p className="mt-1 truncate text-base font-black text-foreground">
                       {member.firstName} {member.lastName}
                     </p>
-                    <p className="numeric mt-1 truncate text-sm font-semibold text-ink-muted">
+                    <p className="numeric mt-1 truncate text-sm font-semibold text-muted-foreground">
                       {member.phone}
                     </p>
                   </div>
@@ -471,7 +471,7 @@ export function MembersPage() {
                 <col className="w-[130px]" />
                 <col className="w-[230px]" />
               </colgroup>
-              <thead className="bg-surface text-xs font-semibold uppercase text-ink-faint">
+              <thead className="bg-background text-xs font-semibold uppercase text-muted-foreground">
                 {table.getHeaderGroups().map((headerGroup) => (
                   <tr key={headerGroup.id}>
                     {headerGroup.headers.map((header) => (
@@ -515,7 +515,7 @@ export function MembersPage() {
         </div>
 
         <div className="grid gap-4">
-          <section className="min-w-0 rounded-lg border border-line bg-panel p-4 shadow-soft">
+          <section className="min-w-0 rounded-lg border border-border bg-card p-4 shadow-sm">
             <div className="mb-4 flex items-center justify-between gap-3">
               <h3 className="text-base font-bold">
                 {editingMember ? "Edit Member" : "New Member"}
@@ -608,10 +608,10 @@ export function MembersPage() {
                 />
               </div>
               {canManageMedicalNotes ? (
-                <label className="grid min-w-0 gap-2 text-sm font-semibold text-ink">
+                <label className="grid min-w-0 gap-2 text-sm font-semibold text-foreground">
                   <span>Medical notes</span>
                   <textarea
-                    className="min-h-24 w-full rounded-md border border-line bg-surface/70 px-3 py-2 text-sm outline-none transition hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25"
+                    className="min-h-24 w-full rounded-md border border-border bg-surface/70 px-3 py-2 text-sm outline-none transition hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25"
                     {...register("medicalNotes")}
                   />
                 </label>
@@ -708,15 +708,15 @@ function MemberLifecycleModal({
     >
       {content && member ? (
         <div className="grid gap-4">
-          <div className="rounded-md border border-line bg-surface p-3">
-            <p className="font-bold text-ink">
+          <div className="rounded-md border border-border bg-background p-3">
+            <p className="font-bold text-foreground">
               {member.firstName} {member.lastName}
             </p>
-            <p className="numeric mt-1 text-xs font-black text-brand">
+            <p className="numeric mt-1 text-xs font-black text-primary">
               {member.memberCode}
             </p>
           </div>
-          <p className="text-sm font-semibold leading-6 text-ink-muted">
+          <p className="text-sm font-semibold leading-6 text-muted-foreground">
             {content.body}
           </p>
           {action === "suspend" ? (
@@ -786,38 +786,38 @@ function MemberDetailModal({
     >
       {member ? (
         <div className="grid gap-5">
-          <div className="rounded-lg border border-line bg-surface/75 p-4">
+          <div className="rounded-lg border border-border bg-surface/75 p-4">
             <div className="flex min-w-0 items-start gap-4">
-              <div className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-line-faint text-brand shadow-soft">
+              <div className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-line-faint text-primary shadow-sm">
                 <span className="text-lg font-black">
                   {initialsFor(member)}
                 </span>
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h3 className="truncate text-2xl font-black text-ink">
+                  <h3 className="truncate text-2xl font-black text-foreground">
                     {member.firstName} {member.lastName}
                   </h3>
                   <StatusBadge status={member.status} />
                 </div>
-                <p className="numeric mt-1 text-sm font-black text-brand">
+                <p className="numeric mt-1 text-sm font-black text-primary">
                   {member.memberCode}
                 </p>
-                <p className="numeric mt-2 truncate text-sm font-semibold text-ink-muted">
+                <p className="numeric mt-2 truncate text-sm font-semibold text-muted-foreground">
                   {member.phone}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="flex rounded-md border border-line bg-surface p-1">
+          <div className="flex rounded-md border border-border bg-background p-1">
             {(["profile", "payments", "plans"] as const).map((tab) => (
               <button
                 key={tab}
                 className={`h-9 flex-1 rounded px-2 text-sm font-bold capitalize transition focus-visible:focus-ring ${
                   detailTab === tab
-                    ? "bg-panel text-brand shadow-sm"
-                    : "text-ink-muted"
+                    ? "bg-card text-primary shadow-sm"
+                    : "text-muted-foreground"
                 }`}
                 onClick={() => onTab(tab)}
               >
@@ -846,33 +846,33 @@ function MemberDetailModal({
                   <Detail label="Joined" value={member.joinedAt.slice(0, 10)} />
                 </dl>
                 {member.medicalNotes ? (
-                  <div className="rounded-md border border-line bg-surface p-3 text-sm text-ink-muted">
+                  <div className="rounded-md border border-border bg-background p-3 text-sm text-muted-foreground">
                     {member.medicalNotes}
                   </div>
                 ) : null}
               </div>
               {qrPayload ? (
-                <div className="overflow-hidden rounded-lg border border-line bg-surface shadow-soft">
-                  <div className="dark-band-gradient border-b border-line p-3">
-                    <p className="text-xs font-black uppercase tracking-[0.16em] text-brand-light">
+                <div className="overflow-hidden rounded-lg border border-border bg-background shadow-sm">
+                  <div className="dark-band-gradient border-b border-border p-3">
+                    <p className="text-xs font-black uppercase tracking-[0.16em] text-primary-foreground">
                       Membership Card
                     </p>
-                    <p className="mt-1 truncate text-sm font-black text-ink">
+                    <p className="mt-1 truncate text-sm font-black text-foreground">
                       {member.firstName} {member.lastName}
                     </p>
                   </div>
                   <div className="grid gap-3 p-4">
-                    <div className="grid aspect-square max-h-32 place-items-center rounded-md border border-line bg-panel">
+                    <div className="grid aspect-square max-h-32 place-items-center rounded-md border border-border bg-card">
                       <QrCode
-                        className="h-12 w-12 text-brand"
+                        className="h-12 w-12 text-primary"
                         aria-hidden="true"
                       />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-xs font-semibold uppercase text-ink-faint">
+                      <p className="text-xs font-semibold uppercase text-muted-foreground">
                         QR payload
                       </p>
-                      <p className="numeric mt-1 break-all rounded-md bg-line-faint p-2 text-xs font-semibold text-ink-muted">
+                      <p className="numeric mt-1 break-all rounded-md bg-line-faint p-2 text-xs font-semibold text-muted-foreground">
                         {qrPayload}
                       </p>
                     </div>
@@ -885,23 +885,23 @@ function MemberDetailModal({
           {detailTab === "payments" ? (
             <div className="grid gap-2">
               {payments.length === 0 ? (
-                <p className="text-sm text-ink-faint">No payments found.</p>
+                <p className="text-sm text-muted-foreground">No payments found.</p>
               ) : null}
               {payments.map((payment) => (
                 <div
                   key={payment.id}
-                  className="rounded-md border border-line bg-surface p-3 text-sm"
+                  className="rounded-md border border-border bg-background p-3 text-sm"
                 >
                   <div className="flex justify-between gap-2">
-                    <span className="numeric font-bold text-ink">
+                    <span className="numeric font-bold text-foreground">
                       {formatCents(payment.amountCents)}
                     </span>
-                    <span className="font-semibold text-ink-muted">
+                    <span className="font-semibold text-muted-foreground">
                       {payment.method}
                     </span>
                   </div>
                   {payment.refunds.length > 0 ? (
-                    <p className="mt-1 text-xs text-ink-faint">
+                    <p className="mt-1 text-xs text-muted-foreground">
                       Refunded{" "}
                       <span className="numeric">
                         {formatCents(
@@ -920,10 +920,10 @@ function MemberDetailModal({
 
           {detailTab === "plans" ? (
             <div className="grid gap-4 md:grid-cols-2">
-              <div className="rounded-lg border border-line bg-surface p-3">
-                <p className="mb-2 font-bold text-ink">Workout Plans</p>
+              <div className="rounded-lg border border-border bg-background p-3">
+                <p className="mb-2 font-bold text-foreground">Workout Plans</p>
                 {workouts.length === 0 ? (
-                  <p className="text-sm text-ink-faint">
+                  <p className="text-sm text-muted-foreground">
                     No workout plans assigned.
                   </p>
                 ) : null}
@@ -931,22 +931,22 @@ function MemberDetailModal({
                   {workouts.map((plan) => (
                     <div
                       key={plan.id}
-                      className="rounded-md border border-line bg-panel p-3"
+                      className="rounded-md border border-border bg-card p-3"
                     >
                       <p className="font-semibold">
                         Starts {plan.startDate.slice(0, 10)}
                       </p>
-                      <p className="mt-1 text-xs text-ink-faint">
+                      <p className="mt-1 text-xs text-muted-foreground">
                         {plan.exercises.length} exercises
                       </p>
                     </div>
                   ))}
                 </div>
               </div>
-              <div className="rounded-lg border border-line bg-surface p-3">
-                <p className="mb-2 font-bold text-ink">Diet Plans</p>
+              <div className="rounded-lg border border-border bg-background p-3">
+                <p className="mb-2 font-bold text-foreground">Diet Plans</p>
                 {diets.length === 0 ? (
-                  <p className="text-sm text-ink-faint">
+                  <p className="text-sm text-muted-foreground">
                     No diet plans assigned.
                   </p>
                 ) : null}
@@ -954,12 +954,12 @@ function MemberDetailModal({
                   {diets.map((plan) => (
                     <div
                       key={plan.id}
-                      className="rounded-md border border-line bg-panel p-3"
+                      className="rounded-md border border-border bg-card p-3"
                     >
                       <p className="font-semibold">
                         Starts {plan.startDate.slice(0, 10)}
                       </p>
-                      <p className="mt-1 text-xs text-ink-faint">
+                      <p className="mt-1 text-xs text-muted-foreground">
                         {plan.meals.length} meals
                       </p>
                     </div>
@@ -970,7 +970,7 @@ function MemberDetailModal({
           ) : null}
 
           {canManageLifecycle ? (
-            <div className="flex flex-wrap gap-2 border-t border-line pt-4">
+            <div className="flex flex-wrap gap-2 border-t border-border pt-4">
               <Button
                 variant="secondary"
                 className="h-9 px-3"
@@ -1005,7 +1005,7 @@ function MemberDetailModal({
               </Button>
               <Button
                 variant="secondary"
-                className="h-9 px-3 text-accent"
+                className="h-9 px-3 text-destructive"
                 onClick={onArchive}
               >
                 <Archive className="h-4 w-4" aria-hidden="true" />
@@ -1036,14 +1036,14 @@ function MemberSubscriptionSummary({
     : null;
 
   return (
-    <div className="mb-4 rounded-lg border border-line bg-surface p-3">
+    <div className="mb-4 rounded-lg border border-border bg-background p-3">
       <div className="mb-3 flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.16em] text-brand">
+          <p className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.16em] text-primary">
             <WalletCards className="h-3.5 w-3.5" aria-hidden="true" />
             Current Membership
           </p>
-          <p className="mt-1 text-sm font-semibold text-ink-muted">
+          <p className="mt-1 text-sm font-semibold text-muted-foreground">
             {subscription
               ? "Active subscription attached to this member"
               : "No active subscription assigned"}
@@ -1054,19 +1054,19 @@ function MemberSubscriptionSummary({
       {subscription ? (
         <div className="grid gap-2 text-sm">
           <div className="flex justify-between gap-3">
-            <span className="text-ink-faint">Plan</span>
-            <span className="min-w-0 truncate font-bold text-ink">
+            <span className="text-muted-foreground">Plan</span>
+            <span className="min-w-0 truncate font-bold text-foreground">
               {subscription.planName}
             </span>
           </div>
           <div className="flex justify-between gap-3">
-            <span className="text-ink-faint">Period</span>
-            <span className="numeric text-right font-semibold text-ink-muted">
+            <span className="text-muted-foreground">Period</span>
+            <span className="numeric text-right font-semibold text-muted-foreground">
               {subscription.startDate} to {subscription.endDate}
             </span>
           </div>
           <div className="flex justify-between gap-3">
-            <span className="text-ink-faint">Payment</span>
+            <span className="text-muted-foreground">Payment</span>
             <span className="flex flex-wrap justify-end gap-2">
               {invoice ? (
                 <StatusBadge status={invoice.status} />
@@ -1076,7 +1076,7 @@ function MemberSubscriptionSummary({
                 </span>
               )}
               {invoice ? (
-                <span className="numeric text-xs font-bold text-ink-muted">
+                <span className="numeric text-xs font-bold text-muted-foreground">
                   {formatCents(invoice.remainingCents)} due
                 </span>
               ) : null}
@@ -1085,7 +1085,7 @@ function MemberSubscriptionSummary({
           {canCancel ? (
             <Button
               variant="secondary"
-              className="mt-2 h-9 justify-self-start px-3 text-accent"
+              className="mt-2 h-9 justify-self-start px-3 text-destructive"
               onClick={onCancel}
             >
               <X className="h-4 w-4" aria-hidden="true" />
@@ -1094,7 +1094,7 @@ function MemberSubscriptionSummary({
           ) : null}
         </div>
       ) : (
-        <p className="text-sm font-semibold text-ink-faint">
+        <p className="text-sm font-semibold text-muted-foreground">
           Assign a subscription from the Memberships page.
         </p>
       )}
@@ -1137,10 +1137,10 @@ function MemberLoginModal({
           />
           <Detail label="Email" value={login.user.email} />
           <div>
-            <p className="text-xs font-semibold uppercase text-ink-faint">
+            <p className="text-xs font-semibold uppercase text-muted-foreground">
               Temporary password
             </p>
-            <p className="mt-1 rounded-md border border-line bg-surface px-3 py-2 font-mono text-lg font-black text-ink">
+            <p className="mt-1 rounded-md border border-border bg-background px-3 py-2 font-mono text-lg font-black text-foreground">
               {login.temporaryPassword}
             </p>
           </div>
@@ -1162,10 +1162,10 @@ function Detail({
 }) {
   return (
     <div>
-      <dt className="text-xs font-semibold uppercase text-ink-faint">
+      <dt className="text-xs font-semibold uppercase text-muted-foreground">
         {label}
       </dt>
-      <dd className={`mt-1 font-semibold text-ink ${numeric ? "numeric" : ""}`}>
+      <dd className={`mt-1 font-semibold text-foreground ${numeric ? "numeric" : ""}`}>
         {value}
       </dd>
     </div>

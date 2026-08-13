@@ -15,10 +15,10 @@ export function PlaceholderPage() {
 
   return (
     <section className="max-w-6xl">
-      <div className="border-b border-line pb-5">
-        <h2 className="text-2xl font-bold text-ink">{title}</h2>
+      <div className="border-b border-border pb-5">
+        <h2 className="text-2xl font-bold text-foreground">{title}</h2>
       </div>
-      <div className="mt-6 min-h-[360px] rounded-lg border border-dashed border-line bg-panel" />
+      <div className="mt-6 min-h-[360px] rounded-lg border border-dashed border-border bg-card" />
     </section>
   );
 }

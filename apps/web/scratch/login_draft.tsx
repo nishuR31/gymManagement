@@ -105,7 +105,7 @@ export function LoginPage() {
       return (
         <div className="animate-fade-in space-y-6">
           <div className="flex items-center gap-2 pb-4">
-            <Button variant="ghost" className="h-8 w-8 p-0 rounded-full" onClick={() => setStep("email")}><ArrowLeft className="h-4 w-4" /></Button>
+            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" onClick={() => setStep("email")}><ArrowLeft className="h-4 w-4" /></Button>
             <span className="text-sm font-medium">{email}</span>
           </div>
           <form className="grid gap-4" onSubmit={subPass(handlePassNext)}>
@@ -115,7 +115,7 @@ export function LoginPage() {
           
           <div className="grid gap-3 pt-4 border-t border-border">
             <Button variant="outline" type="button" onClick={handleSendOTP} className="w-full h-11 btn-outline"><MessageSquare className="w-4 h-4" /> Send OTP to Email</Button>
-            <Button variant="outline" type="button" onClick={handleMagicLink} className="hidden w-full h-11 btn-outline"><Mail className="w-4 h-4" /> Send Magic Link</Button>
+            <Button variant="outline" type="button" onClick={handleMagicLink} className="w-full h-11 btn-outline"><Mail className="w-4 h-4" /> Send Magic Link</Button>
           </div>
         </div>
       );
@@ -125,7 +125,7 @@ export function LoginPage() {
       return (
         <div className="animate-fade-in space-y-6">
           <div className="flex items-center gap-2 pb-4">
-            <Button variant="ghost" className="h-8 w-8 p-0 rounded-full" onClick={() => setStep("password")}><ArrowLeft className="h-4 w-4" /></Button>
+            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" onClick={() => setStep("password")}><ArrowLeft className="h-4 w-4" /></Button>
             <span className="text-sm font-medium">{step === "2fa" ? "Two-Factor Authentication" : "One-Time Password"}</span>
           </div>
           <p className="text-sm text-muted-foreground">
@@ -156,15 +156,15 @@ export function LoginPage() {
   };
 
   return (
-    <main className="flex min-h-screen w-full text-foreground bg-background">
-      <section className="grid w-full animate-fade-in md:grid-cols-2">
-        <div className="relative hidden min-h-screen md:block bg-zinc-950">
+    <main className="grid min-h-screen place-items-center px-4 py-10 text-foreground bg-background">
+      <section className="grid w-full max-w-6xl animate-fade-in overflow-hidden rounded-[2rem] border border-border bg-card shadow-sm lg:grid-cols-[minmax(0,1fr)_minmax(420px,0.92fr)]">
+        <div className="relative hidden min-h-[600px] overflow-hidden lg:block bg-zinc-950">
           <img
             src="https://images.unsplash.com/photo-1599058917212-d750089bc07e?q=80&w=1169&auto=format&fit=crop"
             alt="Intense workout"
-            className="absolute inset-0 h-full w-full object-cover"
+            className="absolute inset-0 h-full w-full object-cover opacity-60 mix-blend-overlay"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/90 via-zinc-950/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/40 to-transparent" />
           <div className="relative flex h-full flex-col justify-between p-10 text-zinc-100">
             <Link className="flex items-center gap-3 text-xl font-black text-white" to="/">
               <span className="grid h-10 w-10 place-items-center rounded-lg bg-primary text-primary-foreground shadow-lg">
@@ -187,28 +187,23 @@ export function LoginPage() {
           </div>
         </div>
 
-        <div className="flex flex-col justify-center items-center p-8 md:p-12 lg:p-16 bg-card border-l border-border">
-          <div className="w-full max-w-md">
-            <div className="mb-8">
-              <Link to="/" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground mb-6 transition-colors">
-                <ArrowLeft className="h-4 w-4" />
-                Back to website
-              </Link>
-              <h1 className="text-3xl font-black text-foreground md:text-4xl">Sign in</h1>
-              <p className="mt-2 text-sm text-muted-foreground">Access the staff operations dashboard securely.</p>
-            </div>
+        <div className="flex flex-col justify-center p-8 md:p-12 lg:p-16">
+          <div className="mb-8">
+            <Link className="text-sm font-black text-primary lg:hidden mb-4 inline-block" to="/">ValorFitness</Link>
+            <h1 className="text-3xl font-black text-foreground md:text-4xl">Sign in</h1>
+            <p className="mt-2 text-sm text-muted-foreground">Access the staff operations dashboard securely.</p>
+          </div>
 
-            <div className="min-h-[300px]">
-              {renderStep()}
-            </div>
-            
-            <div className="mt-8 pt-6 border-t border-border">
-              <p className="text-sm font-medium text-foreground">Member account?</p>
-              <Link className="mt-2 inline-flex items-center gap-2 text-sm font-bold text-primary hover:underline" to="/member-login">
-                Use member portal
-                <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </Link>
-            </div>
+          <div className="min-h-[300px]">
+            {renderStep()}
+          </div>
+          
+          <div className="mt-8 pt-6 border-t border-border">
+            <p className="text-sm font-medium text-foreground">Member account?</p>
+            <Link className="mt-2 inline-flex items-center gap-2 text-sm font-bold text-primary hover:underline" to="/member-login">
+              Use member portal
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
           </div>
         </div>
       </section>

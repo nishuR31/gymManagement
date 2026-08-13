@@ -1,38 +1,30 @@
-import { useCallback, useEffect, useState } from "react";
-
-type Theme = "light" | "dark";
-
-const STORAGE_KEY = "gymos-theme";
-
-function getSystemTheme(): Theme {
-  if (typeof window === "undefined") return "dark";
-  return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
-}
-
-function getStoredTheme(): Theme | null {
-  try {
-    const v = localStorage.getItem(STORAGE_KEY);
-    return v === "light" || v === "dark" ? v : null;
-  } catch {
-    return null;
-  }
-}
+import { useCallback } from "react";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { setTheme as setReduxTheme, setStyleMode as setReduxStyleMode, toggleTheme as toggleReduxTheme, type Theme, type StyleMode } from "../features/theme/themeSlice";
 
 export function useTheme() {
-  const [theme, setThemeState] = useState<Theme>(() => getStoredTheme() ?? getSystemTheme());
-
-  useEffect(() => {
-    const root = document.documentElement;
-    root.classList.toggle("dark", theme === "dark");
-    root.classList.toggle("light", theme === "light");
-    localStorage.setItem(STORAGE_KEY, theme);
-  }, [theme]);
+  const dispatch = useAppDispatch();
+  const theme = useAppSelector((state) => state.theme.theme);
+  const styleMode = useAppSelector((state) => state.theme.styleMode);
 
   const toggle = useCallback(() => {
-    setThemeState((prev) => (prev === "dark" ? "light" : "dark"));
-  }, []);
+    dispatch(toggleReduxTheme());
+  }, [dispatch]);
 
-  const setTheme = useCallback((t: Theme) => setThemeState(t), []);
+  const setTheme = useCallback((t: Theme) => {
+    dispatch(setReduxTheme(t));
+  }, [dispatch]);
 
-  return { theme, toggle, setTheme, isDark: theme === "dark" } as const;
+  const setStyleMode = useCallback((s: StyleMode) => {
+    dispatch(setReduxStyleMode(s));
+  }, [dispatch]);
+
+  return { 
+    theme, 
+    toggle, 
+    setTheme, 
+    isDark: theme === "dark",
+    styleMode,
+    setStyleMode
+  } as const;
 }

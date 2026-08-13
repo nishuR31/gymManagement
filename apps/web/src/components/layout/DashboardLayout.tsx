@@ -105,21 +105,21 @@ export function DashboardLayout() {
   };
 
   return (
-    <div className="min-h-screen text-ink app-gradient">
-      <aside className="fixed inset-y-0 left-0 hidden w-72 overflow-hidden border-r border-line text-ink shadow-soft dark-band-gradient lg:flex lg:flex-col">
+    <div className="min-h-screen text-foreground bg-background">
+      <aside className="layout-sidebar">
         <div className="shrink-0 px-4 pt-5">
-        <Link to="/" className="block rounded-lg border border-line bg-panel/80 p-4 transition hover:border-brand focus-visible:focus-ring" aria-label="Go to home page">
+        <Link to="/" className="block rounded-lg border border-border bg-panel/80 p-4 transition hover:border-brand focus-visible:focus-ring" aria-label="Go to home page">
           <div className="flex min-w-0 items-center gap-3">
-            <div className="grid h-11 w-11 place-items-center rounded-md bg-brand text-panel shadow-soft">
+            <div className="grid h-11 w-11 place-items-center rounded-md bg-primary text-panel shadow-sm">
               <Dumbbell className="h-5 w-5" aria-hidden="true" />
             </div>
             <div className="min-w-0">
-              <p className="text-xs font-black uppercase tracking-[0.18em] text-brand">ValorFitness</p>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-primary">ValorFitness</p>
               <h1 className="mt-1 truncate text-lg font-black">Command Center</h1>
             </div>
           </div>
           <div className="mt-4 h-px bg-line" />
-          <p className="mt-4 text-xs font-semibold leading-5 text-ink-muted">Single-gym operations across members, revenue, inventory, coaching, and reporting.</p>
+          <p className="mt-4 text-xs font-semibold leading-5 text-muted-foreground">Single-gym operations across members, revenue, inventory, coaching, and reporting.</p>
         </Link>
         </div>
         <nav className="mt-4 min-h-0 flex-1 overflow-y-auto px-4 pb-4">
@@ -131,7 +131,7 @@ export function DashboardLayout() {
               }
               return (
                 <div key={group.label} className="grid gap-1.5">
-                  <p className="px-3 text-[11px] font-black uppercase tracking-[0.18em] text-ink-faint">{group.label}</p>
+                  <p className="px-3 text-[11px] font-black uppercase tracking-[0.18em] text-muted-foreground">{group.label}</p>
                   {items.map((item) => (
                     <SidebarLink key={item.to} item={item} />
                   ))}
@@ -140,23 +140,23 @@ export function DashboardLayout() {
             })}
           </div>
         </nav>
-        <div className="shrink-0 border-t border-line p-4">
-          <div className="rounded-lg border border-line bg-panel/60 p-3">
-            <p className="text-xs font-black uppercase tracking-[0.16em] text-brand">Signed in</p>
-            <p className="mt-1 truncate text-sm font-bold text-ink">{user ? `${user.firstName} ${user.lastName}` : "Workspace user"}</p>
+        <div className="shrink-0 border-t border-border p-4">
+          <div className="rounded-lg border border-border bg-panel/60 p-3">
+            <p className="text-xs font-black uppercase tracking-[0.16em] text-primary">Signed in</p>
+            <p className="mt-1 truncate text-sm font-bold text-foreground">{user ? `${user.firstName} ${user.lastName}` : "Workspace user"}</p>
           </div>
         </div>
       </aside>
 
       <div className="lg:pl-72">
-        <header className="sticky top-0 z-20 border-b border-line px-4 py-3 shadow-soft backdrop-blur dark-band-gradient md:px-6">
+        <header className="layout-dashboard-header">
           <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <Link to="/" className="grid h-10 w-10 place-items-center rounded-md border border-line bg-surface transition hover:border-brand focus-visible:focus-ring lg:hidden" aria-label="Go to home page">
-                <Dumbbell className="h-5 w-5 text-brand" aria-hidden="true" />
+              <Link to="/" className="grid h-10 w-10 place-items-center rounded-md border border-border bg-background transition hover:border-brand focus-visible:focus-ring lg:hidden" aria-label="Go to home page">
+                <Dumbbell className="h-5 w-5 text-primary" aria-hidden="true" />
               </Link>
               <div>
-                <p className="text-xs font-black uppercase tracking-[0.18em] text-ink-faint">{user?.role.replace("_", " ")}</p>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-muted-foreground">{user?.role.replace("_", " ")}</p>
                 <p className="text-base font-black">{user ? `${user.firstName} ${user.lastName}` : "Signed in"}</p>
               </div>
             </div>
@@ -188,8 +188,8 @@ function SidebarLink({ item }: { item: NavItem }) {
       className={({ isActive }) =>
         `group flex h-10 min-w-0 items-center gap-3 rounded-md px-3 text-sm font-bold transition duration-200 focus-visible:focus-ring ${
           isActive
-            ? "bg-brand text-panel shadow-soft"
-            : "text-ink-muted hover:bg-panel/85 hover:text-ink"
+            ? "bg-primary text-panel shadow-sm"
+            : "text-muted-foreground hover:bg-panel/85 hover:text-foreground"
         }`
       }
     >
@@ -209,7 +209,7 @@ function MobileLink({ item }: { item: NavItem }) {
       aria-label={item.label}
       className={({ isActive }) =>
         `inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-md border text-sm font-bold transition focus-visible:focus-ring ${
-          isActive ? "border-brand bg-brand px-3 text-panel" : "w-10 border-line bg-surface px-0 text-ink-muted hover:border-brand hover:text-ink"
+          isActive ? "border-brand bg-primary px-3 text-panel" : "w-10 border-border bg-background px-0 text-muted-foreground hover:border-brand hover:text-foreground"
         }`
       }
     >

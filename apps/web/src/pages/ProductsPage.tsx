@@ -68,28 +68,28 @@ export function ProductsPage() {
 
   return (
     <section className="grid max-w-7xl gap-6 animate-fade-in">
-      <div className="panel-gradient grid gap-4 rounded-lg border border-line p-4 shadow-soft md:grid-cols-[minmax(0,1fr)_320px] md:items-end">
+      <div className="bg-card grid gap-4 rounded-lg border border-border p-4 shadow-sm md:grid-cols-[minmax(0,1fr)_320px] md:items-end">
         <div>
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-brand">Product Shelf</p>
-          <h2 className="mt-2 text-3xl font-black text-ink">Products</h2>
-          <p className="mt-1 text-sm font-semibold text-ink-muted">
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-primary">Product Shelf</p>
+          <h2 className="mt-2 text-3xl font-black text-foreground">Products</h2>
+          <p className="mt-1 text-sm font-semibold text-muted-foreground">
             {isMember ? "Book gym products for offline payment and pickup." : "Browse active products exactly as members see them."}
           </p>
         </div>
         <Input label="Search products" value={search} onChange={(event) => setSearch(event.target.value)} />
       </div>
 
-      {isLoading ? <div className="rounded-lg border border-line bg-panel p-6 text-sm font-bold text-ink-muted shadow-soft">Loading products</div> : null}
+      {isLoading ? <div className="rounded-lg border border-border bg-card p-6 text-sm font-bold text-muted-foreground shadow-sm">Loading products</div> : null}
       {!isLoading && shownProducts.length === 0 ? <EmptyState icon={PackageSearch} title="No products available" description="Products added by admin will appear here." /> : null}
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {shownProducts.map((product) => (
-          <article key={product.id} className="surface-gradient group grid min-w-0 overflow-hidden rounded-lg border border-line shadow-soft transition hover:-translate-y-1 hover:border-brand">
+          <article key={product.id} className="bg-card group grid min-w-0 overflow-hidden rounded-lg border border-border shadow-sm transition hover:-translate-y-1 hover:border-brand">
             <div className="aspect-[4/3] bg-line-faint">
               {product.imageUrl ? (
                 <img className="h-full w-full object-cover" src={product.imageUrl} alt={product.name} />
               ) : (
-                <div className="grid h-full place-items-center text-brand">
+                <div className="grid h-full place-items-center text-primary">
                   <ImageIcon className="h-12 w-12" aria-hidden="true" />
                 </div>
               )}
@@ -98,12 +98,12 @@ export function ProductsPage() {
               <div className="min-w-0">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="truncate text-lg font-black text-ink">{product.name}</p>
-                    <p className="mt-1 text-xs font-black uppercase text-brand">{readableStatus(product.category)}</p>
+                    <p className="truncate text-lg font-black text-foreground">{product.name}</p>
+                    <p className="mt-1 text-xs font-black uppercase text-primary">{readableStatus(product.category)}</p>
                   </div>
-                  <p className="numeric shrink-0 text-xl font-black text-brand-light">{formatCents(product.priceCents)}</p>
+                  <p className="numeric shrink-0 text-xl font-black text-primary-foreground">{formatCents(product.priceCents)}</p>
                 </div>
-                <p className="mt-3 text-sm font-semibold leading-6 text-ink-muted">{product.description ?? "Available at the gym desk."}</p>
+                <p className="mt-3 text-sm font-semibold leading-6 text-muted-foreground">{product.description ?? "Available at the gym desk."}</p>
               </div>
               <LoadBar value={product.currentStock} max={Math.max(1, product.reorderThreshold)} label={`${product.currentStock} available`} tone={stockTone(product)} />
               <Button
@@ -125,10 +125,10 @@ export function ProductsPage() {
       <Modal title="Confirm Product Order" open={!!selected} onClose={() => setSelected(null)}>
         {selected ? (
           <div className="grid gap-4">
-            <div className="rounded-md border border-line bg-surface p-3">
-              <p className="font-black text-ink">{selected.name}</p>
-              <p className="numeric mt-1 text-2xl font-black text-brand-light">{formatCents(selected.priceCents * Number(quantity || "0"))}</p>
-              <p className="mt-1 text-sm font-semibold text-ink-faint">Payment is collected manually at the gym desk.</p>
+            <div className="rounded-md border border-border bg-background p-3">
+              <p className="font-black text-foreground">{selected.name}</p>
+              <p className="numeric mt-1 text-2xl font-black text-primary-foreground">{formatCents(selected.priceCents * Number(quantity || "0"))}</p>
+              <p className="mt-1 text-sm font-semibold text-muted-foreground">Payment is collected manually at the gym desk.</p>
             </div>
             <Input label="Quantity" type="number" min={1} max={selected.currentStock} value={quantity} onChange={(event) => setQuantity(event.target.value)} />
             <Button isLoading={isOrdering} disabled={Number(quantity) <= 0 || Number(quantity) > selected.currentStock} onClick={() => void placeOrder()}>

@@ -54,19 +54,19 @@ export function FirstPasswordPage() {
   };
 
   return (
-    <main className="grid min-h-screen place-items-center px-4 py-10 text-ink app-gradient">
-      <section className="w-full max-w-lg animate-slide-up rounded-lg border border-line bg-panel/95 p-6 shadow-soft md:p-8">
+    <main className="grid min-h-screen place-items-center px-4 py-10 text-foreground bg-background">
+      <section className="w-full max-w-lg animate-slide-up rounded-lg border border-border bg-panel/95 p-6 shadow-sm md:p-8">
         <div className="mb-8">
-          <Link className="flex items-center gap-3 text-sm font-black text-brand" to="/">
+          <Link className="flex items-center gap-3 text-sm font-black text-primary" to="/">
             <Dumbbell className="h-4 w-4" aria-hidden="true" />
             ValorFitness
           </Link>
-          <p className="mt-6 inline-flex items-center gap-2 rounded-md border border-brand/30 bg-surface px-3 py-2 text-xs font-black uppercase tracking-[0.18em] text-brand">
+          <p className="mt-6 inline-flex items-center gap-2 rounded-md border border-brand/30 bg-background px-3 py-2 text-xs font-black uppercase tracking-[0.18em] text-primary">
             <KeyRound className="h-3.5 w-3.5" aria-hidden="true" />
             First Login
           </p>
-          <h1 className="mt-4 text-3xl font-black text-ink md:text-4xl">Set your password</h1>
-          <p className="mt-2 text-sm leading-6 text-ink-muted">Create a private password before opening your workspace.</p>
+          <h1 className="mt-4 text-3xl font-black text-foreground md:text-4xl">Set your password</h1>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">Create a private password before opening your workspace.</p>
         </div>
 
         <form className="grid gap-5" onSubmit={(event) => void handleSubmit(onSubmit)(event)}>
@@ -83,9 +83,9 @@ export function FirstPasswordPage() {
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Button>
         </form>
-        <div className="mt-6 grid gap-2 rounded-lg border border-line bg-surface/70 p-4 text-sm font-semibold text-ink-muted">
-          <span className="inline-flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-brand" aria-hidden="true" /> Your temporary password is replaced immediately.</span>
-          <span className="inline-flex items-center gap-2"><BadgeCheck className="h-4 w-4 text-brand" aria-hidden="true" /> Future logins use this private password.</span>
+        <div className="mt-6 grid gap-2 rounded-lg border border-border bg-surface/70 p-4 text-sm font-semibold text-muted-foreground">
+          <span className="inline-flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-primary" aria-hidden="true" /> Your temporary password is replaced immediately.</span>
+          <span className="inline-flex items-center gap-2"><BadgeCheck className="h-4 w-4 text-primary" aria-hidden="true" /> Future logins use this private password.</span>
         </div>
       </section>
     </main>
