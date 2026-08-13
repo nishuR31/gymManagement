@@ -11,12 +11,20 @@ import { Input } from "../components/ui/Input";
 import { submitPublicInquiry } from "../features/public/publicApi";
 import { getApiErrorMessage } from "../utils/apiError";
 
-interface InquiryForm {
-  name: string;
-  email: string;
-  phone: string;
-  message: string;
-}
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const inquirySchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Please enter a valid email address"),
+  phone: z.union([
+    z.string().regex(/^\+?[0-9\s\-()]{10,15}$/, "Invalid phone number format"),
+    z.literal("")
+  ]),
+  message: z.string().min(10, "Message must be at least 10 characters"),
+});
+
+type InquiryForm = z.infer<typeof inquirySchema>;
 
 export function PublicHomePage() {
   const {
@@ -25,6 +33,7 @@ export function PublicHomePage() {
     reset,
     formState: { errors, isSubmitting }
   } = useForm<InquiryForm>({
+    resolver: zodResolver(inquirySchema),
     defaultValues: {
       name: "",
       email: "",
@@ -115,12 +124,12 @@ export function PublicHomePage() {
           "
           sizes="100vw"
           alt="Male training"
-          className="absolute inset-0  h-full w-full object-cover opacity-60 dark:opacity-100"
+          className="absolute inset-0  h-full w-full object-cover backdrop-blur-sm opacity-60 dark:opacity-100"
           style={{ objectPosition: "center 20%" }}
         />
         {/* Gradient overlays to blend into the main background */}
         <div className="absolute inset-0 bg-linear-b from-background via-background/40 to-background" />
-        {/* <div className="absolute inset-0 bg-background/30 " /> */}
+        <div className="absolute inset-0 bg-background/30 " />
 
         <div className="relative z-10">
           <section className="border-y border-border/30 bg-background/40 backdrop-blur-md">
@@ -171,17 +180,21 @@ export function PublicHomePage() {
                 <Input
                   label="Phone"
                   type="tel"
-                  {...register("phone")}
+                  {...register("phone", {
+                    onChange: (e) => {
+                      e.target.value = e.target.value.replace(/[^\d\s\+\-\(\)]/g, "");
+                    }
+                  })}
                   error={errors.phone?.message}
                 />
                 <label className="grid gap-2 text-sm font-medium text-foreground">
                   <span>Message</span>
                   <textarea
-                    className="input-base min-h-32 resize-y"
-                    {...register("message", { required: "Message is required" })}
+                    className={`input-base min-h-32 resize-y ${errors.message ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                    {...register("message")}
                   />
                   {errors.message?.message && (
-                    <span className="text-sm font-medium text-destructive">{errors.message.message as string}</span>
+                    <span className="text-sm font-medium text-red-500">{errors.message.message as string}</span>
                   )}
                 </label>
                 <Button type="submit" className="mt-2" isLoading={isSubmitting}>
