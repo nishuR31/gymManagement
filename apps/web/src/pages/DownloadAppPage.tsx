@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { APP_NAME } from "../utils/env";
-import { Link } from "react-router-dom";
-import { ArrowRight, CheckCircle2, QrCode, Smartphone, Apple, Play } from "lucide-react";
+import { CheckCircle2, Smartphone } from "lucide-react";
 import { Button } from "../components/ui/Button";
 import { Card } from "../components/ui/Card";
 
@@ -28,7 +27,7 @@ export function DownloadAppPage() {
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed mb-10">
             Download our app for better services, easy access, and a more convenient gym experience. View timelines, track your classes, and manage your membership seamlessly.
           </p>
-          
+
           <div className="flex flex-wrap justify-center gap-4">
             <Button className="h-14 px-8 text-base" onClick={() => setPlatform("ios")}>
               Download for iOS
@@ -47,40 +46,40 @@ export function DownloadAppPage() {
               <h2 className="text-3xl font-black text-foreground mb-4">How to get started</h2>
               <p className="text-muted-foreground">It takes less than a minute to setup your account and start using the app.</p>
             </div>
-            
+
             <div className="space-y-6">
               <Step number="01" title="Download & Install" description="Get the app from the App Store or Google Play." />
               <Step number="02" title="Sign In" description="Use your member email and password." />
               <Step number="03" title="Scan & Go" description="Use the app barcode to quickly scan in at the front desk." />
             </div>
           </div>
-          
+
           <div className="relative">
             <div className="absolute inset-0 bg-brand/20 blur-[100px] rounded-full" />
             <div className="card-base relative p-6 shadow-xl mx-auto max-w-sm transform rotate-2 hover:rotate-0 transition duration-500">
-              <div className="border border-border/50 bg-background rounded-2xl p-4 h-[600px] flex flex-col items-center justify-center text-center">
+              <div className="border border-border/50 bg-background rounded-2xl p-4 h-150 flex flex-col items-center justify-center text-center">
                 <div className="flex gap-1 p-1 card-base rounded-lg mb-8">
-                  <button 
-                    onClick={() => setPlatform("ios")} 
+                  <button
+                    onClick={() => setPlatform("ios")}
                     className={`px-4 py-2 text-sm font-bold rounded-md transition flex items-center gap-2 ${platform === "ios" ? "bg-primary text-panel shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
                   >
                     iOS
                   </button>
-                  <button 
-                    onClick={() => setPlatform("android")} 
+                  <button
+                    onClick={() => setPlatform("android")}
                     className={`px-4 py-2 text-sm font-bold rounded-md transition flex items-center gap-2 ${platform === "android" ? "bg-primary text-panel shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
                   >
                     Android
                   </button>
                 </div>
-                
+
                 <div className="bg-white p-3 rounded-xl shadow-sm mb-6">
                   <img src={qrCodeUrl} alt={`QR Code for ${platform}`} className="h-36 w-36" />
                 </div>
-                
+
                 <h3 className="text-xl font-bold text-foreground mb-2">Scan to download</h3>
                 <p className="text-sm text-muted-foreground mb-8">Point your camera to get the {platform === "ios" ? "iOS" : "Android"} app</p>
-                
+
                 <div className="w-full space-y-3">
                   <div className="h-12 card-base w-full animate-pulse bg-brand/5" />
                   <div className="h-12 card-base w-full animate-pulse bg-brand/5" />
@@ -90,20 +89,20 @@ export function DownloadAppPage() {
           </div>
         </div>
       </section>
-      
+
       <section className="mx-auto max-w-7xl px-6 py-12">
         <h2 className="text-3xl font-black text-foreground mb-10 text-center">App Functionalities</h2>
         <div className="grid md:grid-cols-3 gap-6">
-          <FeatureCard 
-            title="Fast Check-in" 
+          <FeatureCard
+            title="Fast Check-in"
             description="No more waiting at the front desk. Flash your app barcode to scan in instantly."
           />
-          <FeatureCard 
-            title="Class Timelines" 
+          <FeatureCard
+            title="Class Timelines"
             description="View daily schedules, track class availability, and book your spot ahead of time."
           />
-          <FeatureCard 
-            title="Membership Management" 
+          <FeatureCard
+            title="Membership Management"
             description="Check your billing cycle, renew plans, or upgrade your membership natively in the app."
           />
         </div>
@@ -115,7 +114,7 @@ export function DownloadAppPage() {
 function Step({ number, title, description }: { number: string, title: string, description: string }) {
   return (
     <div className="flex gap-4 items-start">
-      <div className="flex-shrink-0 w-12 h-12 bg-brand/10 text-primary font-black rounded-full flex items-center justify-center text-sm border border-brand/20">
+      <div className="shrink-0 w-12 h-12 bg-brand/10 text-primary font-black rounded-full flex items-center justify-center text-sm border border-brand/20">
         {number}
       </div>
       <div>

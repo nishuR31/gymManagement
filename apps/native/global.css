@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --brand: 220 90% 56%;
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+    --panel: 0 0% 100%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+    --primary: 222 47% 11%;
+    --primary-foreground: 210 40% 98%;
+    --border: 214 32% 91%;
+    --line: 214 32% 91%;
+  }
+
+  .theme-clay {
+    --background: 210 20% 98%;
+    --panel: 0 0% 100%;
+    --primary: 220 90% 56%;
+    --primary-foreground: 0 0% 100%;
+  }
+
+  .theme-minimal {
+    --background: 0 0% 100%;
+    --primary: 0 0% 0%;
+  }
+}
