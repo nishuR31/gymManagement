@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "native",
-    "slug": "native",
+    "slug": "gym",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -17,7 +17,14 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
-    }
+      "predictiveBackGestureEnabled": false,
+      "package": "com.gym.com"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "9317d332-0724-43a2-8e8b-eb862bb2efed"
+      }
+    },
+    "owner": "dream691"
   }
 }

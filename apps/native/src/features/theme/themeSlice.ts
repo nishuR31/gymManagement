@@ -1,4 +1,6 @@
-import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk, type PayloadAction } from "@reduxjs/toolkit";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Appearance } from "react-native";
 
 export type Theme = "light" | "dark";
 export type StyleMode = "minimal" | "glass" | "clay";
@@ -6,38 +8,26 @@ export type StyleMode = "minimal" | "glass" | "clay";
 export interface ThemeState {
   theme: Theme;
   styleMode: StyleMode;
+  isLoaded: boolean;
 }
 
 const STORAGE_KEY = "gymos-theme";
 const STYLE_STORAGE_KEY = "gymos-style";
 
-function getSystemTheme(): Theme {
-  if (typeof window === "undefined") return "dark";
-  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-}
-
-function getStoredTheme(): Theme | null {
-  try {
-    const v = localStorage.getItem(STORAGE_KEY);
-    return v === "light" || v === "dark" ? v : null;
-  } catch {
-    return null;
-  }
-}
-
-function getStoredStyle(): StyleMode | null {
-  try {
-    const v = localStorage.getItem(STYLE_STORAGE_KEY);
-    return v === "minimal" || v === "glass" || v === "clay" ? v : null;
-  } catch {
-    return null;
-  }
-}
-
 const initialState: ThemeState = {
-  theme: getStoredTheme() ?? getSystemTheme(),
-  styleMode: getStoredStyle() ?? "minimal"
+  theme: Appearance.getColorScheme() === "dark" ? "dark" : "light",
+  styleMode: "minimal",
+  isLoaded: false
 };
+
+export const loadThemeSettings = createAsyncThunk("theme/loadSettings", async () => {
+  const theme = await AsyncStorage.getItem(STORAGE_KEY);
+  const style = await AsyncStorage.getItem(STYLE_STORAGE_KEY);
+  return {
+    theme: (theme === "light" || theme === "dark") ? theme : null,
+    styleMode: (style === "minimal" || style === "glass" || style === "clay") ? style : null
+  };
+});
 
 export const themeSlice = createSlice({
   name: "theme",
@@ -45,24 +35,26 @@ export const themeSlice = createSlice({
   reducers: {
     setTheme: (state, action: PayloadAction<Theme>) => {
       state.theme = action.payload;
-      try {
-        localStorage.setItem(STORAGE_KEY, action.payload);
-      } catch { }
+      AsyncStorage.setItem(STORAGE_KEY, action.payload).catch(() => {});
     },
     setStyleMode: (state, action: PayloadAction<StyleMode>) => {
       state.styleMode = action.payload;
-      try {
-        localStorage.setItem(STYLE_STORAGE_KEY, action.payload);
-      } catch { }
+      AsyncStorage.setItem(STYLE_STORAGE_KEY, action.payload).catch(() => {});
     },
     toggleTheme: (state) => {
       state.theme = state.theme === "dark" ? "light" : "dark";
-      try {
-        localStorage.setItem(STORAGE_KEY, state.theme);
-      } catch { }
+      AsyncStorage.setItem(STORAGE_KEY, state.theme).catch(() => {});
     }
+  },
+  extraReducers: (builder) => {
+    builder.addCase(loadThemeSettings.fulfilled, (state, action) => {
+      if (action.payload.theme) state.theme = action.payload.theme as Theme;
+      if (action.payload.styleMode) state.styleMode = action.payload.styleMode as StyleMode;
+      state.isLoaded = true;
+    });
   }
 });
 
 export const { setTheme, setStyleMode, toggleTheme } = themeSlice.actions;
 export const themeReducer = themeSlice.reducer;
+

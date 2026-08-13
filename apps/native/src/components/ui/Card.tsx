@@ -1,13 +1,25 @@
 import React from 'react';
 import { View, Text, ViewProps } from 'react-native';
+import { useAppSelector } from '../../store/hooks';
 
 interface CardProps extends ViewProps {
   children: React.ReactNode;
 }
 
 export function Card({ children, className, ...props }: CardProps) {
+  const styleMode = useAppSelector((state) => state.theme.styleMode);
+  
+  let baseClass = 'bg-card ';
+  if (styleMode === 'clay') {
+    baseClass += 'border border-transparent shadow-md rounded-[32px]';
+  } else if (styleMode === 'glass') {
+    baseClass += 'border border-border bg-card/60 shadow-sm rounded-xl';
+  } else {
+    baseClass += 'rounded-xl border border-border shadow-none';
+  }
+
   return (
-    <View className={`rounded-xl border border-border bg-card shadow-sm ${className || ''}`} {...props}>
+    <View className={`${baseClass} ${className || ''}`} {...props}>
       {children}
     </View>
   );

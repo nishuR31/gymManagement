@@ -8,8 +8,9 @@ import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
 import { useAppDispatch } from '../store/hooks';
-import { loginThunk } from '../features/auth/authSlice';
+import { memberLoginThunk } from '../features/auth/authSlice';
 import { LockKeyhole, Mail, ArrowRight } from 'lucide-react-native';
+import Toast from 'react-native-toast-message';
 
 const emailSchema = z.object({ email: z.string().email("Enter a valid email") });
 const passwordSchema = z.object({ password: z.string().min(8, "Password must be at least 8 characters") });
@@ -35,12 +36,18 @@ export function LoginScreen({ navigation }: any) {
 
   const onFinalLogin = async (data: any) => {
     setIsSimulating(true);
-    const result = await dispatch(loginThunk({ email: email || "admin@example.com", password: data.password || "adminpassword" }));
+    const result = await dispatch(memberLoginThunk({ email: email || "john@example.com", password: data.password || "password123" }));
     setIsSimulating(false);
-    if (loginThunk.fulfilled.match(result)) {
+    
+    if (memberLoginThunk.fulfilled.match(result)) {
+      Toast.show({ type: 'success', text1: 'Welcome back!' });
       navigation.replace("Dashboard");
     } else {
-      console.log("Login failed");
+      if (result.payload === "NOT_A_MEMBER") {
+        Toast.show({ type: 'error', text1: `You are not a member of ${APP_NAME}` });
+      } else {
+        Toast.show({ type: 'error', text1: 'Authentication failed' });
+      }
     }
   };
 
