@@ -45,7 +45,7 @@ export function PublicHomePage() {
 
   return (
     <main className="min-h-screen bg-background overflow-y-auto snap-y snap-proximity scroll-smooth text-foreground">
-      <section className="sticky top-0 snap-start flex h-screen items-stretch overflow-hidden -mt-[68px] pt-[68px]">
+      <section className="sticky top-0 snap-start flex h-screen items-stretch overflow-hidden -mt-17 pt-17">
         <img
           src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=1800&q=85"
           srcSet="
@@ -119,7 +119,7 @@ export function PublicHomePage() {
           style={{ objectPosition: "center 20%" }}
         />
         {/* Gradient overlays to blend into the main background */}
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-background/40 to-background" />
+        <div className="absolute inset-0 bg-linear-b from-background via-background/40 to-background" />
         {/* <div className="absolute inset-0 bg-background/30 " /> */}
 
         <div className="relative z-10">

@@ -42,7 +42,7 @@ export function MemberLoginPage() {
     setIsSimulating(true);
     const result = await dispatch(memberLoginThunk({ email: email || "john@example.com", password: pass || "password123" }));
     setIsSimulating(false);
-    
+
     if (memberLoginThunk.fulfilled.match(result)) {
       if (result.payload.user.mustChangePassword) {
         navigate("/member/first-password", { replace: true });
@@ -78,7 +78,7 @@ export function MemberLoginPage() {
             <Input label="Member Email" type="email" autoComplete="email" error={errEmail.email?.message} {...regEmail("email")} />
             <Button type="submit" className="w-full h-11 btn-primary">Continue with Email <ArrowRight className="h-4 w-4" /></Button>
           </form>
-          
+
           <div className="relative">
             <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border" /></div>
             <div className="relative flex justify-center text-xs uppercase"><span className="bg-background px-2 text-muted-foreground">Or continue with</span></div>
@@ -112,7 +112,7 @@ export function MemberLoginPage() {
             <Input label="Password" type="password" autoComplete="current-password" error={errPass.password?.message} {...regPass("password")} />
             <Button type="submit" className="w-full h-11 btn-primary">Sign In <ArrowRight className="h-4 w-4" /></Button>
           </form>
-          
+
           <div className="grid gap-3 pt-4 border-t border-border">
             <Button variant="outline" type="button" onClick={handleSendOTP} className="w-full h-11 btn-outline"><MessageSquare className="w-4 h-4" /> Send OTP to Email</Button>
             <Button variant="outline" type="button" onClick={handleMagicLink} className="hidden w-full h-11 btn-outline"><Mail className="w-4 h-4" /> Send Magic Link</Button>
@@ -164,7 +164,7 @@ export function MemberLoginPage() {
             alt="Member workout"
             className="absolute inset-0 h-full w-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/90 via-zinc-950/20 to-transparent" />
+          <div className="absolute inset-0 bg-linear-t from-zinc-950/90 via-zinc-950/20 to-transparent" />
           <div className="relative flex h-full flex-col justify-between p-10 text-zinc-100">
             <Link className="flex items-center gap-3 text-xl font-black text-white" to="/">
               <span className="grid h-10 w-10 place-items-center rounded-lg bg-primary text-primary-foreground shadow-lg">
@@ -177,7 +177,7 @@ export function MemberLoginPage() {
                 <UserRound className="h-3.5 w-3.5" aria-hidden="true" />
                 Member Access
               </p>
-              <h1 className="mt-6 text-5xl font-black leading-[1.1] text-white">Unlock<br/>your true<br/>potential.</h1>
+              <h1 className="mt-6 text-5xl font-black leading-[1.1] text-white">Unlock<br />your true<br />potential.</h1>
               <div className="mt-8 grid gap-4">
                 <div className="flex items-center gap-3"><BadgeCheck className="h-5 w-5 text-primary" /><span className="font-semibold">Track your training progress</span></div>
                 <div className="flex items-center gap-3"><KeyRound className="h-5 w-5 text-primary" /><span className="font-semibold">Manage your memberships</span></div>
@@ -198,10 +198,10 @@ export function MemberLoginPage() {
               <p className="mt-2 text-sm text-muted-foreground">Access your personal gym portal securely.</p>
             </div>
 
-            <div className="min-h-[300px]">
+            <div className="min-h-75">
               {renderStep()}
             </div>
-            
+
             <div className="mt-8 pt-6 border-t border-border">
               <p className="text-sm font-medium text-foreground">Staff or Administrator?</p>
               <Link className="mt-2 inline-flex items-center gap-2 text-sm font-bold text-primary hover:underline" to="/login">

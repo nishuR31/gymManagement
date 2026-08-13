@@ -46,7 +46,7 @@ export function OwnerPage() {
           <img
             src="https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=800&q=80"
             alt="Owner in the gym"
-            className="relative rounded-2xl border border-border shadow-lg object-cover w-full h-[500px]"
+            className="relative rounded-2xl border border-border shadow-lg object-cover w-full h-125"
           />
         </div>
       </div>

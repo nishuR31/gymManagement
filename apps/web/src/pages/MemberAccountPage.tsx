@@ -116,7 +116,7 @@ export function MemberAccountPage({ mode }: { mode: MemberAccountMode }) {
           </div>
           {payments.length === 0 ? <div className="p-4"><EmptyState icon={CreditCard} title="No payments recorded" description="Offline payments recorded by admin will appear here." /></div> : null}
           <div className="overflow-x-auto">
-            <table className="min-w-[760px] w-full text-left text-sm">
+            <table className="min-w-190 w-full text-left text-sm">
               <thead className="bg-background text-xs uppercase text-muted-foreground">
                 <tr>
                   <th className="px-4 py-3">Payment</th>
