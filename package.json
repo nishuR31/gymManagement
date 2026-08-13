@@ -8,6 +8,7 @@
     "packages/*"
   ],
   "scripts": {
+    "update": "npm update -i --recursive",
     "dev": "npm run dev:api & npm run dev:web",
     "dev:api": "npm run dev --workspace @gym/api",
     "dev:web": "npm run dev --workspace @gym/web",
