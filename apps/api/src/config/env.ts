@@ -36,7 +36,10 @@ const envSchema = z.object({
     )
     .default("http://localhost:5173"),
   COOKIE_SECURE: z.coerce.boolean().default(false),
-  API_PORT: z.coerce.number().int().positive().default(4000)
+  API_PORT: z.coerce.number().int().positive().default(4000),
+  PASSKEY_EXPECTED_ORIGIN: z.string().url().default("http://localhost:5173"),
+  PASSKEY_RP_ID: z.string().default("localhost"),
+  PASSKEY_RP_NAME: z.string().default("ValorFitness")
 });
 
 export type Env = z.infer<typeof envSchema>;

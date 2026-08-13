@@ -1,11 +1,12 @@
 import crypto from "node:crypto";
 // @ts-ignore
-import { authenticator } from "otplib";
+import * as otplib from "otplib";
+const authenticator = otplib.authenticator;
 import qrcode from "qrcode";
 // @ts-ignore
 import { generateRegistrationOptions, verifyRegistrationResponse } from "@simplewebauthn/server";
 // @ts-ignore
-import type { VerifiedRegistrationResponse } from "@simplewebauthn/server";
+import type { VerifiedRegistrationResponse, RegistrationResponseJSON } from "@simplewebauthn/server";
 import type { AuthUserDto, RoleName, TwoFactorSetupResponse } from "@gym/shared";
 import { canManageRole } from "../config/auth.js";
 import type { Env } from "../config/env.js";
@@ -380,8 +381,8 @@ export class AuthService {
     if (!user) throw errors.unauthorized();
 
     const options = await generateRegistrationOptions({
-      rpName: "ValorFitness",
-      rpID: "localhost", // Should come from env in prod
+      rpName: this.env.PASSKEY_RP_NAME,
+      rpID: this.env.PASSKEY_RP_ID,
       userID: new Uint8Array(Buffer.from(user.id)),
       userName: user.email,
       attestationType: "none",
@@ -398,7 +399,7 @@ export class AuthService {
     return options;
   }
 
-  public async verifyPasskeyRegistration(actor: RequestActor, body: any, expectedChallenge: string, context: RequestContext) {
+  public async verifyPasskeyRegistration(actor: RequestActor, body: RegistrationResponseJSON, expectedChallenge: string, context: RequestContext) {
     const user = await this.repository.findUserForSecurity(actor.id);
     if (!user) throw errors.unauthorized();
 
@@ -407,8 +408,8 @@ export class AuthService {
       verification = await verifyRegistrationResponse({
         response: body,
         expectedChallenge,
-        expectedOrigin: "http://localhost:5173", // Should come from env in prod
-        expectedRPID: "localhost",
+        expectedOrigin: this.env.PASSKEY_EXPECTED_ORIGIN,
+        expectedRPID: this.env.PASSKEY_RP_ID,
       });
     } catch (error: any) {
       throw errors.badRequest(error.message);

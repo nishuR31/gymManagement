@@ -1,13 +1,11 @@
-import type { PrismaClient } from "@prisma/client";
+import type { PrismaClient, Passkey } from "@prisma/client";
 import type { InputJsonValue } from "@prisma/client/runtime/library";
-import type { AuthUserDto, RoleName } from "@gym/shared";
+import type { AuthUserDto, RoleName, ProfileUpdateDto } from "@gym/shared";
 
 export interface AuthUserRecord extends AuthUserDto {
   passwordHash: string;
   isActive: boolean;
   memberId: string | null;
-  twoFactorEnabled: boolean;
-  hasPasskeys: boolean;
 }
 
 export interface SessionRecord {
@@ -63,11 +61,7 @@ export interface AuditLogInput {
   userAgent?: string;
 }
 
-export interface ProfileUpdateInput {
-  firstName: string;
-  lastName: string;
-  email: string;
-}
+
 
 export interface PasskeyInput {
   userId: string;
@@ -89,13 +83,13 @@ export interface AuthRepository {
   revokeSession(id: string): Promise<void>;
   revokeAllUserSessions(userId: string): Promise<void>;
   updatePassword(userId: string, passwordHash: string, mustChangePassword?: boolean): Promise<void>;
-  updateProfile(userId: string, input: ProfileUpdateInput): Promise<void>;
+  updateProfile(userId: string, input: ProfileUpdateDto): Promise<void>;
   setTwoFactorSecret(userId: string, secret: string): Promise<void>;
   enableTwoFactor(userId: string): Promise<void>;
   disableTwoFactor(userId: string): Promise<void>;
   addPasskey(input: PasskeyInput): Promise<void>;
   removePasskey(id: string): Promise<void>;
-  findUserForSecurity(userId: string): Promise<(AuthUserRecord & { twoFactorSecret: string | null; passkeys: any[] }) | null>;
+  findUserForSecurity(userId: string): Promise<(AuthUserRecord & { twoFactorSecret: string | null; passkeys: Passkey[] }) | null>;
   writeAuditLog(input: AuditLogInput): Promise<void>;
 }
 
@@ -217,7 +211,7 @@ export class PrismaAuthRepository implements AuthRepository {
     });
   }
 
-  public async updateProfile(userId: string, input: ProfileUpdateInput): Promise<void> {
+  public async updateProfile(userId: string, input: ProfileUpdateDto): Promise<void> {
     await this.prisma.user.update({
       where: { id: userId },
       data: {
@@ -267,7 +261,7 @@ export class PrismaAuthRepository implements AuthRepository {
     });
   }
 
-  public async findUserForSecurity(userId: string): Promise<(AuthUserRecord & { twoFactorSecret: string | null; passkeys: any[] }) | null> {
+  public async findUserForSecurity(userId: string): Promise<(AuthUserRecord & { twoFactorSecret: string | null; passkeys: Passkey[] }) | null> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       include: { role: true, memberProfile: { select: { id: true } }, passkeys: true }
