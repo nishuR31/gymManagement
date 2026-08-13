@@ -33,7 +33,7 @@
     "typescript": "~6.0.3"
   },
   "scripts": {
-    "apk": "eas build --platform android --profile development",
+    "apk": "eas build --platform android --profile preview",
     "apple": "eas build --platform ios --profile development",
     "start": "EXPO_NO_DEV_TOOLS=1 EXPO_USE_DEVTOOLS=false expo start",
     "android": "EXPO_NO_DEV_TOOLS=1 EXPO_USE_DEVTOOLS=false expo start --android",
