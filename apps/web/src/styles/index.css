@@ -276,11 +276,16 @@
 
 /* --- Glassmorphism Overrides --- */
 .theme-glass body {
-  /* Dynamic background images should be handled per-page if needed */
-  background-color: transparent;
+  background: radial-gradient(circle at 15% 50%, color-mix(in srgb, var(--color-primary) 15%, transparent), transparent 50%),
+              radial-gradient(circle at 85% 30%, color-mix(in srgb, var(--color-primary) 10%, transparent), transparent 50%);
+  background-attachment: fixed;
+  background-color: var(--color-background);
 }
 .dark.theme-glass body {
-  background-color: transparent;
+  background: radial-gradient(circle at 15% 50%, color-mix(in srgb, var(--color-primary) 20%, transparent), transparent 50%),
+              radial-gradient(circle at 85% 30%, color-mix(in srgb, var(--color-primary) 15%, transparent), transparent 50%);
+  background-attachment: fixed;
+  background-color: var(--color-background);
 }
 
 .theme-glass .layout-header, .theme-glass .layout-footer, .theme-glass .layout-sidebar, .theme-glass .layout-dashboard-header {

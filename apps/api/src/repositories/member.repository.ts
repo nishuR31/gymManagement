@@ -477,16 +477,20 @@ function toAuthUserRecord(user: {
   mustChangePassword: boolean;
   memberProfile?: { id: string } | null;
   role: { name: string };
+  twoFactorEnabled: boolean;
+  passkeys?: { id: string }[];
 }): AuthUserRecord {
   return {
     id: user.id,
     email: user.email,
-    passwordHash: user.passwordHash,
+    passwordHash: user.passwordHash ?? "",
     firstName: user.firstName,
     lastName: user.lastName,
     isActive: user.isActive,
     role: user.role.name as RoleName,
     mustChangePassword: user.mustChangePassword,
-    memberId: user.memberProfile?.id ?? null
+    memberId: user.memberProfile?.id ?? null,
+    twoFactorEnabled: user.twoFactorEnabled,
+    hasPasskeys: (user.passkeys?.length ?? 0) > 0
   };
 }

@@ -32,6 +32,21 @@ const passwordResetConfirmBodySchema = z.object({
   newPassword: passwordSchema
 });
 
+const profileUpdateSchema = z.object({
+  firstName: z.string().trim().min(1).max(80),
+  lastName: z.string().trim().min(1).max(80),
+  email: emailSchema
+});
+
+const changePasswordSchema = z.object({
+  currentPassword: z.string().optional(),
+  newPassword: passwordSchema
+});
+
+const tokenSchema = z.object({
+  token: z.string().length(6)
+});
+
 export interface AuthRoutesOptions {
   authService: AuthService;
   env: Env;
@@ -117,6 +132,101 @@ export async function authRoutes(app: FastifyInstance, options: AuthRoutesOption
     }
 
     return { user: await options.authService.me(request.actor) };
+  });
+
+  app.patch("/me/profile", {
+    preHandler: app.authenticate
+  }, async (request) => {
+    if (!request.actor) throw errors.unauthorized();
+    const body = profileUpdateSchema.parse(request.body);
+    const user = await options.authService.updateProfile(request.actor, body, getRequestContext(request));
+    return { user };
+  });
+
+  app.post("/me/password", {
+    preHandler: app.authenticate
+  }, async (request, reply) => {
+    if (!request.actor) throw errors.unauthorized();
+    const body = changePasswordSchema.parse(request.body);
+    await options.authService.changePassword(request.actor, body.currentPassword, body.newPassword, getRequestContext(request));
+    reply.status(204).send();
+  });
+
+  app.post("/2fa/generate", {
+    preHandler: app.authenticate
+  }, async (request) => {
+    if (!request.actor) throw errors.unauthorized();
+    return await options.authService.generateTwoFactor(request.actor, getRequestContext(request));
+  });
+
+  app.post("/2fa/verify", {
+    preHandler: app.authenticate
+  }, async (request, reply) => {
+    if (!request.actor) throw errors.unauthorized();
+    const body = tokenSchema.parse(request.body);
+    await options.authService.verifyTwoFactor(request.actor, body.token, getRequestContext(request));
+    reply.status(204).send();
+  });
+
+  app.post("/2fa/disable", {
+    preHandler: app.authenticate
+  }, async (request, reply) => {
+    if (!request.actor) throw errors.unauthorized();
+    const body = tokenSchema.parse(request.body);
+    await options.authService.disableTwoFactor(request.actor, body.token, getRequestContext(request));
+    reply.status(204).send();
+  });
+
+  app.get("/passkeys", {
+    preHandler: app.authenticate
+  }, async (request) => {
+    if (!request.actor) throw errors.unauthorized();
+    return await options.authService.getPasskeys(request.actor);
+  });
+
+  app.post("/passkeys/generate-registration", {
+    preHandler: app.authenticate
+  }, async (request, reply) => {
+    if (!request.actor) throw errors.unauthorized();
+    const optionsResult = await options.authService.generatePasskeyRegistration(request.actor);
+    
+    // Store challenge in session cookie (in a real app, use a dedicated session store)
+    reply.setCookie("passkeyChallenge", optionsResult.challenge, {
+      httpOnly: true,
+      secure: options.env.COOKIE_SECURE,
+      sameSite: "lax",
+      path: "/auth/passkeys"
+    });
+    
+    return optionsResult;
+  });
+
+  app.post("/passkeys/verify-registration", {
+    preHandler: app.authenticate
+  }, async (request, reply) => {
+    if (!request.actor) throw errors.unauthorized();
+    const expectedChallenge = request.cookies.passkeyChallenge;
+    if (!expectedChallenge) throw errors.badRequest("Missing passkey challenge");
+
+    await options.authService.verifyPasskeyRegistration(request.actor, request.body, expectedChallenge, getRequestContext(request));
+    
+    reply.clearCookie("passkeyChallenge", {
+      httpOnly: true,
+      secure: options.env.COOKIE_SECURE,
+      sameSite: "lax",
+      path: "/auth/passkeys"
+    });
+    
+    reply.status(204).send();
+  });
+
+  app.delete("/passkeys/:id", {
+    preHandler: app.authenticate
+  }, async (request, reply) => {
+    if (!request.actor) throw errors.unauthorized();
+    const params = z.object({ id: z.string() }).parse(request.params);
+    await options.authService.removePasskey(request.actor, params.id, getRequestContext(request));
+    reply.status(204).send();
   });
 
   app.post("/password-reset/request", {

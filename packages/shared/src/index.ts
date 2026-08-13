@@ -9,6 +9,29 @@ export interface AuthUserDto {
   lastName: string;
   role: RoleName;
   mustChangePassword: boolean;
+  twoFactorEnabled: boolean;
+  hasPasskeys: boolean;
+}
+
+export interface PasskeyDto {
+  id: string;
+  createdAt: string;
+}
+
+export interface ProfileUpdateDto {
+  firstName: string;
+  lastName: string;
+  email: string;
+}
+
+export interface PasswordUpdateDto {
+  currentPassword?: string;
+  newPassword: string;
+}
+
+export interface TwoFactorSetupResponse {
+  secret: string;
+  qrCodeDataUrl: string;
 }
 
 export const memberStatuses = ["ACTIVE", "SUSPENDED", "ARCHIVED"] as const;

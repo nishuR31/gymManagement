@@ -41,7 +41,7 @@ const navItems: NavItem[] = [
   { label: "Products", to: "/dashboard/products", icon: PackageSearch, memberAllowed: true },
   { label: "My Orders", to: "/dashboard/my-orders", icon: ClipboardList, memberAllowed: true, memberOnly: true },
   { label: "My Payments", to: "/dashboard/my-payments", icon: CreditCard, memberAllowed: true, memberOnly: true },
-  { label: "Profile", to: "/dashboard/profile", icon: UserRound, memberAllowed: true, memberOnly: true },
+  { label: "Profile", to: "/dashboard/profile", icon: UserRound, memberAllowed: true },
   { label: "Members", to: "/dashboard/members", icon: Users },
   { label: "Memberships", to: "/dashboard/memberships", icon: WalletCards },
   { label: "Attendance", to: "/dashboard/attendance", icon: Activity },
@@ -106,7 +106,7 @@ export function DashboardLayout() {
   };
 
   return (
-    <div className="min-h-screen text-foreground bg-background">
+    <div className="min-h-screen text-foreground">
       <aside className="layout-sidebar">
         <div className="shrink-0 px-4 pt-5">
         <Link to="/" className="block rounded-lg border border-border bg-card/80 p-4 transition hover:border-primary focus-visible:focus-ring" aria-label="Go to home page">

@@ -34,7 +34,9 @@ export function registerAuthMiddleware(app: FastifyInstance, options: AuthMiddle
         firstName: user.firstName,
         lastName: user.lastName,
         role: user.role,
-        mustChangePassword: user.mustChangePassword
+        mustChangePassword: user.mustChangePassword,
+        twoFactorEnabled: user.twoFactorEnabled,
+        hasPasskeys: user.hasPasskeys
       };
     } catch {
       throw errors.unauthorized();

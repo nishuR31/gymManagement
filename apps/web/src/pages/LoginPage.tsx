@@ -44,10 +44,12 @@ export function LoginPage() {
 
   if (status === "authenticated") return <Navigate to={destination} replace />;
 
-  const onFinalLogin = async (pass?: string) => {
+  const onFinalLogin = async (pass?: string, code?: string) => {
     setIsSimulating(true);
+    // In the future, pass the 2FA `code` to the backend if provided.
     const result = await dispatch(loginThunk({ email: email || "admin@example.com", password: pass || "adminpassword" }));
     setIsSimulating(false);
+    
     if (loginThunk.fulfilled.match(result)) {
       if (result.payload.user.role === "MEMBER") {
         await dispatch(logoutThunk());
@@ -59,12 +61,21 @@ export function LoginPage() {
       navigate(destination, { replace: true });
       return;
     }
+
+    // If the backend eventually supports returning a 2FA error:
+    if (loginThunk.rejected.match(result) && result.payload === "2FA_REQUIRED") {
+      setPasswordCache(pass || "");
+      setStep("2fa");
+      toast.success("Password accepted. Enter 2FA code.");
+      return;
+    }
+
     toast.error("Authentication failed");
   };
 
   const handleEmailNext = (v: EmailFormValues) => { setEmail(v.email); setStep("password"); };
-  const handlePassNext = (v: PasswordFormValues) => { setPasswordCache(v.password); setStep("2fa"); toast.success("Password accepted. Enter 2FA code."); };
-  const handleCodeSubmit = () => { onFinalLogin(passwordCache); };
+  const handlePassNext = (v: PasswordFormValues) => { onFinalLogin(v.password); };
+  const handleCodeSubmit = (v: CodeFormValues) => { onFinalLogin(passwordCache, v.code); };
 
   const handleOAuth = (provider: string) => { toast.success(`Redirecting to ${provider}...`); setTimeout(() => onFinalLogin(), 1500); };
   const handlePasskey = () => { toast.success("Prompting for Passkey..."); setTimeout(() => onFinalLogin(), 1500); };

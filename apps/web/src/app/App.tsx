@@ -37,6 +37,8 @@ const NotificationsPage = lazy(() => import("../pages/NotificationsPage").then((
 const ActivityLogsPage = lazy(() => import("../pages/ActivityLogsPage").then((module) => ({ default: module.ActivityLogsPage })));
 const SettingsPage = lazy(() => import("../pages/SettingsPage").then((module) => ({ default: module.SettingsPage })));
 const InquiriesPage = lazy(() => import("../pages/InquiriesPage").then((module) => ({ default: module.InquiriesPage })));
+const AttendancePage = lazy(() => import("../pages/AttendancePage").then((module) => ({ default: module.AttendancePage })));
+const ProfileSettingsPage = lazy(() => import("../pages/ProfileSettingsPage").then((module) => ({ default: module.ProfileSettingsPage })));
 const PlaceholderPage = lazy(() => import("../pages/PlaceholderPage").then((module) => ({ default: module.PlaceholderPage })));
 const NotFoundPage = lazy(() => import("../pages/NotFoundPage").then((module) => ({ default: module.default })));
 
@@ -91,8 +93,10 @@ export function App() {
                 <Route path="plans" element={<PlansPage />} />
                 <Route path="reports" element={<ReportsPage />} />
                 <Route path="notifications" element={<NotificationsPage />} />
+                <Route path="attendance" element={<AttendancePage />} />
                 <Route path="activity-logs" element={<ActivityLogsPage />} />
                 <Route path="settings" element={<SettingsPage />} />
+                <Route path="profile" element={<ProfileSettingsPage />} />
               </Route>
               <Route element={<RoleRoute allowedRoles={adminRoles} />}>
                 <Route path="inquiries" element={<InquiriesPage />} />
@@ -102,7 +106,7 @@ export function App() {
                 <Route path="my-membership" element={<MemberAccountPage mode="membership" />} />
                 <Route path="my-plans" element={<MemberAccountPage mode="plans" />} />
                 <Route path="my-payments" element={<MemberAccountPage mode="payments" />} />
-                <Route path="profile" element={<MemberAccountPage mode="profile" />} />
+                <Route path="profile" element={<ProfileSettingsPage />} />
               </Route>
               <Route path=":section" element={<PlaceholderPage />} />
             </Route>

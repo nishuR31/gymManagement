@@ -11,6 +11,7 @@ import { Input } from "../components/ui/Input";
 import { submitPublicInquiry } from "../features/public/publicApi";
 import { getApiErrorMessage } from "../utils/apiError";
 
+import { MiniCalendar } from "../components/ui/MiniCalendar";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -133,6 +134,9 @@ export function PublicHomePage() {
           <section className="mx-auto grid max-w-7xl gap-6 px-4 py-14 md:px-6 lg:grid-cols-[minmax(0,1fr)_430px]">
             <FadeIn>
               <div className="mb-6 max-w-2xl">
+                <div className="mb-4">
+                  <MiniCalendar />
+                </div>
                 <p className="text-xs font-black uppercase tracking-[0.18em] text-primary">What members feel</p>
                 <h2 className="mt-3 text-3xl font-black text-foreground md:text-4xl">A gym experience that feels organized from warm-up to checkout.</h2>
               </div>

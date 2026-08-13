@@ -5,12 +5,14 @@ import { Provider } from "react-redux";
 import { authReducer, type AuthState } from "../features/auth/authSlice";
 
 const baseUser: AuthUserDto = {
-  id: "user-1",
-  email: "user@example.com",
-  firstName: "Test",
-  lastName: "User",
+  id: "user-123",
+  email: "member@example.com",
+  firstName: "Jane",
+  lastName: "Doe",
   role: "MEMBER",
-  mustChangePassword: false
+  mustChangePassword: false,
+  twoFactorEnabled: false,
+  hasPasskeys: false
 };
 
 export function makeAuthState(overrides: Partial<AuthState> = {}): AuthState {

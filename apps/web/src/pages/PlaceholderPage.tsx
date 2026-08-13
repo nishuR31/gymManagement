@@ -2,7 +2,6 @@ import { useParams } from "react-router-dom";
 
 const titles: Record<string, string> = {
   members: "Members",
-  attendance: "Attendance",
   payments: "Payments",
   inventory: "Inventory",
   settings: "Settings"

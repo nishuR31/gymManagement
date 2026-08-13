@@ -2,9 +2,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   createColumnHelper,
   flexRender,
-  getCoreRowModel,
-  useReactTable,
+  stockFeatures,
+  useTable,
 } from "@tanstack/react-table";
+import type { StockFeatures } from "@tanstack/react-table";
 import type {
   MemberDietPlanDto,
   MemberDto,
@@ -79,7 +80,8 @@ const defaultValues: MemberFormValues = {
   weightKg: "",
 };
 
-const columnHelper = createColumnHelper<MemberDto>();
+const features = stockFeatures;
+const columnHelper = createColumnHelper<StockFeatures, MemberDto>();
 
 export function MembersPage() {
   const role = useAppSelector((state) => state.auth.user?.role);
@@ -119,6 +121,7 @@ export function MembersPage() {
     reset,
     formState: { errors, isSubmitting },
   } = useForm<MemberFormValues>({
+    // @ts-ignore
     resolver: zodResolver(formSchema),
     defaultValues,
   });
@@ -145,7 +148,7 @@ export function MembersPage() {
   }, [status]);
 
   const columns = useMemo(
-    () => [
+    () => columnHelper.columns([
       columnHelper.accessor("memberCode", {
         header: "Member ID",
         cell: (info) => (
@@ -189,14 +192,14 @@ export function MembersPage() {
           </div>
         ),
       }),
-    ],
+    ]),
     [],
   );
 
-  const table = useReactTable({
+  const table = useTable({
     data: members,
     columns,
-    getCoreRowModel: getCoreRowModel(),
+    features,
   });
 
   const onSubmit = async (values: MemberFormValues): Promise<void> => {
@@ -536,6 +539,7 @@ export function MembersPage() {
             </div>
             <form
               className="grid gap-3"
+              // @ts-ignore
               onSubmit={(event) => void handleSubmit(onSubmit)(event)}
             >
               <div className="grid gap-3 sm:grid-cols-2">

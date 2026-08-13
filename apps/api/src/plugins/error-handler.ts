@@ -11,7 +11,7 @@ interface ErrorResponse {
 }
 
 export async function registerErrorHandler(app: FastifyInstance): Promise<void> {
-  app.setErrorHandler((error, request, reply) => {
+  app.setErrorHandler((error: any, request, reply) => {
     request.log.error({ error }, "request failed");
 
     if (error instanceof ZodError) {
@@ -19,7 +19,7 @@ export async function registerErrorHandler(app: FastifyInstance): Promise<void> 
         error: {
           code: "VALIDATION_ERROR",
           message: "Request validation failed",
-          details: error.flatten()
+          details: error.issues
         }
       };
       reply.status(400).send(response);
@@ -41,7 +41,7 @@ export async function registerErrorHandler(app: FastifyInstance): Promise<void> 
     if (error.statusCode === 429) {
       const response: ErrorResponse = {
         error: {
-          code: "TOO_MANY_REQUESTS",
+          code: "RATE_LIMIT_EXCEEDED",
           message: error.message || "Too many requests"
         }
       };
@@ -52,7 +52,7 @@ export async function registerErrorHandler(app: FastifyInstance): Promise<void> 
     if (typeof error.statusCode === "number" && error.statusCode >= 400 && error.statusCode < 500) {
       const response: ErrorResponse = {
         error: {
-          code: "BAD_REQUEST",
+          code: error.code || "CLIENT_ERROR",
           message: error.message || "Bad request"
         }
       };

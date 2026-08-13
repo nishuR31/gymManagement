@@ -67,12 +67,29 @@ export function SettingsPage() {
     }
   };
 
+  const handleClearCache = () => {
+    const theme = localStorage.getItem("gymos-theme");
+    localStorage.clear();
+    sessionStorage.clear();
+    if (theme) {
+      localStorage.setItem("gymos-theme", theme);
+    }
+    window.location.reload();
+  };
+
   return (
     <section className="grid max-w-7xl gap-6 animate-fade-in">
-      <div className="card-base p-4">
-        <p className="text-xs font-black uppercase tracking-[0.18em] text-primary">Control Room</p>
-        <h2 className="mt-2 text-3xl font-black text-foreground">Settings</h2>
-        <p className="mt-1 max-w-2xl text-sm font-semibold leading-6 text-muted-foreground">Grouped gym details, business rules, receipts, and runtime configuration. Advanced values still save as JSON so the backend contract stays flexible.</p>
+      <div className="card-base p-4 flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-primary">Control Room</p>
+          <h2 className="mt-2 text-3xl font-black text-foreground">Settings</h2>
+          <p className="mt-1 max-w-2xl text-sm font-semibold leading-6 text-muted-foreground">Grouped gym details, business rules, receipts, and runtime configuration. Advanced values still save as JSON so the backend contract stays flexible.</p>
+        </div>
+        <div className="shrink-0">
+          <Button variant="outline" onClick={handleClearCache} className="btn-outline h-9 px-4">
+            Clear App Cache
+          </Button>
+        </div>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[320px_minmax(0,1fr)]">

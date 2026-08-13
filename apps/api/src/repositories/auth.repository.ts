@@ -6,6 +6,8 @@ export interface AuthUserRecord extends AuthUserDto {
   passwordHash: string;
   isActive: boolean;
   memberId: string | null;
+  twoFactorEnabled: boolean;
+  hasPasskeys: boolean;
 }
 
 export interface SessionRecord {
@@ -61,6 +63,20 @@ export interface AuditLogInput {
   userAgent?: string;
 }
 
+export interface ProfileUpdateInput {
+  firstName: string;
+  lastName: string;
+  email: string;
+}
+
+export interface PasskeyInput {
+  userId: string;
+  credentialId: string;
+  publicKey: Uint8Array;
+  counter: bigint;
+  transports?: string;
+}
+
 export interface AuthRepository {
   findUserByEmail(email: string): Promise<AuthUserRecord | null>;
   findUserById(id: string): Promise<AuthUserRecord | null>;
@@ -73,6 +89,13 @@ export interface AuthRepository {
   revokeSession(id: string): Promise<void>;
   revokeAllUserSessions(userId: string): Promise<void>;
   updatePassword(userId: string, passwordHash: string, mustChangePassword?: boolean): Promise<void>;
+  updateProfile(userId: string, input: ProfileUpdateInput): Promise<void>;
+  setTwoFactorSecret(userId: string, secret: string): Promise<void>;
+  enableTwoFactor(userId: string): Promise<void>;
+  disableTwoFactor(userId: string): Promise<void>;
+  addPasskey(input: PasskeyInput): Promise<void>;
+  removePasskey(id: string): Promise<void>;
+  findUserForSecurity(userId: string): Promise<(AuthUserRecord & { twoFactorSecret: string | null; passkeys: any[] }) | null>;
   writeAuditLog(input: AuditLogInput): Promise<void>;
 }
 
@@ -82,7 +105,7 @@ export class PrismaAuthRepository implements AuthRepository {
   public async findUserByEmail(email: string): Promise<AuthUserRecord | null> {
     const user = await this.prisma.user.findUnique({
       where: { email },
-      include: { role: true, memberProfile: { select: { id: true } } }
+      include: { role: true, memberProfile: { select: { id: true } }, passkeys: { select: { id: true } } }
     });
     return user ? toAuthUserRecord(user) : null;
   }
@@ -90,7 +113,7 @@ export class PrismaAuthRepository implements AuthRepository {
   public async findUserById(id: string): Promise<AuthUserRecord | null> {
     const user = await this.prisma.user.findUnique({
       where: { id },
-      include: { role: true, memberProfile: { select: { id: true } } }
+      include: { role: true, memberProfile: { select: { id: true } }, passkeys: { select: { id: true } } }
     });
     return user ? toAuthUserRecord(user) : null;
   }
@@ -109,7 +132,7 @@ export class PrismaAuthRepository implements AuthRepository {
           }
         }
       },
-      include: { role: true, memberProfile: { select: { id: true } } }
+      include: { role: true, memberProfile: { select: { id: true } }, passkeys: { select: { id: true } } }
     });
     return toAuthUserRecord(user);
   }
@@ -130,7 +153,7 @@ export class PrismaAuthRepository implements AuthRepository {
     const refreshToken = await this.prisma.refreshToken.create({
       data: input,
       include: {
-        user: { include: { role: true, memberProfile: { select: { id: true } } } },
+        user: { include: { role: true, memberProfile: { select: { id: true } }, passkeys: { select: { id: true } } } },
         session: true
       }
     });
@@ -141,7 +164,7 @@ export class PrismaAuthRepository implements AuthRepository {
     const refreshToken = await this.prisma.refreshToken.findUnique({
       where: { tokenHash },
       include: {
-        user: { include: { role: true, memberProfile: { select: { id: true } } } },
+        user: { include: { role: true, memberProfile: { select: { id: true } }, passkeys: { select: { id: true } } } },
         session: true
       }
     });
@@ -194,6 +217,69 @@ export class PrismaAuthRepository implements AuthRepository {
     });
   }
 
+  public async updateProfile(userId: string, input: ProfileUpdateInput): Promise<void> {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        firstName: input.firstName,
+        lastName: input.lastName,
+        email: input.email
+      }
+    });
+  }
+
+  public async setTwoFactorSecret(userId: string, secret: string): Promise<void> {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { twoFactorSecret: secret }
+    });
+  }
+
+  public async enableTwoFactor(userId: string): Promise<void> {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { twoFactorEnabled: true }
+    });
+  }
+
+  public async disableTwoFactor(userId: string): Promise<void> {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { twoFactorEnabled: false, twoFactorSecret: null }
+    });
+  }
+
+  public async addPasskey(input: PasskeyInput): Promise<void> {
+    await this.prisma.passkey.create({
+      data: {
+        userId: input.userId,
+        credentialId: input.credentialId,
+        publicKey: Buffer.from(input.publicKey),
+        counter: input.counter,
+        transports: input.transports ?? null
+      }
+    });
+  }
+
+  public async removePasskey(id: string): Promise<void> {
+    await this.prisma.passkey.delete({
+      where: { id }
+    });
+  }
+
+  public async findUserForSecurity(userId: string): Promise<(AuthUserRecord & { twoFactorSecret: string | null; passkeys: any[] }) | null> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      include: { role: true, memberProfile: { select: { id: true } }, passkeys: true }
+    });
+    if (!user) return null;
+    return {
+      ...toAuthUserRecord(user),
+      twoFactorSecret: user.twoFactorSecret,
+      passkeys: user.passkeys
+    };
+  }
+
   public async writeAuditLog(input: AuditLogInput): Promise<void> {
     await this.prisma.auditLog.create({
       data: {
@@ -217,7 +303,9 @@ function toAuthUserRecord(user: {
   lastName: string;
   isActive: boolean;
   mustChangePassword: boolean;
+  twoFactorEnabled: boolean;
   memberProfile?: { id: string } | null;
+  passkeys?: { id: string }[];
   role: { name: string };
 }): AuthUserRecord {
   return {
@@ -229,6 +317,8 @@ function toAuthUserRecord(user: {
     isActive: user.isActive,
     role: user.role.name as RoleName,
     mustChangePassword: user.mustChangePassword,
+    twoFactorEnabled: user.twoFactorEnabled,
+    hasPasskeys: (user.passkeys?.length ?? 0) > 0,
     memberId: user.memberProfile?.id ?? null
   };
 }
@@ -250,7 +340,9 @@ function toRefreshTokenRecord(refreshToken: {
     lastName: string;
     isActive: boolean;
     mustChangePassword: boolean;
+    twoFactorEnabled: boolean;
     memberProfile?: { id: string } | null;
+    passkeys?: { id: string }[];
     role: { name: string };
   };
   session: SessionRecord;

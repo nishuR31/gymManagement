@@ -418,6 +418,8 @@ function toUserDto(user: {
   lastName: string;
   role: RoleName;
   mustChangePassword: boolean;
+  twoFactorEnabled?: boolean;
+  hasPasskeys?: boolean;
 }): MemberLoginSetupDto["user"] {
   return {
     id: user.id,
@@ -425,7 +427,9 @@ function toUserDto(user: {
     firstName: user.firstName,
     lastName: user.lastName,
     role: user.role,
-    mustChangePassword: user.mustChangePassword
+    mustChangePassword: user.mustChangePassword,
+    twoFactorEnabled: user.twoFactorEnabled ?? false,
+    hasPasskeys: user.hasPasskeys ?? false
   };
 }
 

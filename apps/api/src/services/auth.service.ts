@@ -1,5 +1,12 @@
 import crypto from "node:crypto";
-import type { AuthUserDto, RoleName } from "@gym/shared";
+// @ts-ignore
+import { authenticator } from "otplib";
+import qrcode from "qrcode";
+// @ts-ignore
+import { generateRegistrationOptions, verifyRegistrationResponse } from "@simplewebauthn/server";
+// @ts-ignore
+import type { VerifiedRegistrationResponse } from "@simplewebauthn/server";
+import type { AuthUserDto, RoleName, TwoFactorSetupResponse } from "@gym/shared";
 import { canManageRole } from "../config/auth.js";
 import type { Env } from "../config/env.js";
 import { errors } from "../errors/app-error.js";
@@ -256,7 +263,192 @@ export class AuthService {
   }
 
   public async me(actor: RequestActor): Promise<AuthUserDto> {
-    return actor;
+    const user = await this.repository.findUserById(actor.id);
+    if (!user) throw errors.unauthorized();
+    return toUserDto(user);
+  }
+
+  public async updateProfile(actor: RequestActor, input: { firstName: string; lastName: string; email: string }, context: RequestContext): Promise<AuthUserDto> {
+    const user = await this.repository.findUserById(actor.id);
+    if (!user) throw errors.unauthorized();
+
+    if (input.email.toLowerCase() !== user.email) {
+      const existing = await this.repository.findUserByEmail(input.email.toLowerCase());
+      if (existing) throw errors.conflict("A user with that email already exists");
+    }
+
+    await this.repository.updateProfile(user.id, {
+      firstName: input.firstName,
+      lastName: input.lastName,
+      email: input.email.toLowerCase()
+    });
+
+    await this.repository.writeAuditLog({
+      userId: user.id,
+      action: "PROFILE_UPDATED",
+      entity: "User",
+      entityId: user.id,
+      ...context
+    });
+
+    const updatedUser = await this.repository.findUserById(user.id);
+    return toUserDto(updatedUser!);
+  }
+
+  public async changePassword(actor: RequestActor, currentPassword: string | undefined, newPassword: string, context: RequestContext): Promise<void> {
+    const user = await this.repository.findUserForSecurity(actor.id);
+    if (!user) throw errors.unauthorized();
+
+    if (user.passwordHash) {
+      if (!currentPassword) throw errors.badRequest("Current password is required");
+      const passwordMatches = await verifyPassword(currentPassword, user.passwordHash);
+      if (!passwordMatches) throw errors.badRequest("Incorrect current password");
+    }
+
+    const passwordHash = await hashPassword(newPassword);
+    await this.repository.updatePassword(user.id, passwordHash, false);
+    await this.repository.revokeAllUserSessions(user.id);
+
+    await this.repository.writeAuditLog({
+      userId: user.id,
+      action: "PASSWORD_CHANGED",
+      entity: "User",
+      entityId: user.id,
+      ...context
+    });
+  }
+
+  public async generateTwoFactor(actor: RequestActor, context: RequestContext): Promise<{ secret: string; qrCodeDataUrl: string }> {
+    const user = await this.repository.findUserForSecurity(actor.id);
+    if (!user) throw errors.unauthorized();
+    if (user.twoFactorEnabled) throw errors.conflict("Two-factor authentication is already enabled");
+
+    const secret = authenticator.generateSecret();
+    await this.repository.setTwoFactorSecret(user.id, secret);
+
+    const otpauthUrl = authenticator.keyuri(user.email, "ValorFitness", secret);
+    const qrCodeDataUrl = await qrcode.toDataURL(otpauthUrl);
+
+    return { secret, qrCodeDataUrl };
+  }
+
+  public async verifyTwoFactor(actor: RequestActor, token: string, context: RequestContext): Promise<void> {
+    const user = await this.repository.findUserForSecurity(actor.id);
+    if (!user || !user.twoFactorSecret) throw errors.badRequest("Two-factor setup not initiated");
+
+    const isValid = authenticator.verify({ token, secret: user.twoFactorSecret });
+    if (!isValid) throw errors.badRequest("Invalid two-factor code");
+
+    await this.repository.enableTwoFactor(user.id);
+    await this.repository.writeAuditLog({
+      userId: user.id,
+      action: "2FA_ENABLED",
+      entity: "User",
+      entityId: user.id,
+      ...context
+    });
+  }
+
+  public async disableTwoFactor(actor: RequestActor, token: string, context: RequestContext): Promise<void> {
+    const user = await this.repository.findUserForSecurity(actor.id);
+    if (!user || !user.twoFactorEnabled || !user.twoFactorSecret) throw errors.badRequest("Two-factor not enabled");
+
+    const isValid = authenticator.verify({ token, secret: user.twoFactorSecret });
+    if (!isValid) throw errors.badRequest("Invalid two-factor code");
+
+    await this.repository.disableTwoFactor(user.id);
+    await this.repository.writeAuditLog({
+      userId: user.id,
+      action: "2FA_DISABLED",
+      entity: "User",
+      entityId: user.id,
+      ...context
+    });
+  }
+
+  public async getPasskeys(actor: RequestActor) {
+    const user = await this.repository.findUserForSecurity(actor.id);
+    if (!user) throw errors.unauthorized();
+    return user.passkeys.map(pk => ({
+      id: pk.id,
+      createdAt: pk.createdAt
+    }));
+  }
+
+  public async generatePasskeyRegistration(actor: RequestActor) {
+    const user = await this.repository.findUserForSecurity(actor.id);
+    if (!user) throw errors.unauthorized();
+
+    const options = await generateRegistrationOptions({
+      rpName: "ValorFitness",
+      rpID: "localhost", // Should come from env in prod
+      userID: new Uint8Array(Buffer.from(user.id)),
+      userName: user.email,
+      attestationType: "none",
+      excludeCredentials: user.passkeys.map(pk => ({
+        id: Buffer.from(pk.credentialId, 'base64url'),
+        type: "public-key"
+      })),
+      authenticatorSelection: {
+        residentKey: "preferred",
+        userVerification: "preferred"
+      }
+    });
+
+    return options;
+  }
+
+  public async verifyPasskeyRegistration(actor: RequestActor, body: any, expectedChallenge: string, context: RequestContext) {
+    const user = await this.repository.findUserForSecurity(actor.id);
+    if (!user) throw errors.unauthorized();
+
+    let verification: VerifiedRegistrationResponse;
+    try {
+      verification = await verifyRegistrationResponse({
+        response: body,
+        expectedChallenge,
+        expectedOrigin: "http://localhost:5173", // Should come from env in prod
+        expectedRPID: "localhost",
+      });
+    } catch (error: any) {
+      throw errors.badRequest(error.message);
+    }
+
+    if (verification.verified && verification.registrationInfo) {
+      const { credentialPublicKey, credentialID, counter } = verification.registrationInfo;
+      await this.repository.addPasskey({
+        userId: user.id,
+        credentialId: Buffer.from(credentialID).toString('base64url'),
+        publicKey: credentialPublicKey,
+        counter: BigInt(counter)
+      });
+      await this.repository.writeAuditLog({
+        userId: user.id,
+        action: "PASSKEY_REGISTERED",
+        entity: "User",
+        entityId: user.id,
+        ...context
+      });
+    } else {
+      throw errors.badRequest("Passkey verification failed");
+    }
+  }
+
+  public async removePasskey(actor: RequestActor, passkeyId: string, context: RequestContext): Promise<void> {
+    const user = await this.repository.findUserForSecurity(actor.id);
+    if (!user) throw errors.unauthorized();
+
+    const passkey = user.passkeys.find(pk => pk.id === passkeyId);
+    if (!passkey) throw errors.badRequest("Passkey not found");
+
+    await this.repository.removePasskey(passkeyId);
+    await this.repository.writeAuditLog({
+      userId: user.id,
+      action: "PASSKEY_REMOVED",
+      entity: "User",
+      entityId: user.id,
+      ...context
+    });
   }
 
   public async completeFirstPassword(actor: RequestActor, newPassword: string, context: RequestContext): Promise<AuthResult> {
@@ -325,7 +517,9 @@ function toUserDto(user: AuthUserRecord): AuthUserDto {
     firstName: user.firstName,
     lastName: user.lastName,
     role: user.role,
-    mustChangePassword: user.mustChangePassword
+    mustChangePassword: user.mustChangePassword,
+    twoFactorEnabled: user.twoFactorEnabled,
+    hasPasskeys: user.hasPasskeys
   };
 }
 

@@ -130,6 +130,8 @@ model User {
   lastName      String
   isActive      Boolean        @default(true)
   mustChangePassword Boolean   @default(false)
+  twoFactorSecret String?
+  twoFactorEnabled Boolean     @default(false)
   roleId        String
   role          Role           @relation(fields: [roleId], references: [id])
   refreshTokens RefreshToken[]
@@ -137,6 +139,7 @@ model User {
   auditLogs     AuditLog[]
   notifications Notification[]
   memberProfile Member?
+  passkeys      Passkey[]
   checkedInAttendances Attendance[] @relation("AttendanceCheckedInBy")
   recordedPayments Payment[] @relation("PaymentRecordedBy")
   issuedRefunds Refund[] @relation("RefundedBy")
@@ -147,6 +150,19 @@ model User {
   updatedAt     DateTime       @updatedAt
 
   @@index([roleId])
+}
+
+model Passkey {
+  id             String   @id @default(uuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  credentialId   String   @unique
+  publicKey      Bytes
+  counter        BigInt
+  transports     String?
+  createdAt      DateTime @default(now())
+
+  @@index([userId])
 }
 
 model Member {
