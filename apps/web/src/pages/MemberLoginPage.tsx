@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { APP_NAME } from "../utils/env";
 import { ArrowRight, BadgeCheck, Dumbbell, KeyRound, UserRound, Fingerprint, Mail, MessageSquare, ArrowLeft, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -53,7 +54,7 @@ export function MemberLoginPage() {
     }
 
     if (result.payload === "NOT_A_MEMBER") {
-      toast.error("You are not a member of ValorFitness");
+      toast.error(`You are not a member of ${APP_NAME}`);
       return;
     }
 
@@ -169,7 +170,7 @@ export function MemberLoginPage() {
               <span className="grid h-10 w-10 place-items-center rounded-lg bg-primary text-primary-foreground shadow-lg">
                 <Dumbbell className="h-5 w-5" aria-hidden="true" />
               </span>
-              ValorFitness
+              {APP_NAME}
             </Link>
             <div className="animate-slide-up">
               <p className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-black uppercase tracking-widest text-white backdrop-blur-md">

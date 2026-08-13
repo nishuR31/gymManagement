@@ -1,4 +1,5 @@
-import { Link, Outlet } from "react-router-dom";
+import { Link, NavLink, Outlet } from "react-router-dom";
+import { APP_NAME } from "../../utils/env";
 import { ChevronUp, Dumbbell, Settings, Smartphone } from "lucide-react";
 
 export function PublicLayout() {
@@ -10,7 +11,7 @@ export function PublicLayout() {
             <Dumbbell className="h-5 w-5" aria-hidden="true" />
           </span>
           <span>
-            <span className="block text-sm font-black uppercase tracking-[0.18em] text-primary-foreground">ValorFitness</span>
+            <span className="block text-sm font-black uppercase tracking-[0.18em] text-primary-foreground">{APP_NAME}</span>
             <span className="hidden md:block text-xs font-semibold text-muted-foreground">Iron & Chalk Training Club</span>
           </span>
         </Link>
@@ -37,9 +38,9 @@ export function PublicLayout() {
       </main>
 
       <footer className="layout-footer">
-        <div className="mx-auto max-w-screen px-6 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="mx-auto max-w-screen px-6 flex flex-col md:flex-row items-center justify-around gap-4">
           <p className="text-sm font-semibold text-muted-foreground">
-            &copy; {new Date().getFullYear()} ValorFitness. All rights reserved.
+            &copy; {new Date().getFullYear()} {APP_NAME}. All rights reserved.
           </p>
           <nav className="flex items-center flex-wrap gap-4 md:gap-6 text-sm font-medium text-muted-foreground">
             <Link to="/owner" className="hover:text-primary transition focus-visible:focus-ring rounded" tabIndex={0}>Owner</Link>
@@ -48,19 +49,25 @@ export function PublicLayout() {
             <Link
               to="/download-app"
               tabIndex={0}
-              className="flex items-center gap-1 rounded-2xl bg-primary p-2 pr-3 text-sm font-bold text-muted shadow-sm transition hover:-translate-y-1 hover:shadow-lg focus-visible:focus-ring hover:bg-primary/90 animate-slide-up"
+              className="btn-base btn-primary animate-slide-up rounded-full pl-2 pr-4"
               aria-label="Download our App"
             >
-              <div className="grid h-8 w-8 place-items-center rounded-full bg-panel/20">
+              <div className="grid h-8 w-8 place-items-center rounded-full bg-background/20">
                 <Smartphone className="h-5 w-5" aria-hidden="true" />
               </div>
               <span>Download App</span>
             </Link>
-            <ChevronUp className="font-extrabold bg-transparent text-[clamp(3rem,6vw,5rem)] backdrop-blur-sm text-muted-foreground rounded cursor-pointer animate-bounce mx-2 focus-visible:focus-ring " onClick={() => globalThis.scrollTo({ top: 0, behavior: "smooth" })} />
           </nav>
-
         </div>
       </footer>
+
+      <button
+        onClick={() => globalThis.scrollTo({ top: 0, behavior: "smooth" })}
+        className="fixed btn-base bottom-6 right-6 z-50 rounded-full bg-background outline outline-border p-3 text-muted-foreground shadow-lg backdrop-blur-md transition-all hover:-translate-y-1 hover:text-foreground hover:shadow-xl focus-visible:focus-ring"
+        aria-label="Scroll to top"
+      >
+        <ChevronUp className="h-6 w-6 font-extrabold animate-bounce" />
+      </button>
 
       {/* Download App Pill */}
 

@@ -1,6 +1,7 @@
 import type { GymInfoDto, MemberDietPlanDto, MemberDto, MemberWorkoutPlanDto, MembershipSubscriptionDto, PaymentDto, ProductOrderDto } from "@gym/shared";
 import { Beef, CalendarClock, Clock3, CreditCard, Dumbbell, MapPin, Phone, UserRound, WalletCards } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { APP_NAME } from "../utils/env";
 import { toast } from "sonner";
 import { EmptyState } from "../components/ui/EmptyState";
 import { StatusBadge } from "../components/ui/StatusBadge";
@@ -212,7 +213,7 @@ function GymInfoCard({ info }: { info: GymInfoDto | null }) {
   return (
     <section className="bg-card rounded-lg border border-border p-4 shadow-sm">
       <p className="text-xs font-black uppercase tracking-[0.18em] text-primary">Gym Info</p>
-      <h3 className="mt-2 text-xl font-black text-foreground">{info?.name ?? "ValorFitness"}</h3>
+      <h3 className="mt-2 text-xl font-black text-foreground">{info?.name ?? APP_NAME}</h3>
       <div className="mt-4 grid gap-3 text-sm">
         <InfoLine icon={MapPin} value={info?.address || "Address not set"} />
         <InfoLine icon={Phone} value={[info?.phone, info?.email].filter(Boolean).join(" · ") || "Contact not set"} />

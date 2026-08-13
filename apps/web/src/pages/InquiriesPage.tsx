@@ -2,6 +2,7 @@ import type { InquiryDto, InquiryStatus, PaginatedInquiryDto } from "@gym/shared
 import { inquiryStatuses } from "@gym/shared";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { APP_NAME } from "../utils/env";
 import { Button } from "../components/ui/Button";
 import { Card } from "../components/ui/Card";
 import { EmptyState } from "../components/ui/EmptyState";
@@ -67,7 +68,7 @@ export function InquiriesPage() {
       <div className="flex flex-wrap items-end justify-between gap-3 border-b border-border pb-5">
         <div>
           <h2 className="text-2xl font-bold text-foreground">Inquiries</h2>
-          <p className="mt-1 text-sm text-muted-foreground">Public contact form submissions from ValorFitness visitors</p>
+          <p className="mt-1 text-sm text-muted-foreground">Public contact form submissions from {APP_NAME} visitors</p>
         </div>
         <label className="grid gap-2 text-sm font-medium text-foreground">
           <span>Status</span>

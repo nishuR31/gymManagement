@@ -1,4 +1,5 @@
 import { Link, Navigate, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { APP_NAME } from "../../utils/env";
 import type { LucideIcon } from "lucide-react";
 import {
   Activity,
@@ -114,7 +115,7 @@ export function DashboardLayout() {
               <Dumbbell className="h-5 w-5" aria-hidden="true" />
             </div>
             <div className="min-w-0">
-              <p className="text-xs font-black uppercase tracking-[0.18em] text-primary">ValorFitness</p>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-primary">{APP_NAME}</p>
               <h1 className="mt-1 truncate text-lg font-black">Command Center</h1>
             </div>
           </div>

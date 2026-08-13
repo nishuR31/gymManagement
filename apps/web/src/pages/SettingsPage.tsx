@@ -69,7 +69,7 @@ export function SettingsPage() {
 
   return (
     <section className="grid max-w-7xl gap-6 animate-fade-in">
-      <div className="bg-card rounded-lg border border-border p-4 shadow-sm">
+      <div className="card-base p-4">
         <p className="text-xs font-black uppercase tracking-[0.18em] text-primary">Control Room</p>
         <h2 className="mt-2 text-3xl font-black text-foreground">Settings</h2>
         <p className="mt-1 max-w-2xl text-sm font-semibold leading-6 text-muted-foreground">Grouped gym details, business rules, receipts, and runtime configuration. Advanced values still save as JSON so the backend contract stays flexible.</p>
@@ -114,7 +114,7 @@ export function SettingsPage() {
           }
         >
           <div className="grid gap-3">
-            <div className="rounded-md border border-border bg-background p-3">
+            <div className="card-base rounded-md p-3">
               <p className="text-xs font-black uppercase tracking-[0.16em] text-primary">Editing</p>
               <Input label="Key" value={selectedKey} onChange={(event) => setSelectedKey(event.target.value)} disabled={!isAdminRole(role)} />
               <Button variant="secondary" className="mt-3 h-9 px-3" onClick={() => setDraft(JSON.stringify(defaultValueForKey(selectedKey), null, 2))} disabled={!isAdminRole(role)}>
@@ -124,7 +124,7 @@ export function SettingsPage() {
             <label className="grid gap-2 text-sm font-medium text-foreground">
               <span>Value JSON</span>
               <textarea
-                className="numeric min-h-80 w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-brand focus:ring-2 focus:ring-brand/20"
+                className="input-base numeric min-h-80 resize-y"
                 value={draft}
                 onChange={(event) => setDraft(event.target.value)}
                 disabled={!isAdminRole(role)}

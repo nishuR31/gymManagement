@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
+import { APP_NAME } from "../utils/env";
 import { completeFirstPasswordThunk } from "../features/auth/authSlice";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 
@@ -59,7 +60,7 @@ export function FirstPasswordPage() {
         <div className="mb-8">
           <Link className="flex items-center gap-3 text-sm font-black text-primary" to="/">
             <Dumbbell className="h-4 w-4" aria-hidden="true" />
-            ValorFitness
+            {APP_NAME}
           </Link>
           <p className="mt-6 inline-flex items-center gap-2 rounded-md border border-brand/30 bg-background px-3 py-2 text-xs font-black uppercase tracking-[0.18em] text-primary">
             <KeyRound className="h-3.5 w-3.5" aria-hidden="true" />

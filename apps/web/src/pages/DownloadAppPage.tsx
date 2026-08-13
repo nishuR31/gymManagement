@@ -1,9 +1,18 @@
+import { useState } from "react";
+import { APP_NAME } from "../utils/env";
 import { Link } from "react-router-dom";
-import { ArrowRight, CheckCircle2, QrCode, Smartphone } from "lucide-react";
+import { ArrowRight, CheckCircle2, QrCode, Smartphone, Apple, Play } from "lucide-react";
 import { Button } from "../components/ui/Button";
 import { Card } from "../components/ui/Card";
 
 export function DownloadAppPage() {
+  const [platform, setPlatform] = useState<"ios" | "android">("ios");
+
+  const iosUrl = "https://apps.apple.com/app/valorfitness";
+  const androidUrl = "https://play.google.com/store/apps/details?id=com.valorfitness";
+  const currentUrl = platform === "ios" ? iosUrl : androidUrl;
+  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(currentUrl)}&color=000000&bgcolor=ffffff`;
+
   return (
     <div className="w-full animate-fade-in pb-16">
       <section className="relative px-6 py-20 md:py-24 overflow-hidden border-b border-border">
@@ -11,7 +20,7 @@ export function DownloadAppPage() {
         <div className="relative mx-auto max-w-4xl text-center">
           <span className="inline-flex items-center gap-2 rounded-full border border-brand/40 bg-brand/10 px-4 py-1.5 text-xs font-black uppercase tracking-[0.18em] text-primary-foreground shadow-sm mb-6">
             <Smartphone className="h-4 w-4" aria-hidden="true" />
-            ValorFitness App
+            {APP_NAME} App
           </span>
           <h1 className="text-4xl md:text-6xl font-black text-foreground mb-6 tracking-tight text-balance">
             Your gym pass in your pocket.
@@ -21,10 +30,10 @@ export function DownloadAppPage() {
           </p>
           
           <div className="flex flex-wrap justify-center gap-4">
-            <Button className="h-14 px-8 text-base">
+            <Button className="h-14 px-8 text-base" onClick={() => setPlatform("ios")}>
               Download for iOS
             </Button>
-            <Button variant="secondary" className="h-14 px-8 text-base">
+            <Button variant="secondary" className="h-14 px-8 text-base" onClick={() => setPlatform("android")}>
               Download for Android
             </Button>
           </div>
@@ -48,15 +57,33 @@ export function DownloadAppPage() {
           
           <div className="relative">
             <div className="absolute inset-0 bg-brand/20 blur-[100px] rounded-full" />
-            <div className="relative border border-border bg-card p-6 rounded-3xl shadow-xl mx-auto max-w-sm transform rotate-2 hover:rotate-0 transition duration-500">
-              <div className="border border-border bg-background rounded-2xl p-4 h-[600px] flex flex-col items-center justify-center text-center">
-                <QrCode className="h-32 w-32 text-foreground mb-6" />
-                <h3 className="text-xl font-bold text-foreground mb-2">Scan to enter</h3>
-                <p className="text-sm text-muted-foreground mb-8">Show this code at the front desk</p>
+            <div className="card-base relative p-6 shadow-xl mx-auto max-w-sm transform rotate-2 hover:rotate-0 transition duration-500">
+              <div className="border border-border/50 bg-background rounded-2xl p-4 h-[600px] flex flex-col items-center justify-center text-center">
+                <div className="flex gap-1 p-1 card-base rounded-lg mb-8">
+                  <button 
+                    onClick={() => setPlatform("ios")} 
+                    className={`px-4 py-2 text-sm font-bold rounded-md transition flex items-center gap-2 ${platform === "ios" ? "bg-primary text-panel shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+                  >
+                    iOS
+                  </button>
+                  <button 
+                    onClick={() => setPlatform("android")} 
+                    className={`px-4 py-2 text-sm font-bold rounded-md transition flex items-center gap-2 ${platform === "android" ? "bg-primary text-panel shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+                  >
+                    Android
+                  </button>
+                </div>
+                
+                <div className="bg-white p-3 rounded-xl shadow-sm mb-6">
+                  <img src={qrCodeUrl} alt={`QR Code for ${platform}`} className="h-36 w-36" />
+                </div>
+                
+                <h3 className="text-xl font-bold text-foreground mb-2">Scan to download</h3>
+                <p className="text-sm text-muted-foreground mb-8">Point your camera to get the {platform === "ios" ? "iOS" : "Android"} app</p>
+                
                 <div className="w-full space-y-3">
-                  <div className="h-12 bg-card rounded-lg w-full" />
-                  <div className="h-12 bg-card rounded-lg w-full" />
-                  <div className="h-12 bg-card rounded-lg w-full" />
+                  <div className="h-12 card-base w-full animate-pulse bg-brand/5" />
+                  <div className="h-12 card-base w-full animate-pulse bg-brand/5" />
                 </div>
               </div>
             </div>

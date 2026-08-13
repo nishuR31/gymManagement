@@ -2,7 +2,8 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import type { LucideIcon } from "lucide-react";
-import { ArrowRight, BadgeCheck, Clock3, CreditCard, Dumbbell, MapPin, ShieldCheck, Sparkles, Users } from "lucide-react";
+import { ArrowRight, BadgeCheck, ChevronRight, Clock3, CreditCard, Dumbbell, MapPin, ShieldCheck, Sparkles, Trophy, Users } from "lucide-react";
+import { APP_NAME } from "../utils/env";
 import { toast } from "sonner";
 import { Button } from "../components/ui/Button";
 import { Card } from "../components/ui/Card";
@@ -47,6 +48,13 @@ export function PublicHomePage() {
       <section className="sticky top-0 snap-start flex h-screen items-stretch overflow-hidden -mt-[68px] pt-[68px]">
         <img
           src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=1800&q=85"
+          srcSet="
+            https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=800&q=80 800w,
+            https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=1200&q=85 1200w,
+            https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=1800&q=85 1800w,
+            https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=2400&q=85 2400w
+          "
+          sizes="100vw"
           alt=""
           className="absolute inset-0 h-full w-full scale-105 object-cover motion-safe:animate-fade-in"
         />
@@ -68,7 +76,7 @@ export function PublicHomePage() {
             <div className="max-w-4xl animate-slide-up">
               <p className="inline-flex items-center gap-2 rounded-md border border-brand/40 bg-backdrop/85 px-3 py-2 text-xs font-black uppercase tracking-[0.18em] text-primary-foreground shadow-sm">
                 <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-                ValorFitness
+                {APP_NAME}
               </p>
               <h1 className="mt-5 max-w-4xl text-balance text-5xl font-black leading-tight text-foreground md:text-7xl">
                 Train with intent. Track every win.
@@ -99,6 +107,13 @@ export function PublicHomePage() {
         {/* Background image for bottom components */}
         <img
           src="https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=1800&q=85"
+          srcSet="
+            https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=800&q=80 800w,
+            https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=1200&q=85 1200w,
+            https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=1800&q=85 1800w,
+            https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=2400&q=85 2400w
+          "
+          sizes="100vw"
           alt="Male training"
           className="absolute inset-0  h-full w-full object-cover opacity-60 dark:opacity-100"
           style={{ objectPosition: "center 20%" }}
@@ -137,7 +152,7 @@ export function PublicHomePage() {
               </div>
             </div>
 
-            <Card title="Contact ValorFitness" className="ring-1  ring-brand/15">
+            <Card title={`Contact ${APP_NAME}`} className="ring-1  ring-brand/15">
               <form
                 className="grid gap-4"
                 onSubmit={handleSubmit(onSubmit)}
