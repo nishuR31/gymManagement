@@ -1,4 +1,3 @@
-import React from 'react';
 import { View, Text, ScrollView, SafeAreaView } from 'react-native';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
 import { APP_NAME } from '../utils/env';

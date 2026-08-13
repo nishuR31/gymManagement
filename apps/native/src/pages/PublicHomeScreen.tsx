@@ -1,7 +1,6 @@
-import React from 'react';
-import { View, Text, ScrollView, Image, TouchableOpacity, SafeAreaView, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, ScrollView, Image, SafeAreaView, KeyboardAvoidingView, Platform } from 'react-native';
 import { useForm, Controller } from "react-hook-form";
-import { ArrowRight, BadgeCheck, Clock3, CreditCard, Dumbbell, MapPin, ShieldCheck, Sparkles, Users } from "lucide-react-native";
+import { CreditCard, Dumbbell, ShieldCheck, Sparkles } from "lucide-react-native";
 import { APP_NAME } from "../utils/env";
 import Toast from 'react-native-toast-message';
 import { Button } from "../components/ui/Button";

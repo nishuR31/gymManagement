@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, SafeAreaView, KeyboardAvoidingView, Platform } from 'react-native';
+import { useState } from 'react';
+import { View, Text, TouchableOpacity, SafeAreaView, KeyboardAvoidingView, Platform } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -9,7 +9,7 @@ import { Button } from '../components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
 import { useAppDispatch } from '../store/hooks';
 import { memberLoginThunk } from '../features/auth/authSlice';
-import { LockKeyhole, Mail, ArrowRight } from 'lucide-react-native';
+import { LockKeyhole, ArrowRight } from 'lucide-react-native';
 import Toast from 'react-native-toast-message';
 
 const emailSchema = z.object({ email: z.string().email("Enter a valid email") });

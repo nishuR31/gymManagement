@@ -1,4 +1,3 @@
-import React from 'react';
 import { TextInput, TextInputProps, View, Text } from 'react-native';
 import { useAppSelector } from '../../store/hooks';
 

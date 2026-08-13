@@ -1,14 +1,14 @@
 import './global.css';
-import React, { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Provider } from 'react-redux';
 import { store } from './src/store';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { registerForPushNotificationsAsync } from './src/services/notifications';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 import { LoginScreen } from './src/pages/LoginScreen';
 import { DashboardScreen } from './src/pages/DashboardScreen';
-import { Button } from './src/components/ui/Button';
+
 
 import { Toaster } from './src/components/ui/Toaster';
 import { useAppSelector, useAppDispatch } from './src/store/hooks';
@@ -29,11 +29,8 @@ function RootApp() {
     dispatch(loadThemeSettings());
   }, [dispatch]);
 
-  const [expoPushToken, setExpoPushToken] = useState<string | undefined>('');
   useEffect(() => {
-    registerForPushNotificationsAsync().then(token => {
-      if (token) setExpoPushToken(token);
-    });
+    registerForPushNotificationsAsync();
   }, []);
 
   if (!isLoaded) {
@@ -59,10 +56,14 @@ function RootApp() {
   );
 }
 
+import { ErrorBoundary } from './src/components/ErrorBoundary';
+
 export default function App() {
   return (
-    <Provider store={store}>
-      <RootApp />
-    </Provider>
+    <ErrorBoundary>
+      <Provider store={store}>
+        <RootApp />
+      </Provider>
+    </ErrorBoundary>
   );
 }

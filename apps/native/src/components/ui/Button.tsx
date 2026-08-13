@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity, Text, TouchableOpacityProps, View, ActivityIndicator } from 'react-native';
+import { TouchableOpacity, Text, TouchableOpacityProps, ActivityIndicator } from 'react-native';
 import { useAppSelector } from '../../store/hooks';
 
 interface ButtonProps extends TouchableOpacityProps {
