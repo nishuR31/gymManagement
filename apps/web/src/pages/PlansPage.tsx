@@ -94,7 +94,7 @@ export function PlansPage() {
 
       <div className="flex w-fit rounded-md border border-border bg-card p-1">
         {(["workout", "diet"] as const).map((item) => (
-          <button key={item} className={`h-9 rounded px-3 text-sm font-bold capitalize transition focus-visible:focus-ring ${kind === item ? "bg-primary text-panel" : "text-muted-foreground hover:text-foreground"}`} onClick={() => setKind(item)}>
+          <button key={item} className={`h-9 rounded px-3 text-sm font-bold capitalize transition focus-visible:focus-ring ${kind === item ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`} onClick={() => setKind(item)}>
             {item}
           </button>
         ))}
@@ -104,13 +104,13 @@ export function PlansPage() {
         {activeTemplates.length === 0 ? <EmptyState title="No templates yet" /> : null}
         <div className="grid gap-3 md:grid-cols-2">
           {activeTemplates.map((template) => (
-            <div key={template.id} className="group rounded-lg border border-border bg-background p-4 shadow-sm transition hover:-translate-y-1 hover:border-brand">
+            <div key={template.id} className="group rounded-lg border border-border bg-background p-4 shadow-sm transition hover:-translate-y-1 hover:border-primary">
               <div className="mb-4 flex items-start justify-between gap-3">
                 <div>
                   <p className="font-black text-foreground">{template.name}</p>
                   <p className="mt-1 text-xs font-semibold uppercase text-muted-foreground">Template</p>
                 </div>
-                <div className="grid h-11 w-11 place-items-center rounded-md bg-line-faint text-primary transition group-hover:scale-105">
+                <div className="grid h-11 w-11 place-items-center rounded-md bg-secondary text-primary transition group-hover:scale-105">
                   {"exercises" in template ? <Dumbbell className="h-5 w-5" aria-hidden="true" /> : <Beef className="h-5 w-5" aria-hidden="true" />}
                 </div>
               </div>
@@ -125,13 +125,13 @@ export function PlansPage() {
                 </Button>
               </div>
               <div className="mb-3 flex flex-wrap gap-2">
-                <span className="inline-flex items-center gap-1.5 rounded bg-line-faint px-2 py-1 text-xs font-bold text-muted-foreground">
+                <span className="inline-flex items-center gap-1.5 rounded bg-secondary px-2 py-1 text-xs font-bold text-muted-foreground">
                   <ClipboardList className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
                   <span className="numeric">{"exercises" in template ? template.exercises.length : template.meals.length}</span>
                   {"exercises" in template ? " exercises" : " meals"}
                 </span>
                 {"exercises" in template ? (
-                  <span className="inline-flex items-center gap-1.5 rounded bg-line-faint px-2 py-1 text-xs font-bold text-muted-foreground">
+                  <span className="inline-flex items-center gap-1.5 rounded bg-secondary px-2 py-1 text-xs font-bold text-muted-foreground">
                     <Timer className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
                     <span className="numeric">{template.exercises.length * 8}</span> min est.
                   </span>
@@ -364,7 +364,7 @@ function AssignModal({
           <div className="relative">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
             <input
-              className="h-11 w-full rounded-md border border-border bg-surface/70 pl-9 pr-3 text-sm text-foreground outline-none transition hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25"
+              className="h-11 w-full rounded-md border border-border bg-surface/70 pl-9 pr-3 text-sm text-foreground outline-none transition hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/25"
               placeholder="Name, member ID, phone, or email"
               value={memberSearch}
               onChange={(event) => {
@@ -376,7 +376,7 @@ function AssignModal({
           </div>
         </label>
         {selectedMember ? (
-          <div className="flex items-center gap-3 rounded-md border border-brand/40 bg-line-faint p-3">
+          <div className="flex items-center gap-3 rounded-md border border-primary/40 bg-secondary p-3">
             <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-background text-primary">
               <UserRound className="h-5 w-5" aria-hidden="true" />
             </div>
@@ -392,7 +392,7 @@ function AssignModal({
               <button
                 key={member.id}
                 type="button"
-                className="flex w-full items-center gap-3 border-b border-border px-3 py-2 text-left transition last:border-b-0 hover:bg-line-faint focus-visible:focus-ring"
+                className="flex w-full items-center gap-3 border-b border-border px-3 py-2 text-left transition last:border-b-0 hover:bg-secondary focus-visible:focus-ring"
                 onClick={() => {
                   setSelectedMember(member);
                   setMemberId(member.id);
@@ -411,14 +411,14 @@ function AssignModal({
         ) : null}
         <label className="grid gap-2 text-sm font-medium text-foreground">
           <span>Template</span>
-          <select className="h-11 rounded-md border border-border bg-surface/70 px-3 outline-none transition hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25" value={templateId} onChange={(event) => setTemplateId(event.target.value)}>
+          <select className="h-11 rounded-md border border-border bg-surface/70 px-3 outline-none transition hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/25" value={templateId} onChange={(event) => setTemplateId(event.target.value)}>
             {templates.map((template) => <option key={template.id} value={template.id}>{template.name}</option>)}
           </select>
         </label>
         {canPickTrainer ? (
           <label className="grid gap-2 text-sm font-medium text-foreground">
             <span>Trainer optional</span>
-            <select className="h-11 rounded-md border border-border bg-surface/70 px-3 outline-none transition hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25" value={trainerId} onChange={(event) => setTrainerId(event.target.value)}>
+            <select className="h-11 rounded-md border border-border bg-surface/70 px-3 outline-none transition hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/25" value={trainerId} onChange={(event) => setTrainerId(event.target.value)}>
               <option value="">No trainer assigned</option>
               {trainerProfiles.map((profile) => <option key={profile.id} value={profile.id}>{profile.userId}</option>)}
             </select>

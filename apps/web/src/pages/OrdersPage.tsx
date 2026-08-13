@@ -97,14 +97,14 @@ export function OrdersPage() {
         <div className="grid gap-3 border-b border-border p-4 md:grid-cols-3">
           <label className="grid gap-2 text-sm font-semibold text-foreground">
             <span>Order status</span>
-            <select className="h-11 rounded-md border border-border bg-surface/70 px-3 outline-none transition hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25" value={status} onChange={(event) => setStatus(event.target.value as ProductOrderStatus | "")}>
+            <select className="h-11 rounded-md border border-border bg-surface/70 px-3 outline-none transition hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/25" value={status} onChange={(event) => setStatus(event.target.value as ProductOrderStatus | "")}>
               <option value="">All</option>
               {productOrderStatuses.map((item) => <option key={item} value={item}>{item}</option>)}
             </select>
           </label>
           <label className="grid gap-2 text-sm font-semibold text-foreground">
             <span>Payment status</span>
-            <select className="h-11 rounded-md border border-border bg-surface/70 px-3 outline-none transition hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25" value={paymentStatus} onChange={(event) => setPaymentStatus(event.target.value as ProductOrderPaymentStatus | "")}>
+            <select className="h-11 rounded-md border border-border bg-surface/70 px-3 outline-none transition hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/25" value={paymentStatus} onChange={(event) => setPaymentStatus(event.target.value as ProductOrderPaymentStatus | "")}>
               <option value="">All</option>
               {productOrderPaymentStatuses.map((item) => <option key={item} value={item}>{item}</option>)}
             </select>
@@ -128,7 +128,7 @@ export function OrdersPage() {
             </thead>
             <tbody className="divide-y divide-line">
               {orders.map((order) => (
-                <tr key={order.id} className="cursor-pointer transition hover:bg-line-faint/40" onClick={() => setSelected(order)}>
+                <tr key={order.id} className="cursor-pointer transition hover:bg-secondary/40" onClick={() => setSelected(order)}>
                   <td className="numeric px-4 py-3 font-black text-primary">{order.orderCode}</td>
                   <td className="px-4 py-3">
                     <p className="font-bold text-foreground">{order.memberName}</p>
@@ -153,7 +153,7 @@ export function OrdersPage() {
             <div className="rounded-md border border-border bg-background p-3">
               <p className="numeric text-xs font-black text-primary">{selected.orderCode}</p>
               <p className="mt-1 text-lg font-black text-foreground">{selected.productName}</p>
-              <p className="numeric mt-2 text-3xl font-black text-primary-foreground">{formatCents(selected.amountCents)}</p>
+              <p className="numeric mt-2 text-3xl font-black text-foreground">{formatCents(selected.amountCents)}</p>
             </div>
             <div className="grid gap-3 text-sm sm:grid-cols-2">
               <Detail label="Member" value={`${selected.memberName} (${selected.memberCode})`} />
@@ -167,13 +167,13 @@ export function OrdersPage() {
               <div className="grid gap-3 sm:grid-cols-2">
                 <label className="grid gap-2 text-sm font-semibold text-foreground">
                   <span>Order status</span>
-                  <select className="h-11 rounded-md border border-border bg-surface/70 px-3 outline-none transition hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25" value={selected.status} onChange={(event) => void updateOrder({ status: event.target.value as ProductOrderStatus })}>
+                  <select className="h-11 rounded-md border border-border bg-surface/70 px-3 outline-none transition hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/25" value={selected.status} onChange={(event) => void updateOrder({ status: event.target.value as ProductOrderStatus })}>
                     {productOrderStatuses.map((item) => <option key={item} value={item}>{item}</option>)}
                   </select>
                 </label>
                 <label className="grid gap-2 text-sm font-semibold text-foreground">
                   <span>Payment status</span>
-                  <select className="h-11 rounded-md border border-border bg-surface/70 px-3 outline-none transition hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25" value={selected.paymentStatus} onChange={(event) => void updateOrder({ paymentStatus: event.target.value as ProductOrderPaymentStatus })}>
+                  <select className="h-11 rounded-md border border-border bg-surface/70 px-3 outline-none transition hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/25" value={selected.paymentStatus} onChange={(event) => void updateOrder({ paymentStatus: event.target.value as ProductOrderPaymentStatus })}>
                     {productOrderPaymentStatuses.map((item) => <option key={item} value={item}>{item}</option>)}
                   </select>
                 </label>
@@ -190,7 +190,7 @@ function Metric({ label, value }: { label: string; value: string }) {
   return (
     <div className="bg-card rounded-lg border border-border p-4 shadow-sm">
       <p className="text-xs font-black uppercase tracking-[0.14em] text-muted-foreground">{label}</p>
-      <p className="numeric mt-2 text-3xl font-black text-primary-foreground">{value}</p>
+      <p className="numeric mt-2 text-3xl font-black text-foreground">{value}</p>
     </div>
   );
 }

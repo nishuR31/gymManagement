@@ -8,7 +8,7 @@ export function PrivacyPage() {
         <p className="text-lg text-muted-foreground">Last updated: {new Date().toLocaleDateString()}</p>
       </div>
 
-      <div className="prose prose-invert prose-zinc max-w-none text-muted-foreground space-y-8 bg-panel/30 p-8 md:p-12 rounded-2xl border border-border shadow-sm">
+      <div className="prose prose-invert prose-zinc max-w-none text-muted-foreground space-y-8 bg-card/30 p-8 md:p-12 rounded-2xl border border-border shadow-sm">
         <section>
           <h2 className="text-2xl font-bold text-foreground mb-4">Information We Collect</h2>
           <p className="leading-relaxed">We collect information you provide directly to us, such as when you create or modify your account, request services, contact customer support, or otherwise communicate with us. This includes your name, email address, phone number, and physical fitness information provided during sign-up.</p>

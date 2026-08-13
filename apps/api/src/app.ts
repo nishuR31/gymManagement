@@ -181,6 +181,9 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   });
 
   await registerErrorHandler(app);
+
+
+
   await registerSecurity(
     app,
     options.enableRateLimit === undefined ? { env } : { env, enableRateLimit: options.enableRateLimit }
@@ -189,6 +192,10 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
     repository: authRepository,
     tokenService
   });
+
+  app.get("/", async () => ({
+    status: "ok"
+  }));
 
   app.get("/health", async () => ({
     status: "ok"

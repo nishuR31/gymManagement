@@ -22,7 +22,7 @@ export function LoadBar({ value, max, label, maxLabel, tone }: LoadBarProps) {
         <span>{label ?? `${value}`}</span>
         <span className="font-mono tabular-nums">{maxLabel ?? max}</span>
       </div>
-      <div className="h-2 overflow-hidden rounded-full bg-line-faint">
+      <div className="h-2 overflow-hidden rounded-full bg-secondary">
         <div className={`h-full rounded-full transition-all duration-500 ${toneClass}`} style={{ width: `${percent}%` }} />
       </div>
     </div>

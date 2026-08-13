@@ -59,7 +59,7 @@ export function DashboardPage() {
         >
           <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-end">
             <div className="min-w-0">
-              <p className="inline-flex items-center gap-2 rounded-md border border-brand/35 bg-panel/10 px-3 py-2 text-xs font-black uppercase tracking-[0.18em] text-primary-foreground">
+              <p className="inline-flex items-center gap-2 rounded-md border border-primary/35 bg-card/10 px-3 py-2 text-xs font-black uppercase tracking-[0.18em] text-foreground">
                 <Dumbbell className="h-3.5 w-3.5" aria-hidden="true" />
                 Live Operations
               </p>
@@ -68,8 +68,8 @@ export function DashboardPage() {
                 Live operational summary for the gym floor, front desk, revenue, dues, inventory, and recent activity.
               </p>
             </div>
-            <div className="w-fit rounded-lg border border-border bg-panel/10 px-4 py-3 xl:justify-self-end">
-              <p className="text-xs font-black uppercase tracking-[0.14em] text-primary-foreground">Refresh state</p>
+            <div className="w-fit rounded-lg border border-border bg-card/10 px-4 py-3 xl:justify-self-end">
+              <p className="text-xs font-black uppercase tracking-[0.14em] text-foreground">Refresh state</p>
               <p className="mt-1 text-sm font-bold text-foreground">{isLoading ? "Loading live metrics" : "Metrics synced"}</p>
             </div>
           </div>
@@ -84,7 +84,7 @@ export function DashboardPage() {
       </div>
 
       <div className="grid min-w-0 gap-4 md:grid-cols-2 2xl:grid-cols-3">
-        <Card title="Pending Dues" className="hover:-translate-y-1 hover:border-brand">
+        <Card title="Pending Dues" className="hover:-translate-y-1 hover:border-primary">
           {isLoading ? <SkeletonRows rows={2} /> : null}
           {!isLoading ? (
             <>
@@ -96,7 +96,7 @@ export function DashboardPage() {
             </>
           ) : null}
         </Card>
-        <Card title="Expiring Soon" className="hover:-translate-y-1 hover:border-brand">
+        <Card title="Expiring Soon" className="hover:-translate-y-1 hover:border-primary">
           {isLoading ? <SkeletonRows rows={2} /> : null}
           {!isLoading ? (
             <>
@@ -108,7 +108,7 @@ export function DashboardPage() {
             </>
           ) : null}
         </Card>
-        <Card title="Low Stock Alerts" className="hover:-translate-y-1 hover:border-brand">
+        <Card title="Low Stock Alerts" className="hover:-translate-y-1 hover:border-primary">
           {isLoading ? <SkeletonRows rows={2} /> : null}
           {!isLoading ? (
             <>
@@ -204,7 +204,7 @@ function MemberDashboard({ userName }: { userName: string }) {
     <section className="grid max-w-7xl gap-6 animate-fade-in">
       <div className="overflow-hidden rounded-lg border border-border text-foreground shadow-sm dark-band-gradient">
         <div className="p-5 md:p-6">
-          <p className="inline-flex items-center gap-2 rounded-md border border-brand/35 bg-panel/10 px-3 py-2 text-xs font-black uppercase tracking-[0.18em] text-primary-foreground">
+          <p className="inline-flex items-center gap-2 rounded-md border border-primary/35 bg-card/10 px-3 py-2 text-xs font-black uppercase tracking-[0.18em] text-foreground">
             <Dumbbell className="h-3.5 w-3.5" aria-hidden="true" />
             Member Portal
           </p>
@@ -214,16 +214,16 @@ function MemberDashboard({ userName }: { userName: string }) {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <Card className="hover:-translate-y-1 hover:border-brand">
+        <Card className="hover:-translate-y-1 hover:border-primary">
           <PortalMetric icon={WalletCards} title="Membership" value={membership.label} copy={activeSubscription?.planName ?? "No active plan"} tone={membership.tone} />
         </Card>
-        <Card className="hover:-translate-y-1 hover:border-brand">
+        <Card className="hover:-translate-y-1 hover:border-primary">
           <PortalMetric icon={CalendarClock} title="Days Remaining" value={membership.daysRemaining.toString()} copy={activeSubscription ? `Ends ${formatDateTime(activeSubscription.endDate)}` : "Contact front desk"} tone="warning" />
         </Card>
-        <Card className="hover:-translate-y-1 hover:border-brand">
+        <Card className="hover:-translate-y-1 hover:border-primary">
           <PortalMetric icon={CreditCard} title="Recent Payments" value={formatCents(recentPaymentTotal)} copy={`${payments.length} payment records`} tone="brand" />
         </Card>
-        <Card className="hover:-translate-y-1 hover:border-brand">
+        <Card className="hover:-translate-y-1 hover:border-primary">
           <PortalMetric icon={Boxes} title="Products Available" value={products.length.toString()} copy={`${orders.length} recent bookings`} tone="success" />
         </Card>
       </div>
@@ -237,10 +237,10 @@ function MemberDashboard({ userName }: { userName: string }) {
       <div className="grid gap-4 xl:grid-cols-3">
         <Card title="Quick Actions">
           <div className="grid gap-2">
-            <a className="rounded-md border border-border bg-background px-3 py-2 text-sm font-bold text-foreground transition hover:border-brand focus-visible:focus-ring" href="/dashboard/products">View Products</a>
-            <a className="rounded-md border border-border bg-background px-3 py-2 text-sm font-bold text-foreground transition hover:border-brand focus-visible:focus-ring" href="/dashboard/my-membership">View Membership</a>
-            <a className="rounded-md border border-border bg-background px-3 py-2 text-sm font-bold text-foreground transition hover:border-brand focus-visible:focus-ring" href="/dashboard/my-orders">View Orders</a>
-            <a className="rounded-md border border-border bg-background px-3 py-2 text-sm font-bold text-foreground transition hover:border-brand focus-visible:focus-ring" href="/dashboard/my-payments">View Payments</a>
+            <a className="rounded-md border border-border bg-background px-3 py-2 text-sm font-bold text-foreground transition hover:border-primary focus-visible:focus-ring" href="/dashboard/products">View Products</a>
+            <a className="rounded-md border border-border bg-background px-3 py-2 text-sm font-bold text-foreground transition hover:border-primary focus-visible:focus-ring" href="/dashboard/my-membership">View Membership</a>
+            <a className="rounded-md border border-border bg-background px-3 py-2 text-sm font-bold text-foreground transition hover:border-primary focus-visible:focus-ring" href="/dashboard/my-orders">View Orders</a>
+            <a className="rounded-md border border-border bg-background px-3 py-2 text-sm font-bold text-foreground transition hover:border-primary focus-visible:focus-ring" href="/dashboard/my-payments">View Payments</a>
           </div>
         </Card>
         <Card title="Recent Orders">
@@ -274,7 +274,7 @@ function MemberDashboard({ userName }: { userName: string }) {
 
 function PortalMetric({ icon: Icon, title, value, copy, tone }: { icon: LucideIcon; title: string; value: string; copy: string; tone: "brand" | "success" | "warning" | "danger" }) {
   const tones = {
-    brand: "bg-line-faint text-primary",
+    brand: "bg-secondary text-primary",
     success: "bg-success-soft text-success",
     warning: "bg-warning-soft text-warning",
     danger: "bg-accent-soft text-destructive"
@@ -326,13 +326,13 @@ function MetricCard({
   const animated = useCountUp(value, !loading);
   const displayValue = formatter ? formatter(animated) : Math.round(animated).toString();
   const tones = {
-    brand: "bg-line-faint text-primary",
+    brand: "bg-secondary text-primary",
     success: "bg-success-soft text-success",
     warning: "bg-warning-soft text-warning"
   };
 
   return (
-    <Card className="group min-w-0 overflow-hidden hover:-translate-y-1 hover:border-brand">
+    <Card className="group min-w-0 overflow-hidden hover:-translate-y-1 hover:border-primary">
       <div className="flex min-w-0 items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-xs font-black uppercase tracking-[0.12em] text-muted-foreground sm:text-sm">{title}</p>
@@ -386,13 +386,13 @@ function useCountUp(value: number, enabled: boolean) {
 
 function PaymentRow({ payment }: { payment: PaymentDto }) {
   return (
-    <div className="rounded-md border border-border bg-surface/80 p-3 transition hover:border-brand">
+    <div className="rounded-md border border-border bg-surface/80 p-3 transition hover:border-primary">
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
           <p className="numeric font-bold text-foreground">{formatCents(payment.amountCents)}</p>
           <p className="truncate text-xs font-semibold text-muted-foreground">{payment.method} · {formatRelativeTime(payment.paidAt)}</p>
         </div>
-        <span className="numeric rounded-md bg-line-faint px-2 py-1 text-xs text-muted-foreground">{payment.invoiceId.slice(0, 8)}</span>
+        <span className="numeric rounded-md bg-secondary px-2 py-1 text-xs text-muted-foreground">{payment.invoiceId.slice(0, 8)}</span>
       </div>
     </div>
   );
@@ -400,7 +400,7 @@ function PaymentRow({ payment }: { payment: PaymentDto }) {
 
 function LowStockRow({ product }: { product: LowStockProductDto }) {
   return (
-    <div className="rounded-md border border-border bg-surface/80 p-3 transition hover:border-brand">
+    <div className="rounded-md border border-border bg-surface/80 p-3 transition hover:border-primary">
       <div className="mb-2 flex justify-between gap-2 text-sm">
         <span className="inline-flex items-center gap-2 font-bold text-foreground"><Boxes className="h-4 w-4 text-primary" aria-hidden="true" />{product.name}</span>
         <span className="numeric font-semibold text-muted-foreground">{product.currentStock} left</span>
@@ -412,7 +412,7 @@ function LowStockRow({ product }: { product: LowStockProductDto }) {
 
 function SubscriptionRow({ subscription }: { subscription: MembershipSubscriptionDto }) {
   return (
-    <div className="rounded-md border border-border bg-surface/80 p-3 transition hover:border-brand">
+    <div className="rounded-md border border-border bg-surface/80 p-3 transition hover:border-primary">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="min-w-0">
           <p className="truncate font-bold text-foreground">{subscription.planName}</p>
@@ -428,7 +428,7 @@ function SubscriptionRow({ subscription }: { subscription: MembershipSubscriptio
 
 function ActivityRow({ activity }: { activity: AuditLogDto }) {
   return (
-    <div className="rounded-md border border-border bg-surface/80 p-3 transition hover:border-brand">
+    <div className="rounded-md border border-border bg-surface/80 p-3 transition hover:border-primary">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="font-bold text-foreground">{activity.action}</p>
         <p className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground"><Clock3 className="h-3.5 w-3.5" aria-hidden="true" />{formatRelativeTime(activity.createdAt)}</p>

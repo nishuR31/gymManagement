@@ -5,21 +5,21 @@ const toneByStatus: Record<string, string> = {
   ACTIVE: "bg-success-soft text-success",
   PAID: "bg-success-soft text-success",
   PARTIALLY_PAID: "bg-warning-soft text-warning",
-  PENDING: "bg-line-faint text-muted-foreground",
-  REFUNDED: "bg-line-faint text-muted-foreground",
+  PENDING: "bg-secondary text-muted-foreground",
+  REFUNDED: "bg-secondary text-muted-foreground",
   CANCELLED: "bg-accent-soft text-destructive",
-  EXPIRED: "bg-line-faint text-muted-foreground",
+  EXPIRED: "bg-secondary text-muted-foreground",
   EXPIRING_SOON: "bg-warning-soft text-warning",
-  FROZEN: "bg-line-faint text-muted-foreground",
-  LOW: "bg-line-faint text-muted-foreground",
+  FROZEN: "bg-secondary text-muted-foreground",
+  LOW: "bg-secondary text-muted-foreground",
   NORMAL: "bg-success-soft text-success",
   HIGH: "bg-warning-soft text-warning",
   NEW: "bg-warning-soft text-warning",
-  READ: "bg-line-faint text-muted-foreground",
+  READ: "bg-secondary text-muted-foreground",
   SUPER_ADMIN: "bg-accent-soft text-destructive",
   GYM_OWNER: "bg-warning-soft text-warning",
-  ADMIN: "bg-line-faint text-primary",
-  STAFF: "bg-line-faint text-muted-foreground",
+  ADMIN: "bg-secondary text-primary",
+  STAFF: "bg-secondary text-muted-foreground",
   TRAINER: "bg-success-soft text-success"
 };
 
@@ -52,7 +52,7 @@ export function StatusBadge({ status }: { status: string }) {
   const Icon = iconByStatus[status as keyof typeof iconByStatus] ?? Circle;
 
   return (
-    <span className={`inline-flex max-w-full items-center gap-1.5 truncate rounded px-2 py-1 text-xs font-bold ${toneByStatus[status] ?? "bg-line-faint text-muted-foreground"}`}>
+    <span className={`inline-flex max-w-full items-center gap-1.5 truncate rounded px-2 py-1 text-xs font-bold ${toneByStatus[status] ?? "bg-secondary text-muted-foreground"}`}>
       <Icon className="h-3 w-3 shrink-0" aria-hidden="true" />
       {readableStatus(status)}
     </span>

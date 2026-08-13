@@ -305,7 +305,7 @@ export function MembershipsPage() {
                   <div className="relative">
                     <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
                     <input
-                      className="h-11 w-full min-w-0 rounded-md border border-border bg-surface/70 pl-9 pr-3 text-sm text-foreground outline-none transition placeholder:text-muted-foreground hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25"
+                      className="h-11 w-full min-w-0 rounded-md border border-border bg-surface/70 pl-9 pr-3 text-sm text-foreground outline-none transition placeholder:text-muted-foreground hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/25"
                       placeholder="Search by name, member ID, phone, or email"
                       value={memberSearch}
                       onChange={(event) => {
@@ -320,7 +320,7 @@ export function MembershipsPage() {
                   <p className="text-xs font-semibold text-destructive">{assignForm.formState.errors.memberId.message}</p>
                 ) : null}
                 {selectedMember ? (
-                  <div className="flex min-w-0 items-center gap-3 rounded-md border border-brand/40 bg-line-faint p-3">
+                  <div className="flex min-w-0 items-center gap-3 rounded-md border border-primary/40 bg-secondary p-3">
                     <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-background text-primary">
                       <UserRound className="h-5 w-5" aria-hidden="true" />
                     </div>
@@ -336,10 +336,10 @@ export function MembershipsPage() {
                       <button
                         key={member.id}
                         type="button"
-                        className="flex w-full min-w-0 items-center gap-3 border-b border-border px-3 py-2 text-left transition last:border-b-0 hover:bg-line-faint focus-visible:focus-ring"
+                        className="flex w-full min-w-0 items-center gap-3 border-b border-border px-3 py-2 text-left transition last:border-b-0 hover:bg-secondary focus-visible:focus-ring"
                         onClick={() => selectMemberForAssignment(member)}
                       >
-                        <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-line-faint text-primary">
+                        <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-secondary text-primary">
                           <UserRound className="h-4 w-4" aria-hidden="true" />
                         </div>
                         <div className="min-w-0">
@@ -394,7 +394,7 @@ export function MembershipsPage() {
               ) : null}
               <label className="grid min-w-0 gap-2 text-sm font-semibold text-foreground">
                 <span>Plan</span>
-                <select className="h-11 w-full rounded-md border border-border bg-surface/70 px-3 text-sm outline-none transition hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25" {...assignForm.register("planId")}>
+                <select className="h-11 w-full rounded-md border border-border bg-surface/70 px-3 text-sm outline-none transition hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/25" {...assignForm.register("planId")}>
                   <option value="">Select plan</option>
                   {plans
                     .filter((plan) => plan.isActive)

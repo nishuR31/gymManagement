@@ -15,9 +15,9 @@ export function DownloadAppPage() {
   return (
     <div className="w-full animate-fade-in pb-16">
       <section className="relative px-6 py-20 md:py-24 overflow-hidden border-b border-border">
-        <div className="absolute inset-0 bg-brand/5 blur-[120px] rounded-full" />
+        <div className="absolute inset-0 bg-primary/5 blur-[120px] rounded-full" />
         <div className="relative mx-auto max-w-4xl text-center">
-          <span className="inline-flex items-center gap-2 rounded-full border border-brand/40 bg-brand/10 px-4 py-1.5 text-xs font-black uppercase tracking-[0.18em] text-primary-foreground shadow-sm mb-6">
+          <span className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-4 py-1.5 text-xs font-black uppercase tracking-[0.18em] text-primary-foreground shadow-sm mb-6">
             <Smartphone className="h-4 w-4" aria-hidden="true" />
             {APP_NAME} App
           </span>
@@ -55,19 +55,19 @@ export function DownloadAppPage() {
           </div>
 
           <div className="relative">
-            <div className="absolute inset-0 bg-brand/20 blur-[100px] rounded-full" />
+            <div className="absolute inset-0 bg-primary/20 blur-[100px] rounded-full" />
             <div className="card-base relative p-6 shadow-xl mx-auto max-w-sm transform rotate-2 hover:rotate-0 transition duration-500">
               <div className="border border-border/50 bg-background rounded-2xl p-4 h-150 flex flex-col items-center justify-center text-center">
                 <div className="flex gap-1 p-1 card-base rounded-lg mb-8">
                   <button
                     onClick={() => setPlatform("ios")}
-                    className={`px-4 py-2 text-sm font-bold rounded-md transition flex items-center gap-2 ${platform === "ios" ? "bg-primary text-panel shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+                    className={`px-4 py-2 text-sm font-bold rounded-md transition flex items-center gap-2 ${platform === "ios" ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
                   >
                     iOS
                   </button>
                   <button
                     onClick={() => setPlatform("android")}
-                    className={`px-4 py-2 text-sm font-bold rounded-md transition flex items-center gap-2 ${platform === "android" ? "bg-primary text-panel shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+                    className={`px-4 py-2 text-sm font-bold rounded-md transition flex items-center gap-2 ${platform === "android" ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
                   >
                     Android
                   </button>
@@ -81,8 +81,8 @@ export function DownloadAppPage() {
                 <p className="text-sm text-muted-foreground mb-8">Point your camera to get the {platform === "ios" ? "iOS" : "Android"} app</p>
 
                 <div className="w-full space-y-3">
-                  <div className="h-12 card-base w-full animate-pulse bg-brand/5" />
-                  <div className="h-12 card-base w-full animate-pulse bg-brand/5" />
+                  <div className="h-12 card-base w-full animate-pulse bg-primary/5" />
+                  <div className="h-12 card-base w-full animate-pulse bg-primary/5" />
                 </div>
               </div>
             </div>
@@ -114,7 +114,7 @@ export function DownloadAppPage() {
 function Step({ number, title, description }: { number: string, title: string, description: string }) {
   return (
     <div className="flex gap-4 items-start">
-      <div className="shrink-0 w-12 h-12 bg-brand/10 text-primary font-black rounded-full flex items-center justify-center text-sm border border-brand/20">
+      <div className="shrink-0 w-12 h-12 bg-primary/10 text-primary font-black rounded-full flex items-center justify-center text-sm border border-primary/20">
         {number}
       </div>
       <div>
@@ -127,7 +127,7 @@ function Step({ number, title, description }: { number: string, title: string, d
 
 function FeatureCard({ title, description }: { title: string, description: string }) {
   return (
-    <Card className="hover:border-brand/50 transition">
+    <Card className="hover:border-primary/50 transition">
       <div className="mb-4 text-primary">
         <CheckCircle2 className="h-6 w-6" />
       </div>

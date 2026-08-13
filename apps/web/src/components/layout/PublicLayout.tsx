@@ -7,18 +7,18 @@ export function PublicLayout() {
     <div className="min-h-screen bg-transparent backdrop-blur-xs text-foreground flex flex-col">
       <header className="layout-header">
         <Link className="flex items-center gap-3 text-foreground focus-visible:focus-ring rounded-md" to="/" tabIndex={0}>
-          <span className="grid h-10 w-10 place-items-center rounded-md bg-primary text-panel">
+          <span className="grid h-10 w-10 place-items-center rounded-md bg-primary text-primary-foreground">
             <Dumbbell className="h-5 w-5" aria-hidden="true" />
           </span>
           <span>
-            <span className="block text-sm font-black uppercase tracking-[0.18em] text-primary-foreground">{APP_NAME}</span>
+            <span className="block text-sm font-black uppercase tracking-[0.18em] text-foreground">{APP_NAME}</span>
             <span className="hidden md:block text-xs font-semibold text-muted-foreground">Iron & Chalk Training Club</span>
           </span>
         </Link>
         <nav className="flex items-center gap-2">
-          <Link className="hidden md:inline-flex rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition hover:bg-panel/10 hover:text-foreground focus-visible:focus-ring" to="/plans" tabIndex={0}>Plans</Link>
-          <Link className="hidden md:inline-flex rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition hover:bg-panel/10 hover:text-foreground focus-visible:focus-ring" to="/member-login" tabIndex={0}>Member Login</Link>
-          <Link className="hidden md:inline-flex rounded-md border border-border bg-panel/10 px-3 py-2 text-sm font-bold text-foreground transition hover:border-brand focus-visible:focus-ring" to="/login" tabIndex={0}>Admin</Link>
+          <Link className="hidden md:inline-flex rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition hover:bg-card/10 hover:text-foreground focus-visible:focus-ring" to="/plans" tabIndex={0}>Plans</Link>
+          <Link className="hidden md:inline-flex rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition hover:bg-card/10 hover:text-foreground focus-visible:focus-ring" to="/member-login" tabIndex={0}>Member Login</Link>
+          <Link className="hidden md:inline-flex rounded-md border border-border bg-card/10 px-3 py-2 text-sm font-bold text-foreground transition hover:border-primary focus-visible:focus-ring" to="/login" tabIndex={0}>Admin</Link>
           <Link className="p-2 text-muted-foreground hover:text-primary transition rounded-md focus-visible:focus-ring" to="/settings" aria-label="Settings" tabIndex={0}>
             <Settings
               className="

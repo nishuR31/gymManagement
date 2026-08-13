@@ -122,7 +122,7 @@ export function StaffPage() {
           {selected ? (
             <div className="grid gap-4">
               <div>
-                <div className="mb-3 grid h-12 w-12 place-items-center rounded-full bg-line-faint text-primary">
+                <div className="mb-3 grid h-12 w-12 place-items-center rounded-full bg-secondary text-primary">
                   <ShieldCheck className="h-5 w-5" aria-hidden="true" />
                 </div>
                 <StatusBadge status={selected.role} />
@@ -202,7 +202,7 @@ function ProfileModal({ open, onClose, onSaved }: { open: boolean; onClose: () =
         <Input label="User ID" value={userId} onChange={(event) => setUserId(event.target.value)} />
         <label className="grid gap-2 text-sm font-medium text-foreground">
           <span>Profile role</span>
-          <select className="h-11 rounded-md border border-border bg-surface/70 px-3 outline-none transition hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25" value={role} onChange={(event) => setRole(event.target.value as StaffProfileRole)}>
+          <select className="h-11 rounded-md border border-border bg-surface/70 px-3 outline-none transition hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/25" value={role} onChange={(event) => setRole(event.target.value as StaffProfileRole)}>
             {staffProfileRoles.map((item) => <option key={item} value={item}>{item}</option>)}
           </select>
         </label>

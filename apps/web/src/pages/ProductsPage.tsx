@@ -84,8 +84,8 @@ export function ProductsPage() {
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {shownProducts.map((product) => (
-          <article key={product.id} className="bg-card group grid min-w-0 overflow-hidden rounded-lg border border-border shadow-sm transition hover:-translate-y-1 hover:border-brand">
-            <div className="aspect-[4/3] bg-line-faint">
+          <article key={product.id} className="bg-card group grid min-w-0 overflow-hidden rounded-lg border border-border shadow-sm transition hover:-translate-y-1 hover:border-primary">
+            <div className="aspect-[4/3] bg-secondary">
               {product.imageUrl ? (
                 <img className="h-full w-full object-cover" src={product.imageUrl} alt={product.name} />
               ) : (
@@ -101,7 +101,7 @@ export function ProductsPage() {
                     <p className="truncate text-lg font-black text-foreground">{product.name}</p>
                     <p className="mt-1 text-xs font-black uppercase text-primary">{readableStatus(product.category)}</p>
                   </div>
-                  <p className="numeric shrink-0 text-xl font-black text-primary-foreground">{formatCents(product.priceCents)}</p>
+                  <p className="numeric shrink-0 text-xl font-black text-foreground">{formatCents(product.priceCents)}</p>
                 </div>
                 <p className="mt-3 text-sm font-semibold leading-6 text-muted-foreground">{product.description ?? "Available at the gym desk."}</p>
               </div>
@@ -127,7 +127,7 @@ export function ProductsPage() {
           <div className="grid gap-4">
             <div className="rounded-md border border-border bg-background p-3">
               <p className="font-black text-foreground">{selected.name}</p>
-              <p className="numeric mt-1 text-2xl font-black text-primary-foreground">{formatCents(selected.priceCents * Number(quantity || "0"))}</p>
+              <p className="numeric mt-1 text-2xl font-black text-foreground">{formatCents(selected.priceCents * Number(quantity || "0"))}</p>
               <p className="mt-1 text-sm font-semibold text-muted-foreground">Payment is collected manually at the gym desk.</p>
             </div>
             <Input label="Quantity" type="number" min={1} max={selected.currentStock} value={quantity} onChange={(event) => setQuantity(event.target.value)} />

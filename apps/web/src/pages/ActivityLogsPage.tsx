@@ -103,10 +103,10 @@ export function ActivityLogsPage() {
 function ActivityRow({ log, expanded, onToggle }: { log: AuditLogDto; expanded: boolean; onToggle: () => void }) {
   return (
     <Fragment>
-      <tr className="transition hover:bg-line-faint/35">
+      <tr className="transition hover:bg-secondary/35">
         <td className="px-3 py-3">
           <div className="flex items-center gap-2">
-            <span className="grid h-8 w-8 place-items-center rounded-md bg-line-faint text-primary">
+            <span className="grid h-8 w-8 place-items-center rounded-md bg-secondary text-primary">
               <ClipboardList className="h-4 w-4" aria-hidden="true" />
             </span>
             <span className="font-bold text-foreground">{log.action}</span>
@@ -121,7 +121,7 @@ function ActivityRow({ log, expanded, onToggle }: { log: AuditLogDto; expanded: 
           <span title={formatDateTime(log.createdAt)}>{formatRelativeTime(log.createdAt)}</span>
         </td>
         <td className="px-3 py-3 text-right">
-          <button className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition hover:border-brand hover:text-foreground focus-visible:focus-ring" onClick={onToggle} aria-label={expanded ? "Hide activity details" : "Show activity details"}>
+          <button className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition hover:border-primary hover:text-foreground focus-visible:focus-ring" onClick={onToggle} aria-label={expanded ? "Hide activity details" : "Show activity details"}>
             <ChevronDown className={`h-4 w-4 transition ${expanded ? "rotate-180" : ""}`} aria-hidden="true" />
           </button>
         </td>
@@ -137,7 +137,7 @@ function ActivityRow({ log, expanded, onToggle }: { log: AuditLogDto; expanded: 
               </div>
               <div>
                 <p className="font-bold uppercase text-muted-foreground">Metadata</p>
-                <pre className="numeric mt-2 max-h-40 overflow-auto whitespace-pre-wrap break-all rounded bg-line-faint p-2">{JSON.stringify(log.metadata ?? {}, null, 2)}</pre>
+                <pre className="numeric mt-2 max-h-40 overflow-auto whitespace-pre-wrap break-all rounded bg-secondary p-2">{JSON.stringify(log.metadata ?? {}, null, 2)}</pre>
               </div>
             </div>
           </td>

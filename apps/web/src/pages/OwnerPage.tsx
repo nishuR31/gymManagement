@@ -26,15 +26,15 @@ export function OwnerPage() {
           </div>
 
           <div className="mt-8 flex flex-wrap gap-4">
-            <div className="flex items-center gap-2 bg-panel/30 border border-border rounded-lg px-4 py-3 shadow-sm">
+            <div className="flex items-center gap-2 bg-card/30 border border-border rounded-lg px-4 py-3 shadow-sm">
               <HeartPulse className="text-primary h-5 w-5" />
               <span className="text-sm font-bold text-foreground">Injury Rehab</span>
             </div>
-            <div className="flex items-center gap-2 bg-panel/30 border border-border rounded-lg px-4 py-3 shadow-sm">
+            <div className="flex items-center gap-2 bg-card/30 border border-border rounded-lg px-4 py-3 shadow-sm">
               <ShieldCheck className="text-primary h-5 w-5" />
               <span className="text-sm font-bold text-foreground">Safe Programming</span>
             </div>
-            <div className="flex items-center gap-2 bg-panel/30 border border-border rounded-lg px-4 py-3 shadow-sm">
+            <div className="flex items-center gap-2 bg-card/30 border border-border rounded-lg px-4 py-3 shadow-sm">
               <Stethoscope className="text-primary h-5 w-5" />
               <span className="text-sm font-bold text-foreground">Clinical Guidance</span>
             </div>
@@ -42,7 +42,7 @@ export function OwnerPage() {
         </div>
 
         <div className="order-1 md:order-2 relative">
-          <div className="absolute inset-0 bg-brand/20 blur-3xl rounded-full" />
+          <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full" />
           <img
             src="https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=800&q=80"
             alt="Owner in the gym"
@@ -54,24 +54,24 @@ export function OwnerPage() {
       <div className="mb-16">
         <h2 className="text-3xl font-black text-foreground mb-8 text-center">Certifications & Proof of Work</h2>
         <div className="grid gap-6 md:grid-cols-3">
-          <Card className="hover:border-brand/50 transition">
-            <div className="w-12 h-12 rounded-lg bg-brand/10 flex items-center justify-center mb-4 text-primary">
+          <Card className="hover:border-primary/50 transition">
+            <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 text-primary">
               <Award className="h-6 w-6" />
             </div>
             <h3 className="text-lg font-bold text-foreground mb-2">CSCS Certified</h3>
             <p className="text-sm text-muted-foreground">Certified Strength and Conditioning Specialist (NSCA). Specialized in athletic performance and injury prevention.</p>
           </Card>
 
-          <Card className="hover:border-brand/50 transition">
-            <div className="w-12 h-12 rounded-lg bg-brand/10 flex items-center justify-center mb-4 text-primary">
+          <Card className="hover:border-primary/50 transition">
+            <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 text-primary">
               <Medal className="h-6 w-6" />
             </div>
             <h3 className="text-lg font-bold text-foreground mb-2">NASM Corrective Exercise</h3>
             <p className="text-sm text-muted-foreground">Certified Corrective Exercise Specialist. Trained to identify and correct movement dysfunctions to prevent injuries.</p>
           </Card>
 
-          <Card className="hover:border-brand/50 transition">
-            <div className="w-12 h-12 rounded-lg bg-brand/10 flex items-center justify-center mb-4 text-primary">
+          <Card className="hover:border-primary/50 transition">
+            <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 text-primary">
               <ShieldCheck className="h-6 w-6" />
             </div>
             <h3 className="text-lg font-bold text-foreground mb-2">CPR / AED / First Aid</h3>

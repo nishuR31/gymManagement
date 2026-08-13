@@ -116,9 +116,9 @@ export function App() {
 
 function RouteLoading() {
   return (
-    <div className="grid min-h-screen place-items-center bg-backdrop px-6 text-center">
+    <div className="grid min-h-screen place-items-center bg-background/80 backdrop-blur-sm px-6 text-center">
       <div className="grid justify-items-center gap-3 animate-fade-in">
-        <div className="h-12 w-12 animate-pulse rounded-full border border-brand/40 bg-brand/15 shadow-sm" />
+        <div className="h-12 w-12 animate-pulse rounded-full border border-primary/40 bg-primary/15 shadow-sm" />
         <p className="text-sm font-bold text-muted-foreground">Loading workspace</p>
       </div>
     </div>

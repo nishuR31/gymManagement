@@ -396,7 +396,7 @@ export function MembersPage() {
           <label className="grid min-w-0 gap-2 text-sm font-semibold text-foreground">
             <span>Status</span>
             <select
-              className="h-11 w-full rounded-md border border-border bg-surface/70 px-3 text-sm outline-none transition hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25"
+              className="h-11 w-full rounded-md border border-border bg-surface/70 px-3 text-sm outline-none transition hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/25"
               value={status}
               onChange={(event) =>
                 setStatus(event.target.value as MemberStatus | "")
@@ -489,7 +489,7 @@ export function MembersPage() {
                 {table.getRowModel().rows.map((row) => (
                   <tr
                     key={row.id}
-                    className="group align-middle transition hover:bg-line-faint/40"
+                    className="group align-middle transition hover:bg-secondary/40"
                   >
                     {row.getVisibleCells().map((cell) => (
                       <td key={cell.id} className="px-4 py-3 align-middle">
@@ -611,7 +611,7 @@ export function MembersPage() {
                 <label className="grid min-w-0 gap-2 text-sm font-semibold text-foreground">
                   <span>Medical notes</span>
                   <textarea
-                    className="min-h-24 w-full rounded-md border border-border bg-surface/70 px-3 py-2 text-sm outline-none transition hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25"
+                    className="min-h-24 w-full rounded-md border border-border bg-surface/70 px-3 py-2 text-sm outline-none transition hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/25"
                     {...register("medicalNotes")}
                   />
                 </label>
@@ -788,7 +788,7 @@ function MemberDetailModal({
         <div className="grid gap-5">
           <div className="rounded-lg border border-border bg-surface/75 p-4">
             <div className="flex min-w-0 items-start gap-4">
-              <div className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-line-faint text-primary shadow-sm">
+              <div className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-secondary text-primary shadow-sm">
                 <span className="text-lg font-black">
                   {initialsFor(member)}
                 </span>
@@ -854,7 +854,7 @@ function MemberDetailModal({
               {qrPayload ? (
                 <div className="overflow-hidden rounded-lg border border-border bg-background shadow-sm">
                   <div className="dark-band-gradient border-b border-border p-3">
-                    <p className="text-xs font-black uppercase tracking-[0.16em] text-primary-foreground">
+                    <p className="text-xs font-black uppercase tracking-[0.16em] text-foreground">
                       Membership Card
                     </p>
                     <p className="mt-1 truncate text-sm font-black text-foreground">
@@ -872,7 +872,7 @@ function MemberDetailModal({
                       <p className="text-xs font-semibold uppercase text-muted-foreground">
                         QR payload
                       </p>
-                      <p className="numeric mt-1 break-all rounded-md bg-line-faint p-2 text-xs font-semibold text-muted-foreground">
+                      <p className="numeric mt-1 break-all rounded-md bg-secondary p-2 text-xs font-semibold text-muted-foreground">
                         {qrPayload}
                       </p>
                     </div>

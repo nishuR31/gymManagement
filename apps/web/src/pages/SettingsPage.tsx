@@ -87,14 +87,14 @@ export function SettingsPage() {
               <button
                 key={key}
                 className={`flex items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-bold transition focus-visible:focus-ring ${
-                  selectedKey === key ? "bg-primary text-panel" : "border border-border bg-card text-muted-foreground hover:bg-line-faint"
+                  selectedKey === key ? "bg-primary text-primary-foreground" : "border border-border bg-card text-muted-foreground hover:bg-secondary"
                 }`}
                 onClick={() => setSelectedKey(key)}
               >
                 <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
                 <span className="min-w-0">
                   <span className="block truncate">{readableStatus(key)}</span>
-                  <span className={`mt-0.5 block truncate text-xs ${selectedKey === key ? "text-panel/70" : "text-muted-foreground"}`}>{descriptionForKey(key)}</span>
+                  <span className={`mt-0.5 block truncate text-xs ${selectedKey === key ? "text-foreground/70" : "text-muted-foreground"}`}>{descriptionForKey(key)}</span>
                 </span>
               </button>
                 );

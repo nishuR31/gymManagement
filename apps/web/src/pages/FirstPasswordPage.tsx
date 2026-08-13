@@ -56,13 +56,13 @@ export function FirstPasswordPage() {
 
   return (
     <main className="grid min-h-screen place-items-center px-4 py-10 text-foreground bg-background">
-      <section className="w-full max-w-lg animate-slide-up rounded-lg border border-border bg-panel/95 p-6 shadow-sm md:p-8">
+      <section className="w-full max-w-lg animate-slide-up rounded-lg border border-border bg-card/95 p-6 shadow-sm md:p-8">
         <div className="mb-8">
           <Link className="flex items-center gap-3 text-sm font-black text-primary" to="/">
             <Dumbbell className="h-4 w-4" aria-hidden="true" />
             {APP_NAME}
           </Link>
-          <p className="mt-6 inline-flex items-center gap-2 rounded-md border border-brand/30 bg-background px-3 py-2 text-xs font-black uppercase tracking-[0.18em] text-primary">
+          <p className="mt-6 inline-flex items-center gap-2 rounded-md border border-primary/30 bg-background px-3 py-2 text-xs font-black uppercase tracking-[0.18em] text-primary">
             <KeyRound className="h-3.5 w-3.5" aria-hidden="true" />
             First Login
           </p>

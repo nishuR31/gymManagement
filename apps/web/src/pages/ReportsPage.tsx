@@ -97,7 +97,7 @@ export function ReportsPage() {
             <button
               key={option.type}
               className={`inline-flex h-10 items-center gap-2 rounded-md px-3 text-sm font-bold transition focus-visible:focus-ring ${
-                type === option.type ? "bg-primary text-panel" : "border border-border bg-card text-muted-foreground hover:bg-line-faint"
+                type === option.type ? "bg-primary text-primary-foreground" : "border border-border bg-card text-muted-foreground hover:bg-secondary"
               }`}
               onClick={() => setType(option.type)}
             >
@@ -112,7 +112,7 @@ export function ReportsPage() {
           {type === "revenue" ? (
             <label className="grid gap-2 text-sm font-medium text-foreground">
               <span>Range</span>
-              <select className="h-11 rounded-md border border-border bg-surface/70 px-3 outline-none transition hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25" value={range} onChange={(event) => setRange(event.target.value as PaymentAnalyticsRange)}>
+              <select className="h-11 rounded-md border border-border bg-surface/70 px-3 outline-none transition hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/25" value={range} onChange={(event) => setRange(event.target.value as PaymentAnalyticsRange)}>
                 {paymentAnalyticsRanges.map((item) => <option key={item} value={item}>{item}</option>)}
               </select>
             </label>

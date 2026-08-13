@@ -148,7 +148,7 @@ export function PaymentsPage() {
           {paymentAnalyticsRanges.map((item) => (
             <button
               key={item}
-              className={`h-9 shrink-0 rounded px-3 text-sm font-bold capitalize ${range === item ? "bg-primary text-panel" : "text-muted-foreground hover:text-foreground"}`}
+              className={`h-9 shrink-0 rounded px-3 text-sm font-bold capitalize ${range === item ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
               onClick={() => setRange(item)}
             >
               {item}
@@ -161,7 +161,7 @@ export function PaymentsPage() {
         <Card title="Revenue">
           {isAdminRole(role) ? (
             <>
-              <p className="numeric text-4xl font-black text-primary-foreground">{formatCents(total)}</p>
+              <p className="numeric text-4xl font-black text-foreground">{formatCents(total)}</p>
               <div className="mt-4 h-72">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={analytics?.buckets ?? []}>
@@ -206,7 +206,7 @@ export function PaymentsPage() {
                       className="flex w-full min-w-0 items-center gap-3 rounded-md px-3 py-2 text-left transition hover:bg-surface-hover focus-visible:focus-ring"
                       onClick={() => selectMember(member)}
                     >
-                      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-surface-hover text-primary-foreground">
+                      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-surface-hover text-foreground">
                         <UserRound className="h-4 w-4" aria-hidden="true" />
                       </span>
                       <span className="min-w-0">
@@ -220,8 +220,8 @@ export function PaymentsPage() {
             </div>
 
             {selectedMember ? (
-              <div className="rounded-md border border-brand/40 bg-brand/10 p-3">
-                <p className="text-xs font-black uppercase tracking-[0.16em] text-primary-foreground">Selected member</p>
+              <div className="rounded-md border border-primary/40 bg-primary/10 p-3">
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-foreground">Selected member</p>
                 <p className="mt-1 font-bold text-foreground">{selectedMember.firstName} {selectedMember.lastName}</p>
                 <p className="numeric text-xs font-semibold text-muted-foreground">{selectedMember.memberCode}</p>
               </div>
@@ -246,7 +246,7 @@ export function PaymentsPage() {
           title="Pending Dues"
           action={
             selectedMember ? (
-              <span className="numeric text-sm font-black text-primary-foreground">{formatCents(totalPendingCents)}</span>
+              <span className="numeric text-sm font-black text-foreground">{formatCents(totalPendingCents)}</span>
             ) : null
           }
         >
@@ -357,10 +357,10 @@ function PendingInvoiceCard({ invoice, onView, onPay }: { invoice: InvoiceDto; o
   const progress = invoice.amountDueCents <= 0 ? 100 : Math.min(invoice.amountDueCents, invoice.amountPaidCents);
 
   return (
-    <div className="rounded-md border border-border bg-surface/85 p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-brand/70">
+    <div className="rounded-md border border-border bg-surface/85 p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-primary/70">
       <div className="flex min-w-0 items-start justify-between gap-3">
         <div className="flex min-w-0 gap-3">
-          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-md bg-brand/15 text-primary-foreground">
+          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-md bg-primary/15 text-primary-foreground">
             <Receipt className="h-5 w-5" aria-hidden="true" />
           </span>
           <div className="min-w-0">
@@ -369,7 +369,7 @@ function PendingInvoiceCard({ invoice, onView, onPay }: { invoice: InvoiceDto; o
               <span className="numeric truncate text-xs font-bold text-muted-foreground">{invoice.id.slice(0, 8)}</span>
             </div>
             <p className="mt-2 text-xs font-semibold uppercase text-muted-foreground">Remaining due</p>
-            <p className="numeric text-2xl font-black text-primary-foreground">{formatCents(invoice.remainingCents)}</p>
+            <p className="numeric text-2xl font-black text-foreground">{formatCents(invoice.remainingCents)}</p>
           </div>
         </div>
         <div className="text-right">
@@ -396,7 +396,7 @@ function PendingInvoiceCard({ invoice, onView, onPay }: { invoice: InvoiceDto; o
 
 function PaymentRow({ payment, canRefund, onRefund }: { payment: PaymentDto; canRefund: boolean; onRefund: () => void }) {
   return (
-    <div className="min-w-0 rounded-md border border-border bg-background p-3 transition hover:border-brand">
+    <div className="min-w-0 rounded-md border border-border bg-background p-3 transition hover:border-primary">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="min-w-0">
           <p className="numeric font-bold text-foreground">{formatCents(payment.amountCents)}</p>
@@ -457,7 +457,7 @@ function RecordPaymentModal({ invoice, open, onClose, onSaved }: { invoice: Invo
         {invoice ? (
           <div className="rounded-md border border-border bg-background p-3">
             <p className="text-xs font-semibold uppercase text-muted-foreground">Remaining balance</p>
-            <p className="numeric mt-1 text-3xl font-black text-primary-foreground">{formatCents(invoice.remainingCents)}</p>
+            <p className="numeric mt-1 text-3xl font-black text-foreground">{formatCents(invoice.remainingCents)}</p>
             <p className={`numeric mt-2 text-sm font-bold ${exceedsRemaining ? "text-destructive" : "text-muted-foreground"}`}>
               After this payment: {formatCents(Math.max(0, remainingAfterPayment))}
             </p>
@@ -472,7 +472,7 @@ function RecordPaymentModal({ invoice, open, onClose, onSaved }: { invoice: Invo
         <Input label="Amount" type="number" step="0.01" value={amount} onChange={(event) => setAmount(event.target.value)} />
         <label className="grid min-w-0 gap-2 text-sm font-semibold text-foreground">
           <span>Method</span>
-          <select className="h-11 w-full rounded-md border border-border bg-surface/70 px-3 outline-none transition hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25" value={method} onChange={(event) => setMethod(event.target.value as PaymentMethod)}>
+          <select className="h-11 w-full rounded-md border border-border bg-surface/70 px-3 outline-none transition hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/25" value={method} onChange={(event) => setMethod(event.target.value as PaymentMethod)}>
             {paymentMethods.map((item) => <option key={item} value={item}>{item}</option>)}
           </select>
         </label>
@@ -509,7 +509,7 @@ function RefundModal({ payment, onClose, onSaved }: { payment: PaymentDto | null
       <div className="grid gap-3">
         <div className="rounded-md border border-border bg-background p-3">
           <p className="text-xs font-semibold uppercase text-muted-foreground">Refundable</p>
-          <p className="numeric mt-1 text-2xl font-black text-primary-foreground">{formatCents(payment?.refundableCents ?? 0)}</p>
+          <p className="numeric mt-1 text-2xl font-black text-foreground">{formatCents(payment?.refundableCents ?? 0)}</p>
         </div>
         <Input label="Amount" type="number" step="0.01" max={payment ? payment.refundableCents / 100 : undefined} value={amount} onChange={(event) => setAmount(event.target.value)} />
         <Input label="Reason" value={reason} onChange={(event) => setReason(event.target.value)} />

@@ -15,7 +15,7 @@ const STORAGE_KEY = "gymos-theme";
 const STYLE_STORAGE_KEY = "gymos-style";
 
 const initialState: ThemeState = {
-  theme: Appearance.getColorScheme() === "dark" ? "dark" : "light",
+  theme: "light", // Initialized lazily to prevent RN circular dependency
   styleMode: "minimal",
   isLoaded: false
 };
@@ -23,9 +23,10 @@ const initialState: ThemeState = {
 export const loadThemeSettings = createAsyncThunk("theme/loadSettings", async () => {
   const theme = await AsyncStorage.getItem(STORAGE_KEY);
   const style = await AsyncStorage.getItem(STYLE_STORAGE_KEY);
+  const systemTheme = Appearance.getColorScheme() === "dark" ? "dark" : "light";
   return {
-    theme: (theme === "light" || theme === "dark") ? theme : null,
-    styleMode: (style === "minimal" || style === "glass" || style === "clay") ? style : null
+    theme: (theme === "light" || theme === "dark") ? theme : systemTheme,
+    styleMode: (style === "minimal" || style === "glass" || style === "clay") ? style : "minimal"
   };
 });
 

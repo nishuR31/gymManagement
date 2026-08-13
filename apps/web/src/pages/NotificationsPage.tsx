@@ -83,7 +83,7 @@ export function NotificationsPage() {
                   <div className="mb-2 flex flex-wrap items-center gap-2">
                     <p className="font-bold text-foreground">{notification.title}</p>
                     <StatusBadge status={notification.priority} />
-                    <span className="rounded bg-line-faint px-2 py-1 text-xs font-bold text-muted-foreground">{notification.category}</span>
+                    <span className="rounded bg-secondary px-2 py-1 text-xs font-bold text-muted-foreground">{notification.category}</span>
                   </div>
                   <p className="text-sm text-muted-foreground">{notification.body}</p>
                   <p className="mt-2 text-xs font-semibold text-muted-foreground" title={formatDateTime(notification.createdAt)}>{formatRelativeTime(notification.createdAt)}</p>
@@ -164,7 +164,7 @@ function CreateNotificationModal({ open, onClose, onSaved }: { open: boolean; on
         <label className="grid gap-2 text-sm font-medium text-foreground">
           <span>Body</span>
           <textarea
-            className="min-h-28 rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-brand focus:ring-2 focus:ring-brand/20"
+            className="min-h-28 rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20"
             value={body}
             onChange={(event) => setBody(event.target.value)}
           />
@@ -173,13 +173,13 @@ function CreateNotificationModal({ open, onClose, onSaved }: { open: boolean; on
         <div className="grid gap-3 md:grid-cols-2">
           <label className="grid gap-2 text-sm font-medium text-foreground">
             <span>Category</span>
-            <select className="h-11 rounded-md border border-border bg-surface/70 px-3 outline-none transition hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25" value={category} onChange={(event) => setCategory(event.target.value as NotificationCategory)}>
+            <select className="h-11 rounded-md border border-border bg-surface/70 px-3 outline-none transition hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/25" value={category} onChange={(event) => setCategory(event.target.value as NotificationCategory)}>
               {notificationCategories.map((item) => <option key={item} value={item}>{item}</option>)}
             </select>
           </label>
           <label className="grid gap-2 text-sm font-medium text-foreground">
             <span>Priority</span>
-            <select className="h-11 rounded-md border border-border bg-surface/70 px-3 outline-none transition hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25" value={priority} onChange={(event) => setPriority(event.target.value as NotificationPriority)}>
+            <select className="h-11 rounded-md border border-border bg-surface/70 px-3 outline-none transition hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/25" value={priority} onChange={(event) => setPriority(event.target.value as NotificationPriority)}>
               {notificationPriorities.map((item) => <option key={item} value={item}>{item}</option>)}
             </select>
           </label>

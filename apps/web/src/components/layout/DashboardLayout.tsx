@@ -109,9 +109,9 @@ export function DashboardLayout() {
     <div className="min-h-screen text-foreground bg-background">
       <aside className="layout-sidebar">
         <div className="shrink-0 px-4 pt-5">
-        <Link to="/" className="block rounded-lg border border-border bg-panel/80 p-4 transition hover:border-brand focus-visible:focus-ring" aria-label="Go to home page">
+        <Link to="/" className="block rounded-lg border border-border bg-card/80 p-4 transition hover:border-primary focus-visible:focus-ring" aria-label="Go to home page">
           <div className="flex min-w-0 items-center gap-3">
-            <div className="grid h-11 w-11 place-items-center rounded-md bg-primary text-panel shadow-sm">
+            <div className="grid h-11 w-11 place-items-center rounded-md bg-primary text-primary-foreground shadow-sm">
               <Dumbbell className="h-5 w-5" aria-hidden="true" />
             </div>
             <div className="min-w-0">
@@ -142,7 +142,7 @@ export function DashboardLayout() {
           </div>
         </nav>
         <div className="shrink-0 border-t border-border p-4">
-          <div className="rounded-lg border border-border bg-panel/60 p-3">
+          <div className="rounded-lg border border-border bg-card/60 p-3">
             <p className="text-xs font-black uppercase tracking-[0.16em] text-primary">Signed in</p>
             <p className="mt-1 truncate text-sm font-bold text-foreground">{user ? `${user.firstName} ${user.lastName}` : "Workspace user"}</p>
           </div>
@@ -153,7 +153,7 @@ export function DashboardLayout() {
         <header className="layout-dashboard-header">
           <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <Link to="/" className="grid h-10 w-10 place-items-center rounded-md border border-border bg-background transition hover:border-brand focus-visible:focus-ring lg:hidden" aria-label="Go to home page">
+              <Link to="/" className="grid h-10 w-10 place-items-center rounded-md border border-border bg-background transition hover:border-primary focus-visible:focus-ring lg:hidden" aria-label="Go to home page">
                 <Dumbbell className="h-5 w-5 text-primary" aria-hidden="true" />
               </Link>
               <div>
@@ -189,8 +189,8 @@ function SidebarLink({ item }: { item: NavItem }) {
       className={({ isActive }) =>
         `group flex h-10 min-w-0 items-center gap-3 rounded-md px-3 text-sm font-bold transition duration-200 focus-visible:focus-ring ${
           isActive
-            ? "bg-primary text-panel shadow-sm"
-            : "text-muted-foreground hover:bg-panel/85 hover:text-foreground"
+            ? "bg-primary text-primary-foreground shadow-sm"
+            : "text-muted-foreground hover:bg-card/85 hover:text-foreground"
         }`
       }
     >
@@ -210,7 +210,7 @@ function MobileLink({ item }: { item: NavItem }) {
       aria-label={item.label}
       className={({ isActive }) =>
         `inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-md border text-sm font-bold transition focus-visible:focus-ring ${
-          isActive ? "border-brand bg-primary px-3 text-panel" : "w-10 border-border bg-background px-0 text-muted-foreground hover:border-brand hover:text-foreground"
+          isActive ? "border-primary bg-primary px-3 text-primary-foreground" : "w-10 border-border bg-background px-0 text-muted-foreground hover:border-primary hover:text-foreground"
         }`
       }
     >

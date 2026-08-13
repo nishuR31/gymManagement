@@ -1,23 +1,22 @@
 import './global.css';
 import { useEffect } from 'react';
+import { View } from 'react-native';
 import { Provider } from 'react-redux';
-import { store } from './src/store';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+
+import { store } from './src/store';
 import { registerForPushNotificationsAsync } from './src/services/notifications';
-import { View } from 'react-native';
 import { LoginScreen } from './src/pages/LoginScreen';
 import { DashboardScreen } from './src/pages/DashboardScreen';
-
-
+import { PublicHomeScreen } from './src/pages/PublicHomeScreen';
 import { Toaster } from './src/components/ui/Toaster';
 import { useAppSelector, useAppDispatch } from './src/store/hooks';
 import { loadThemeSettings } from './src/features/theme/themeSlice';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { ErrorBoundary } from './src/components/ErrorBoundary';
 
 const Stack = createNativeStackNavigator();
-
-import { PublicHomeScreen } from './src/pages/PublicHomeScreen';
 
 function RootApp() {
   const dispatch = useAppDispatch();
@@ -55,8 +54,6 @@ function RootApp() {
     </SafeAreaProvider>
   );
 }
-
-import { ErrorBoundary } from './src/components/ErrorBoundary';
 
 export default function App() {
   return (

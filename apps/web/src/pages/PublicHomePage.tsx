@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import type { LucideIcon } from "lucide-react";
 import { ArrowRight, BadgeCheck, ChevronRight, Clock3, CreditCard, Dumbbell, MapPin, ShieldCheck, Sparkles, Trophy, Users } from "lucide-react";
@@ -67,47 +67,37 @@ export function PublicHomePage() {
           alt=""
           className="absolute inset-0 h-full w-full scale-105 object-cover motion-safe:animate-fade-in"
         />
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(112deg, hsl(var(--background)) 0%, color-mix(in srgb, hsl(var(--background)) 92%, transparent) 38%, color-mix(in srgb, hsl(var(--background)) 48%, transparent) 70%, transparent 100%), linear-gradient(0deg, hsl(var(--background)) 0%, color-mix(in srgb, hsl(var(--background)) 72%, transparent) 24%, transparent 58%)"
-          }}
-        />
-        <div
-          className="absolute inset-x-0 bottom-0 h-28"
-          style={{
-            background: "linear-gradient(180deg, transparent 0%, hsl(var(--background)) 100%)"
-          }}
-        />
+        <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/40 to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent pointer-events-none" />
+        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-background to-transparent pointer-events-none" />
         <div className="relative mx-auto flex w-full max-w-7xl flex-col px-4 pb-14 pt-5 md:px-6">
           <div className="grid gap-8 pb-4 pt-20 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-end">
-            <div className="max-w-4xl animate-slide-up">
-              <p className="inline-flex items-center gap-2 rounded-md border border-brand/40 bg-backdrop/85 px-3 py-2 text-xs font-black uppercase tracking-[0.18em] text-primary-foreground shadow-sm">
+            <FadeIn className="max-w-4xl" delay={100}>
+              <p className="inline-flex items-center gap-2 rounded-md border border-primary/40 bg-background/85 px-3 py-2 text-xs font-black uppercase tracking-[0.18em] text-primary shadow-sm backdrop-blur-sm">
                 <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
                 {APP_NAME}
               </p>
-              <h1 className="mt-5 max-w-4xl text-balance text-5xl font-black leading-tight text-foreground md:text-7xl">
+              <h1 className="mt-5 max-w-4xl text-balance text-5xl font-black leading-tight text-foreground md:text-7xl drop-shadow-sm">
                 Train with intent. Track every win.
               </h1>
-              <p className="mt-5 max-w-2xl text-base font-semibold leading-7 text-muted-foreground md:text-lg">
+              <p className="mt-5 max-w-2xl text-base font-semibold leading-7 text-foreground/80 md:text-lg">
                 Strength training, personal coaching, flexible memberships, and a front desk experience that keeps every visit moving.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
-                <Link className="inline-flex h-12 items-center gap-2 rounded-md bg-primary px-5 text-sm font-black text-panel shadow-sm transition hover:-translate-y-0.5 hover:bg-primary/90 focus-visible:focus-ring" to="/plans" tabIndex={0}>
+                <Link className="inline-flex h-12 items-center gap-2 rounded-md bg-primary px-5 text-sm font-black text-primary-foreground shadow-md transition hover:-translate-y-0.5 hover:bg-primary/90 focus-visible:focus-ring" to="/plans" tabIndex={0}>
                   View Plans
                   <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </Link>
               </div>
-            </div>
+            </FadeIn>
 
-            <div className="hidden animate-fade-in rounded-lg border border-border bg-backdrop/75 p-4 shadow-sm backdrop-blur-xs lg:block">
+            <FadeIn className="hidden rounded-lg border border-border/50 bg-background/80 p-4 shadow-lg backdrop-blur-md lg:block" delay={300}>
               <div className="grid gap-3">
                 <HeroStat icon={Users} label="Member-first" value="Live floor ops" />
                 <HeroStat icon={Clock3} label="Fast desk" value="Check-ins in seconds" />
                 <HeroStat icon={ShieldCheck} label="Secure" value="Role-based access" />
               </div>
-            </div>
+            </FadeIn>
           </div>
         </div>
       </section>
@@ -128,8 +118,8 @@ export function PublicHomePage() {
           style={{ objectPosition: "center 20%" }}
         />
         {/* Gradient overlays to blend into the main background */}
-        <div className="absolute inset-0 bg-linear-b from-background via-background/40 to-background" />
-        <div className="absolute inset-0 bg-background/30 " />
+        <div className="absolute inset-0 bg-background/10" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background" />
 
         <div className="relative z-10">
           <section className="border-y border-border/30 bg-background/40 backdrop-blur-md">
@@ -141,16 +131,16 @@ export function PublicHomePage() {
           </section>
 
           <section className="mx-auto grid max-w-7xl gap-6 px-4 py-14 md:px-6 lg:grid-cols-[minmax(0,1fr)_430px]">
-            <div>
+            <FadeIn>
               <div className="mb-6 max-w-2xl">
                 <p className="text-xs font-black uppercase tracking-[0.18em] text-primary">What members feel</p>
                 <h2 className="mt-3 text-3xl font-black text-foreground md:text-4xl">A gym experience that feels organized from warm-up to checkout.</h2>
               </div>
               <div className="grid gap-4 md:grid-cols-3">
                 {offerings.map((item, index) => (
-                  <Card key={item.title} title={item.title} className="group hover:-translate-y-1 hover:border-brand transition-all">
+                  <Card key={item.title} title={item.title} className="group hover:-translate-y-1 hover:border-primary transition-all bg-card/80 backdrop-blur-sm">
                     <div className="mb-4 flex items-center justify-between">
-                      <div className="grid h-11 w-11 place-items-center rounded-md bg-primary text-panel shadow-sm transition group-hover:scale-105">
+                      <div className="grid h-11 w-11 place-items-center rounded-md bg-primary text-primary-foreground shadow-sm transition group-hover:scale-105">
                         <item.icon className="h-5 w-5" aria-hidden="true" />
                       </div>
                       <span className="font-mono text-xs font-black text-muted-foreground">{String(index + 1).padStart(2, "0")}</span>
@@ -159,9 +149,10 @@ export function PublicHomePage() {
                   </Card>
                 ))}
               </div>
-            </div>
+            </FadeIn>
 
-            <Card title={`Contact ${APP_NAME}`} className="ring-1  ring-brand/15">
+            <FadeIn delay={200}>
+              <Card title={`Contact ${APP_NAME}`} className="ring-1 ring-primary/15 bg-card/90 backdrop-blur-sm">
               <form
                 className="grid gap-4"
                 onSubmit={handleSubmit(onSubmit)}
@@ -202,7 +193,8 @@ export function PublicHomePage() {
                   {isSubmitting ? "Sending" : "Send Inquiry"}
                 </Button>
               </form>
-            </Card>
+              </Card>
+            </FadeIn>
           </section>
         </div>
       </div>
@@ -230,12 +222,12 @@ const offerings = [
 
 function HeroStat({ icon: Icon, label, value }: { icon: LucideIcon; label: string; value: string }) {
   return (
-    <div className="flex items-center gap-3 rounded-md border border-border bg-panel/10 p-3">
-      <div className="grid h-10 w-10 place-items-center rounded-md bg-primary text-panel">
+    <div className="flex items-center gap-3 rounded-md border border-border/50 bg-background/50 p-3 shadow-sm backdrop-blur-sm">
+      <div className="grid h-10 w-10 place-items-center rounded-md bg-primary text-primary-foreground">
         <Icon className="h-5 w-5" aria-hidden="true" />
       </div>
       <div>
-        <p className="text-xs font-black uppercase tracking-[0.14em] text-primary-foreground">{label}</p>
+        <p className="text-xs font-black uppercase tracking-[0.14em] text-foreground/70">{label}</p>
         <p className="text-sm font-bold text-foreground">{value}</p>
       </div>
     </div>
@@ -244,14 +236,44 @@ function HeroStat({ icon: Icon, label, value }: { icon: LucideIcon; label: strin
 
 function MiniProof({ icon: Icon, label, value }: { icon: LucideIcon; label: string; value: string }) {
   return (
-    <div className="flex items-center gap-3 rounded-lg border border-border bg-card p-3 shadow-sm">
-      <div className="grid h-10 w-10 place-items-center rounded-md bg-line-faint text-primary">
+    <div className="flex items-center gap-3 rounded-lg border border-border/60 bg-card p-3 shadow-sm transition-all hover:bg-card/80">
+      <div className="grid h-10 w-10 place-items-center rounded-md bg-secondary text-primary">
         <Icon className="h-5 w-5" aria-hidden="true" />
       </div>
       <div>
         <p className="text-sm font-black text-foreground">{label}</p>
         <p className="text-xs font-semibold text-muted-foreground">{value}</p>
       </div>
+    </div>
+  );
+}
+
+function FadeIn({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
+  const [isVisible, setIsVisible] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry?.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1, rootMargin: "50px" }
+    );
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div
+      ref={ref}
+      className={`transition-all duration-1000 ease-out ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"} ${className}`}
+      style={{ transitionDelay: `${delay}ms` }}
+    >
+      {children}
     </div>
   );
 }

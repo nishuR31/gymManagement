@@ -188,7 +188,7 @@ export function MemberAccountPage({ mode }: { mode: MemberAccountMode }) {
       {mode === "profile" ? (
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_380px]">
           <section className="bg-card rounded-lg border border-border p-4 shadow-sm">
-            <div className="mb-4 grid h-14 w-14 place-items-center rounded-full bg-line-faint text-primary">
+            <div className="mb-4 grid h-14 w-14 place-items-center rounded-full bg-secondary text-primary">
               <UserRound className="h-6 w-6" aria-hidden="true" />
             </div>
             <div className="grid gap-4 md:grid-cols-2">

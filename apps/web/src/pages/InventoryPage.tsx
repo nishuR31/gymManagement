@@ -95,22 +95,22 @@ export function InventoryPage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
-        <Card title="Low Stock" className="hover:-translate-y-1 hover:border-brand">
+        <Card title="Low Stock" className="hover:-translate-y-1 hover:border-primary">
           <div className="mb-4 grid h-11 w-11 place-items-center rounded-md bg-accent-soft text-destructive">
             <AlertTriangle className="h-5 w-5" aria-hidden="true" />
           </div>
-          <p className="numeric text-4xl font-black text-primary-foreground">{lowStock.length}</p>
+          <p className="numeric text-4xl font-black text-foreground">{lowStock.length}</p>
           <p className="mt-1 text-sm text-muted-foreground">Products at or below threshold</p>
         </Card>
-        <Card title="Valuation" className="hover:-translate-y-1 hover:border-brand">
-          <div className="mb-4 grid h-11 w-11 place-items-center rounded-md bg-line-faint text-primary">
+        <Card title="Valuation" className="hover:-translate-y-1 hover:border-primary">
+          <div className="mb-4 grid h-11 w-11 place-items-center rounded-md bg-secondary text-primary">
             <IndianRupee className="h-5 w-5" aria-hidden="true" />
           </div>
-          <p className="numeric text-4xl font-black text-primary-foreground">{formatCents(valuation)}</p>
+          <p className="numeric text-4xl font-black text-foreground">{formatCents(valuation)}</p>
           <p className="mt-1 text-sm text-muted-foreground">Current stock at cost</p>
         </Card>
-        <Card title="Reports" className="hover:-translate-y-1 hover:border-brand">
-          <div className="mb-4 grid h-11 w-11 place-items-center rounded-md bg-line-faint text-primary">
+        <Card title="Reports" className="hover:-translate-y-1 hover:border-primary">
+          <div className="mb-4 grid h-11 w-11 place-items-center rounded-md bg-secondary text-primary">
             <FileText className="h-5 w-5" aria-hidden="true" />
           </div>
           <p className="text-sm font-semibold text-muted-foreground">Coming in Batch 2 Reports</p>
@@ -125,7 +125,7 @@ export function InventoryPage() {
           <div className="mb-4 flex flex-wrap items-center gap-3">
             <label className="grid min-w-0 gap-1 text-sm font-semibold text-foreground">
               <span>Category</span>
-              <select className="h-10 w-full rounded-md border border-border bg-surface/70 px-3 outline-none transition hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25" value={category} onChange={(event) => setCategory(event.target.value as ProductCategory | "")}>
+              <select className="h-10 w-full rounded-md border border-border bg-surface/70 px-3 outline-none transition hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/25" value={category} onChange={(event) => setCategory(event.target.value as ProductCategory | "")}>
                 <option value="">All</option>
                 {productCategories.map((item) => <option key={item} value={item}>{item}</option>)}
               </select>
@@ -203,7 +203,7 @@ export function InventoryPage() {
             </p>
             <div className="flex justify-end gap-2">
               <Button variant="secondary" onClick={() => setProductToDelete(null)}>Cancel</Button>
-              <Button className="text-panel" onClick={() => void deleteProduct()}>Delete Product</Button>
+              <Button className="text-foreground" onClick={() => void deleteProduct()}>Delete Product</Button>
             </div>
           </div>
         ) : null}
@@ -279,7 +279,7 @@ function ProductModal({ product, onClose, onSaved }: { product: ProductDto | nul
         <label className="grid min-w-0 gap-2 text-sm font-semibold text-foreground">
           <span>Description</span>
           <textarea
-            className="min-h-24 w-full resize-y rounded-md border border-border bg-surface/70 px-3 py-2 text-sm text-foreground outline-none transition placeholder:text-muted-foreground hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25"
+            className="min-h-24 w-full resize-y rounded-md border border-border bg-surface/70 px-3 py-2 text-sm text-foreground outline-none transition placeholder:text-muted-foreground hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/25"
             value={description}
             onChange={(event) => setDescription(event.target.value)}
           />
@@ -287,7 +287,7 @@ function ProductModal({ product, onClose, onSaved }: { product: ProductDto | nul
         <Input label="Image URL" type="url" value={imageUrl} onChange={(event) => setImageUrl(event.target.value)} />
         <label className="grid min-w-0 gap-2 text-sm font-semibold text-foreground">
           <span>Category</span>
-          <select className="h-11 w-full rounded-md border border-border bg-surface/70 px-3 outline-none transition hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25" value={category} onChange={(event) => setCategory(event.target.value as ProductCategory)}>
+          <select className="h-11 w-full rounded-md border border-border bg-surface/70 px-3 outline-none transition hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/25" value={category} onChange={(event) => setCategory(event.target.value as ProductCategory)}>
             {productCategories.map((item) => <option key={item} value={item}>{item}</option>)}
           </select>
         </label>
@@ -374,7 +374,7 @@ function StockActionModal({
       <div className="grid gap-3">
         <label className="grid min-w-0 gap-2 text-sm font-semibold text-foreground">
           <span>Product</span>
-          <select className="h-11 w-full rounded-md border border-border bg-surface/70 px-3 outline-none transition hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25" value={productId} onChange={(event) => setProductId(event.target.value)}>
+          <select className="h-11 w-full rounded-md border border-border bg-surface/70 px-3 outline-none transition hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/25" value={productId} onChange={(event) => setProductId(event.target.value)}>
             {products.map((product) => <option key={product.id} value={product.id}>{product.name}</option>)}
           </select>
         </label>
@@ -382,7 +382,7 @@ function StockActionModal({
         {action === "purchase" ? (
           <label className="grid min-w-0 gap-2 text-sm font-semibold text-foreground">
             <span>Supplier</span>
-            <select className="h-11 w-full rounded-md border border-border bg-surface/70 px-3 outline-none transition hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25" value={supplierId} onChange={(event) => setSupplierId(event.target.value)}>
+            <select className="h-11 w-full rounded-md border border-border bg-surface/70 px-3 outline-none transition hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/25" value={supplierId} onChange={(event) => setSupplierId(event.target.value)}>
               <option value="">No supplier</option>
               {suppliers.map((supplier) => <option key={supplier.id} value={supplier.id}>{supplier.name}</option>)}
             </select>
@@ -393,7 +393,7 @@ function StockActionModal({
             <Input label="Member ID" value={memberId} onChange={(event) => setMemberId(event.target.value)} />
             <label className="grid min-w-0 gap-2 text-sm font-semibold text-foreground">
               <span>Payment method</span>
-              <select className="h-11 w-full rounded-md border border-border bg-surface/70 px-3 outline-none transition hover:border-brand/50 focus:border-brand focus:ring-2 focus:ring-brand/25" value={method} onChange={(event) => setMethod(event.target.value as PaymentMethod)}>
+              <select className="h-11 w-full rounded-md border border-border bg-surface/70 px-3 outline-none transition hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/25" value={method} onChange={(event) => setMethod(event.target.value as PaymentMethod)}>
                 {paymentMethods.map((item) => <option key={item} value={item}>{item}</option>)}
               </select>
             </label>
