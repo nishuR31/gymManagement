@@ -2,6 +2,17 @@
   "name": "@gym/native",
   "version": "1.0.0",
   "main": "expo/AppEntry.js",
+  "scripts": {
+    "apk": "eas build --platform android --profile preview --clear-cache",
+    "apk:prod": "eas build --platform android --profile production-apk --clear-cache",
+    "apk:local": "eas build --platform android --profile preview --local",
+    "aab": "eas build --platform android --profile production --clear-cache",
+    "apple": "eas build --platform ios --profile development",
+    "start": "EXPO_NO_DEV_TOOLS=1 EXPO_USE_DEVTOOLS=false expo start -c",
+    "android": "EXPO_NO_DEV_TOOLS=1 EXPO_USE_DEVTOOLS=false expo start --android",
+    "ios": "EXPO_NO_DEV_TOOLS=1 EXPO_USE_DEVTOOLS=false expo start --ios"
+  },
+  "private": true,
   "dependencies": {
     "@expo/metro-runtime": "^57.0.9",
     "@hookform/resolvers": "^5.7.1",
@@ -34,15 +45,5 @@
   "devDependencies": {
     "@types/react": "~19.2.4",
     "typescript": "~6.0.3"
-  },
-  "scripts": {
-    "apk": "eas build --platform android --profile preview",
-    "apk:prod": "eas build --platform android --profile production",
-    "apk:local": "eas build --platform android --profile preview --local",
-    "apple": "eas build --platform ios --profile development",
-    "start": "EXPO_NO_DEV_TOOLS=1 EXPO_USE_DEVTOOLS=false expo start -c",
-    "android": "EXPO_NO_DEV_TOOLS=1 EXPO_USE_DEVTOOLS=false expo start --android",
-    "ios": "EXPO_NO_DEV_TOOLS=1 EXPO_USE_DEVTOOLS=false expo start --ios"
-  },
-  "private": true
+  }
 }
