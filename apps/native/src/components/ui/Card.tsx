@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ViewProps } from 'react-native';
+import { View, Text, ViewProps, TextProps } from 'react-native';
 import { useAppSelector } from '../../store/hooks';
 
 interface CardProps extends ViewProps {
@@ -33,7 +33,7 @@ export function CardHeader({ children, className, ...props }: CardProps) {
   );
 }
 
-export function CardTitle({ children, className, ...props }: CardProps & { children: React.ReactNode }) {
+export function CardTitle({ children, className, ...props }: TextProps & { children: React.ReactNode, className?: string }) {
   return (
     <Text className={`text-2xl font-semibold leading-none tracking-tight text-foreground ${className || ''}`} {...props}>
       {children}

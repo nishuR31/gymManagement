@@ -18,6 +18,7 @@ const TermsPage = lazy(() => import("../pages/TermsPage").then((module) => ({ de
 const PublicSettingsPage = lazy(() => import("../pages/PublicSettingsPage").then((module) => ({ default: module.PublicSettingsPage })));
 const PublicPlansPage = lazy(() => import("../pages/PublicPlansPage").then((module) => ({ default: module.PublicPlansPage })));
 const DownloadAppPage = lazy(() => import("../pages/DownloadAppPage").then((module) => ({ default: module.DownloadAppPage })));
+const FeaturesPage = lazy(() => import("../pages/FeaturesPage").then((module) => ({ default: module.FeaturesPage })));
 const OwnerPage = lazy(() => import("../pages/OwnerPage").then((module) => ({ default: module.OwnerPage })));
 const MemberLoginPage = lazy(() => import("../pages/MemberLoginPage").then((module) => ({ default: module.MemberLoginPage })));
 const FirstPasswordPage = lazy(() => import("../pages/FirstPasswordPage").then((module) => ({ default: module.FirstPasswordPage })));
@@ -74,6 +75,7 @@ export function App() {
             <Route path="/settings" element={<PublicSettingsPage />} />
             <Route path="/plans" element={<PublicPlansPage />} />
             <Route path="/download-app" element={<DownloadAppPage />} />
+            <Route path="/features" element={<FeaturesPage />} />
             <Route path="/owner" element={<OwnerPage />} />
           </Route>
           <Route path="/member-login" element={<MemberLoginPage />} />

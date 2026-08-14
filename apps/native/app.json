@@ -1,12 +1,11 @@
 {
   "expo": {
-    "name": "native",
+    "name": "Valor Fitness",
     "slug": "gym",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
-    "jsx": true,
+    "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true
     },
@@ -18,8 +17,24 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.gym.com"
+      "package": "com.gym.com",
+      "permissions": [
+        "INTERNET",
+        "ACCESS_NETWORK_STATE",
+        "POST_NOTIFICATIONS",
+        "VIBRATE",
+        "RECEIVE_BOOT_COMPLETED"
+      ]
     },
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/android-icon-foreground.png",
+          "color": "#6366f1"
+        }
+      ]
+    ],
     "extra": {
       "eas": {
         "projectId": "9317d332-0724-43a2-8e8b-eb862bb2efed"

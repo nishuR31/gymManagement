@@ -74,7 +74,7 @@ export function Button({ variant = 'primary', size = 'md', isLoading = false, ch
       disabled={isLoading || props.disabled}
       {...props}
     >
-      {isLoading && <ActivityIndicator size="small" color={variant === 'outline' || variant === 'ghost' ? 'hsl(var(--foreground))' : 'hsl(var(--primary-foreground))'} className="mr-2" />}
+      {isLoading && <ActivityIndicator size="small" color={variant === 'outline' || variant === 'ghost' ? '#09090b' : '#ffffff'} className="mr-2" />}
       {typeof children === 'string' ? (
         <Text className={textClass}>{children}</Text>
       ) : (

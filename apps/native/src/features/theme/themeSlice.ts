@@ -53,6 +53,9 @@ export const themeSlice = createSlice({
       if (action.payload.styleMode) state.styleMode = action.payload.styleMode as StyleMode;
       state.isLoaded = true;
     });
+    builder.addCase(loadThemeSettings.rejected, (state) => {
+      state.isLoaded = true;
+    });
   }
 });
 
