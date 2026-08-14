@@ -1,0 +1,14 @@
+# Valor Fitness
+Valor Fitness is a comprehensive gym management software designed for modern fitness centers.
+
+## Public Pages
+- Home: https://valor-fitness.vercel.app/
+- Features: https://valor-fitness.vercel.app/features
+- Plans & Pricing: https://valor-fitness.vercel.app/plans
+- Download App: https://valor-fitness.vercel.app/download-app
+- Privacy Policy: https://valor-fitness.vercel.app/privacy
+- Terms of Service: https://valor-fitness.vercel.app/terms
+
+## Authentication
+- Staff/Admin Login: https://valor-fitness.vercel.app/login
+- Member Login: https://valor-fitness.vercel.app/member-login

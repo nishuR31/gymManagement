@@ -1,0 +1,21 @@
+# __      __  _       _         ___    ____
+# \ \    / / / \     | |       / _ \  |  _ \
+#  \ \  / / / _ \    | |      | | | | | |_) |
+#   \ \/ / / ___ \   | |___   | |_| | |  _ <
+#    \__/ /_/   \_\  |_____|   \___/  |_| \_\
+
+User-agent: *
+Allow: /
+Allow: /features
+Allow: /plans
+Allow: /download-app
+Allow: /login
+Allow: /member-login
+Allow: /privacy
+Allow: /terms
+
+Disallow: /dashboard/
+Disallow: /settings/
+Disallow: /member/
+
+Sitemap: https://valor-fitness.vercel.app/sitemap.xml
