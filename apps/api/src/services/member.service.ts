@@ -420,6 +420,7 @@ function toUserDto(user: {
   mustChangePassword: boolean;
   twoFactorEnabled?: boolean;
   hasPasskeys?: boolean;
+  securityDisableRequested?: boolean;
 }): MemberLoginSetupDto["user"] {
   return {
     id: user.id,
@@ -429,7 +430,8 @@ function toUserDto(user: {
     role: user.role,
     mustChangePassword: user.mustChangePassword,
     twoFactorEnabled: user.twoFactorEnabled ?? false,
-    hasPasskeys: user.hasPasskeys ?? false
+    hasPasskeys: user.hasPasskeys ?? false,
+    securityDisableRequested: user.securityDisableRequested ?? false
   };
 }
 

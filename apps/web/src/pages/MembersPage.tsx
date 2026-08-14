@@ -84,7 +84,8 @@ const features = stockFeatures;
 const columnHelper = createColumnHelper<StockFeatures, MemberDto>();
 
 export function MembersPage() {
-  const role = useAppSelector((state) => state.auth.user?.role);
+  const user = useAppSelector((state) => state.auth.user);
+  const role = user?.role;
   const [members, setMembers] = useState<MemberDto[]>([]);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<MemberStatus | "">("");
@@ -786,6 +787,8 @@ function MemberDetailModal({
   onRegenerateQr,
   onCreateLogin,
   onArchive,
+  isSuperAdmin,
+  onDisableSecurity,
 }: {
   member: MemberDto | null;
   detailTab: "profile" | "payments" | "plans";

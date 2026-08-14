@@ -479,6 +479,7 @@ function toAuthUserRecord(user: {
   role: { name: string };
   twoFactorEnabled: boolean;
   passkeys?: { id: string }[];
+  securityDisableRequested: boolean;
 }): AuthUserRecord {
   return {
     id: user.id,
@@ -491,6 +492,7 @@ function toAuthUserRecord(user: {
     mustChangePassword: user.mustChangePassword,
     memberId: user.memberProfile?.id ?? null,
     twoFactorEnabled: user.twoFactorEnabled,
-    hasPasskeys: (user.passkeys?.length ?? 0) > 0
+    hasPasskeys: (user.passkeys?.length ?? 0) > 0,
+    securityDisableRequested: user.securityDisableRequested
   };
 }

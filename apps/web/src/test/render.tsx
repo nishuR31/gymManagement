@@ -12,7 +12,8 @@ const baseUser: AuthUserDto = {
   role: "MEMBER",
   mustChangePassword: false,
   twoFactorEnabled: false,
-  hasPasskeys: false
+  hasPasskeys: false,
+  securityDisableRequested: false
 };
 
 export function makeAuthState(overrides: Partial<AuthState> = {}): AuthState {
