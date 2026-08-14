@@ -445,8 +445,8 @@ export function MembersPage() {
                 key={member.id}
                 className="rounded-md border border-border bg-surface/80 p-3"
               >
-                <div className="flex min-w-0 items-start justify-between gap-3">
-                  <div className="min-w-0">
+                <div className="flex min-w-0 items-start justify-between gap-3 flex-wrap">
+                  <div className="min-w-0 flex-1">
                     <p className="numeric text-xs font-black text-primary">
                       {member.memberCode}
                     </p>
@@ -477,20 +477,20 @@ export function MembersPage() {
                 </div>
               </div>
             ))}
-            <div className="pt-2">
-              <Button onClick={() => setIsFormOpen(true)} className="w-full">
-                + Add New Member
-              </Button>
-            </div>
             {!isLoading && members.length === 0 ? (
               <EmptyState
                 title="No members found"
                 description="Create a member or adjust the current filters."
               />
             ) : null}
+            <div className="pt-2">
+              <Button onClick={() => setIsFormOpen(true)} className="w-full">
+                + Add New Member
+              </Button>
+            </div>
           </div>
-          <div className="hidden overflow-x-auto md:block">
-            <table className="w-full table-fixed min-w-[800px] text-left text-sm">
+          <div className="hidden overflow-x-auto md:block max-w-full">
+            <table className="w-full table-auto min-w-[800px] text-left text-sm">
               <colgroup>
                 <col className="w-[160px]" />
                 <col />
@@ -537,7 +537,7 @@ export function MembersPage() {
                 />
               </div>
             ) : null}
-            <div className="p-4 mt-2">
+            <div className="p-4 mt-2 border-t border-border">
               <Button onClick={() => setIsFormOpen(true)}>
                 + Add New Member
               </Button>

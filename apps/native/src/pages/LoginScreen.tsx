@@ -24,20 +24,19 @@ const codeSchema = z.object({ code: z.string().min(4, "Enter valid code") });
 type EmailFormValues = z.infer<typeof emailSchema>;
 type PasswordFormValues = z.infer<typeof passwordSchema>;
 type CodeFormValues = z.infer<typeof codeSchema>;
-type AuthStep = "email" | "password" | "2fa" | "otp" | "magic-link";
+type AuthStep = "login" | "2fa" | "otp" | "magic-link";
 
 export function LoginScreen({ navigation }: any) {
   const dispatch = useAppDispatch();
   const theme = useAppSelector((state) => state.theme.theme);
   const activeColors = themeColors[theme === 'amoled' ? 'amoled' : theme === 'dark' ? 'dark' : 'light'];
 
-  const [step, setStep] = useState<AuthStep>("email");
+  const [step, setStep] = useState<AuthStep>("login");
   const [email, setEmail] = useState("");
   const [passwordCache, setPasswordCache] = useState("");
   const [isSimulating, setIsSimulating] = useState(false);
 
-  const { control: controlEmail, handleSubmit: subEmail, formState: { errors: errEmail } } = useForm<EmailFormValues>({ resolver: zodResolver(emailSchema) });
-  const { control: controlPass, handleSubmit: subPass, formState: { errors: errPass } } = useForm<PasswordFormValues>({ resolver: zodResolver(passwordSchema) });
+  const { control: controlLogin, handleSubmit: subLogin, formState: { errors: errLogin } } = useForm<EmailFormValues & PasswordFormValues>({ resolver: zodResolver(emailSchema.merge(passwordSchema)) });
   const { control: controlCode, handleSubmit: subCode, formState: { errors: errCode } } = useForm<CodeFormValues>({ resolver: zodResolver(codeSchema) });
 
   const onFinalLogin = async (pass?: string, code?: string) => {
@@ -67,8 +66,10 @@ export function LoginScreen({ navigation }: any) {
     Toast.show({ type: 'error', text1: "Authentication failed" });
   };
 
-  const handleEmailNext = (v: EmailFormValues) => { setEmail(v.email); setStep("password"); };
-  const handlePassNext = (v: PasswordFormValues) => { onFinalLogin(v.password); };
+  const handleLoginNext = (v: EmailFormValues & PasswordFormValues) => {
+    setEmail(v.email);
+    onFinalLogin(v.password);
+  };
   const handleCodeSubmit = (v: CodeFormValues) => { onFinalLogin(passwordCache, v.code); };
 
   const handlePasskey = () => { Toast.show({ type: 'success', text1: "Prompting for Passkey..." }); setTimeout(() => onFinalLogin(), 1500); };
@@ -76,15 +77,18 @@ export function LoginScreen({ navigation }: any) {
   const handleSendOTP = () => { setStep("otp"); Toast.show({ type: 'success', text1: "OTP sent to " + email }); };
 
   const renderStep = () => {
-    if (step === "email") {
+    if (step === "login") {
       return (
         <View className="gap-6 animate-fade-in w-full">
           <View className="gap-4">
-            <Controller control={controlEmail} name="email" render={({ field: { onChange, value } }) => (
-              <Input label="Email" autoCapitalize="none" keyboardType="email-address" value={value} onChangeText={onChange} error={errEmail.email?.message} />
+            <Controller control={controlLogin} name="email" render={({ field: { onChange, value } }) => (
+              <Input label="Email" autoCapitalize="none" keyboardType="email-address" value={value} onChangeText={onChange} error={errLogin.email?.message} />
             )} />
-            <Button onPress={subEmail(handleEmailNext)} className="w-full h-11">
-              <Text className="text-primary-foreground font-bold mr-2">Continue with Email</Text>
+            <Controller control={controlLogin} name="password" render={({ field: { onChange, value } }) => (
+              <Input label="Password" secureTextEntry value={value} onChangeText={onChange} error={errLogin.password?.message} />
+            )} />
+            <Button onPress={subLogin(handleLoginNext)} className="w-full h-11">
+              <Text className="text-primary-foreground font-bold mr-2">Sign In</Text>
               <ArrowRight size={16} color={activeColors.primaryForeground} />
             </Button>
           </View>
@@ -108,42 +112,11 @@ export function LoginScreen({ navigation }: any) {
       );
     }
 
-    if (step === "password") {
-      return (
-        <View className="gap-6 animate-fade-in w-full">
-          <View className="flex-row items-center gap-2 pb-4">
-            <TouchableOpacity onPress={() => setStep("email")} className="p-2 -ml-2 rounded-full">
-              <ArrowLeft size={20} color={activeColors.foreground} />
-            </TouchableOpacity>
-            <Text className="text-sm font-bold text-foreground">{email}</Text>
-          </View>
-          <View className="gap-4">
-            <Controller control={controlPass} name="password" render={({ field: { onChange, value } }) => (
-              <Input label="Password" secureTextEntry value={value} onChangeText={onChange} error={errPass.password?.message} />
-            )} />
-
-
-            <Button onPress={subPass(handlePassNext)} className="w-full h-11">
-              <Text className="text-primary-foreground font-bold mr-2">Sign In</Text>
-              <ArrowRight size={16} color={activeColors.primaryForeground} />
-            </Button>
-          </View>
-
-          <View className="gap-3 pt-4 border-t border-border mt-2">
-            <Button variant="outline" onPress={handleSendOTP} className="w-full h-11">
-              <MessageSquare size={16} color={activeColors.foreground} />
-              <Text className="text-foreground font-bold ml-2">Send OTP to Email</Text>
-            </Button>
-          </View>
-        </View>
-      );
-    }
-
     if (step === "2fa" || step === "otp") {
       return (
         <View className="gap-6 animate-fade-in w-full">
           <View className="flex-row items-center gap-2 pb-2">
-            <TouchableOpacity onPress={() => setStep("password")} className="p-2 -ml-2 rounded-full">
+            <TouchableOpacity onPress={() => setStep("login")} className="p-2 -ml-2 rounded-full">
               <ArrowLeft size={20} color={activeColors.foreground} />
             </TouchableOpacity>
             <Text className="text-sm font-bold text-foreground">{step === "2fa" ? "Two-Factor Authentication" : "One-Time Password"}</Text>
@@ -171,7 +144,7 @@ export function LoginScreen({ navigation }: any) {
           </View>
           <Text className="text-xl font-bold text-foreground">Check your email</Text>
           <Text className="text-sm text-muted-foreground text-center px-4">We sent a magic link to <Text className="font-bold text-foreground">{email}</Text>. Click the link inside to instantly sign in.</Text>
-          <Button variant="outline" onPress={() => setStep("email")} className="mt-4 w-full h-11">
+          <Button variant="outline" onPress={() => setStep("login")} className="mt-4 w-full h-11">
             <Text className="text-foreground font-bold">Back to Login</Text>
           </Button>
         </View>

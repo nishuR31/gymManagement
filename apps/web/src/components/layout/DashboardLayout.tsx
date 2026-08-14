@@ -142,9 +142,14 @@ export function DashboardLayout() {
           </div>
         </nav>
         <div className="shrink-0 border-t border-border p-4">
-          <div className="rounded-lg border border-border bg-card/60 p-3">
-            <p className="text-xs font-black uppercase tracking-[0.16em] text-primary">Signed in</p>
-            <p className="mt-1 truncate text-sm font-bold text-foreground">{user ? `${user.firstName} ${user.lastName}` : "Workspace user"}</p>
+          <div className="flex items-center justify-between rounded-lg border border-border bg-card/60 p-3">
+            <div className="min-w-0">
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-primary">Signed in</p>
+              <p className="mt-1 truncate text-sm font-bold text-foreground">{user ? `${user.firstName} ${user.lastName}` : "Workspace user"}</p>
+            </div>
+            <Link to="/settings" className="p-2 shrink-0 text-muted-foreground hover:text-primary transition rounded-md focus-visible:focus-ring" aria-label="Settings" title="Theming & Cache Settings">
+              <Settings className="h-5 w-5 transition-transform duration-500 ease-in-out hover:rotate-180" />
+            </Link>
           </div>
         </div>
       </aside>

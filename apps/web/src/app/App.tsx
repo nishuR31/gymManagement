@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect } from "react";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
+
 import { ProtectedRoute } from "../components/layout/ProtectedRoute";
 import { RoleRoute } from "../components/layout/RoleRoute";
 import { bootstrapAuthThunk } from "../features/auth/authSlice";
@@ -61,7 +62,7 @@ export function App() {
     } else {
       root.classList.add(theme);
     }
-    
+
     root.classList.add(`theme-${styleMode}`);
   }, [theme, styleMode]);
 
@@ -71,7 +72,7 @@ export function App() {
     }
   }, [dispatch, status]);
 
-  return (
+      return (
     <ErrorBoundary>
       <Suspense fallback={<RouteLoading />}>
         <Routes>
