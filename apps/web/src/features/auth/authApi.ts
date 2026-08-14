@@ -12,6 +12,14 @@ export interface AuthResponse {
   expiresIn: string;
 }
 
+export interface RegisterPayload {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+}
+
 export async function login(payload: LoginPayload): Promise<AuthResponse> {
   const response = await api.post<AuthResponse>("/auth/login", payload);
   return response.data;
@@ -19,6 +27,16 @@ export async function login(payload: LoginPayload): Promise<AuthResponse> {
 
 export async function memberLogin(payload: LoginPayload): Promise<AuthResponse> {
   const response = await api.post<AuthResponse>("/auth/member-login", payload);
+  return response.data;
+}
+
+export async function googleLogin(idToken: string): Promise<AuthResponse> {
+  const response = await api.post<AuthResponse>("/auth/google", { idToken });
+  return response.data;
+}
+
+export async function register(payload: RegisterPayload): Promise<{ user: AuthUserDto }> {
+  const response = await api.post<{ user: AuthUserDto }>("/auth/register", payload);
   return response.data;
 }
 
@@ -39,4 +57,22 @@ export async function getCurrentUser(): Promise<AuthUserDto> {
 
 export async function logout(): Promise<void> {
   await api.post("/auth/logout");
+}
+
+export async function requestPasswordReset(email: string): Promise<void> {
+  await api.post("/auth/password-reset/request", { email });
+}
+
+export async function verifyPasswordResetWith2FA(email: string, token: string): Promise<{ resetToken: string }> {
+  const response = await api.post<{ resetToken: string }>("/auth/password-reset/2fa/verify", { email, token });
+  return response.data;
+}
+
+export async function verifyPasswordResetWithPasskey(email: string, body: any): Promise<{ resetToken: string }> {
+  const response = await api.post<{ resetToken: string }>("/auth/password-reset/passkey/verify", { email, ...body });
+  return response.data;
+}
+
+export async function confirmPasswordReset(token: string, newPassword: string): Promise<void> {
+  await api.post("/auth/password-reset/confirm", { token, newPassword });
 }

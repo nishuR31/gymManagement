@@ -44,6 +44,22 @@ export function setAccessToken(token: string | null): void {
   accessToken = token;
 }
 
+export async function setRefreshToken(token: string) {
+  try {
+    await AsyncStorage.setItem('@refresh_token', token);
+  } catch (e) {
+    console.error("Failed to save refresh token", e);
+  }
+}
+
+export async function clearRefreshToken() {
+  try {
+    await AsyncStorage.removeItem('@refresh_token');
+  } catch (e) {
+    console.error("Failed to clear refresh token", e);
+  }
+}
+
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`;
@@ -61,17 +77,25 @@ api.interceptors.response.use(
     }
 
     if (!refreshPromise) {
-      refreshPromise = api
-        .post<{ accessToken: string }>("/auth/refresh")
-        .then((response) => response.data.accessToken)
-        .finally(() => {
-          refreshPromise = null;
-        });
+      refreshPromise = (async () => {
+        const storedRefreshToken = await AsyncStorage.getItem('@refresh_token');
+        const headers: any = {};
+        if (storedRefreshToken) {
+          headers['x-refresh-token'] = storedRefreshToken;
+        }
+
+        const response = await api.post<{ accessToken: string }>("/auth/refresh", {}, { headers });
+        return response.data.accessToken;
+      })();
     }
 
-    const token = await refreshPromise;
-    setAccessToken(token);
-    originalRequest.headers.Authorization = `Bearer ${token}`;
-    return api(originalRequest);
+    try {
+      const token = await refreshPromise;
+      setAccessToken(token);
+      originalRequest.headers.Authorization = `Bearer ${token}`;
+      return api(originalRequest);
+    } finally {
+      refreshPromise = null;
+    }
   }
 );

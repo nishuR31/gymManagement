@@ -24,6 +24,9 @@ const MemberLoginPage = lazy(() => import("../pages/MemberLoginPage").then((modu
 const FirstPasswordPage = lazy(() => import("../pages/FirstPasswordPage").then((module) => ({ default: module.FirstPasswordPage })));
 const DashboardPage = lazy(() => import("../pages/DashboardPage").then((module) => ({ default: module.DashboardPage })));
 const LoginPage = lazy(() => import("../pages/LoginPage").then((module) => ({ default: module.LoginPage })));
+const SignupPage = lazy(() => import("../pages/SignupPage").then((module) => ({ default: module.SignupPage })));
+const ForgotPasswordPage = lazy(() => import("../pages/ForgotPasswordPage").then((module) => ({ default: module.ForgotPasswordPage })));
+const OAuthCallbackPage = lazy(() => import("../pages/OAuthCallbackPage").then((module) => ({ default: module.OAuthCallbackPage })));
 const MembersPage = lazy(() => import("../pages/MembersPage").then((module) => ({ default: module.MembersPage })));
 const MembershipsPage = lazy(() => import("../pages/MembershipsPage").then((module) => ({ default: module.MembershipsPage })));
 const PaymentsPage = lazy(() => import("../pages/PaymentsPage").then((module) => ({ default: module.PaymentsPage })));
@@ -81,6 +84,9 @@ export function App() {
           <Route path="/member-login" element={<MemberLoginPage />} />
           <Route path="/member/first-password" element={<FirstPasswordPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/auth/callback" element={<OAuthCallbackPage />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<DashboardLayout />}>
               <Route index element={<DashboardPage />} />

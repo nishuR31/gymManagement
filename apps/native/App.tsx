@@ -8,6 +8,8 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { store } from './src/store';
 import { LoginScreen } from './src/pages/LoginScreen';
+import { SignupScreen } from './src/pages/SignupScreen';
+import { ForgotPasswordScreen } from './src/pages/ForgotPasswordScreen';
 import { MemberLoginScreen } from './src/pages/MemberLoginScreen';
 import { DashboardScreen } from './src/pages/DashboardScreen';
 import { PublicHomeScreen } from './src/pages/PublicHomeScreen';
@@ -76,6 +78,8 @@ function RootApp() {
           }}>
             <Stack.Screen name="Home" component={PublicHomeScreen} options={{ title: 'Valor Fitness', headerShown: false }} />
             <Stack.Screen name="Login" component={LoginScreen} options={{ title: 'Staff Login' }} />
+            <Stack.Screen name="Signup" component={SignupScreen} options={{ title: 'Sign Up' }} />
+            <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} options={{ title: 'Reset Password' }} />
             <Stack.Screen name="MemberLogin" component={MemberLoginScreen} options={{ title: 'Member Login' }} />
             <Stack.Screen name="Dashboard" component={DashboardScreen} options={{ title: 'Dashboard', headerBackVisible: false }} />
             <Stack.Screen name="MemberAccount" component={MemberAccountScreen} options={{ title: 'My Account' }} />

@@ -24,6 +24,18 @@ export const loginThunk = createAsyncThunk("auth/login", async (payload: authApi
   return authApi.login(payload);
 });
 
+export const registerThunk = createAsyncThunk<
+  authApi.AuthResponse,
+  any,
+  { rejectValue: string | null }
+>("auth/register", async (payload, { rejectWithValue }) => {
+  try {
+    return await authApi.register(payload);
+  } catch (error) {
+    return rejectWithValue(getApiErrorCode(error));
+  }
+});
+
 export const memberLoginThunk = createAsyncThunk<
   authApi.AuthResponse,
   authApi.LoginPayload,
@@ -47,12 +59,19 @@ export const bootstrapAuthThunk = createAsyncThunk("auth/bootstrap", async () =>
 
 export const logoutThunk = createAsyncThunk("auth/logout", async () => {
   await authApi.logout();
+  const { clearRefreshToken } = require("../../services/api");
+  await clearRefreshToken();
 });
 
 const authSlice = createSlice({
   name: "auth",
   initialState,
-  reducers: {},
+  reducers: {
+    setTokens: (state, action) => {
+      state.accessToken = action.payload.accessToken;
+      setAccessToken(action.payload.accessToken);
+    }
+  },
   extraReducers: (builder) => {
     builder
       .addCase(loginThunk.pending, (state) => {
@@ -71,6 +90,20 @@ const authSlice = createSlice({
         state.accessToken = null;
         state.error = "Invalid email or password";
         setAccessToken(null);
+      })
+      .addCase(registerThunk.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(registerThunk.fulfilled, (state, action) => {
+        state.status = "authenticated";
+        state.user = action.payload.user;
+        state.accessToken = action.payload.accessToken;
+        setAccessToken(action.payload.accessToken);
+      })
+      .addCase(registerThunk.rejected, (state, action) => {
+        state.status = "unauthenticated";
+        state.error = action.payload || "Registration failed";
       })
       .addCase(memberLoginThunk.pending, (state) => {
         state.status = "loading";
@@ -127,4 +160,5 @@ const authSlice = createSlice({
   }
 });
 
+export const { setTokens } = authSlice.actions;
 export const authReducer = authSlice.reducer;

@@ -24,6 +24,14 @@ export const loginThunk = createAsyncThunk("auth/login", async (payload: authApi
   return authApi.login(payload);
 });
 
+export const googleLoginThunk = createAsyncThunk("auth/googleLogin", async (idToken: string) => {
+  return authApi.googleLogin(idToken);
+});
+
+export const registerThunk = createAsyncThunk("auth/register", async (payload: authApi.RegisterPayload) => {
+  return authApi.register(payload);
+});
+
 export const memberLoginThunk = createAsyncThunk<
   authApi.AuthResponse,
   authApi.LoginPayload,
@@ -74,6 +82,23 @@ const authSlice = createSlice({
         state.user = null;
         state.accessToken = null;
         state.error = "Invalid email or password";
+        setAccessToken(null);
+      })
+      .addCase(googleLoginThunk.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(googleLoginThunk.fulfilled, (state, action) => {
+        state.status = action.payload.user.mustChangePassword ? "password_change_required" : "authenticated";
+        state.user = action.payload.user;
+        state.accessToken = action.payload.accessToken;
+        setAccessToken(action.payload.accessToken);
+      })
+      .addCase(googleLoginThunk.rejected, (state) => {
+        state.status = "unauthenticated";
+        state.user = null;
+        state.accessToken = null;
+        state.error = "Google login failed";
         setAccessToken(null);
       })
       .addCase(memberLoginThunk.pending, (state) => {

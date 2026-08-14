@@ -10,8 +10,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
-import { loginThunk, logoutThunk } from '../features/auth/authSlice';
+import { loginThunk, logoutThunk, setTokens, bootstrapAuthThunk } from '../features/auth/authSlice';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { setRefreshToken } from '../services/api';
+import * as WebBrowser from 'expo-web-browser';
+import * as Linking from 'expo-linking';
 import { APP_NAME } from '../utils/env';
 import { themeColors } from '../constants/colors';
 
@@ -72,7 +75,46 @@ export function LoginScreen({ navigation }: any) {
   const handlePassNext = (v: PasswordFormValues) => { onFinalLogin(v.password); };
   const handleCodeSubmit = (v: CodeFormValues) => { onFinalLogin(passwordCache, v.code); };
 
-  const handleOAuth = (provider: string) => { Toast.show({ type: 'success', text1: `Redirecting to ${provider}...` }); setTimeout(() => onFinalLogin(), 1500); };
+  const handleOAuth = async (provider: string) => {
+    if (provider !== 'google') return;
+    try {
+      setIsSimulating(true);
+      const redirectUrl = Linking.createURL('/auth/callback');
+      const authUrl = `http://localhost:4000/api/auth/google?redirect=${encodeURIComponent(redirectUrl)}`;
+
+      const result = await WebBrowser.openAuthSessionAsync(authUrl, redirectUrl);
+
+      if (result.type === 'success' && result.url) {
+        const urlObj = new URL(result.url);
+        const accessToken = urlObj.searchParams.get('accessToken');
+        const refreshToken = urlObj.searchParams.get('refreshToken');
+        
+        if (accessToken && refreshToken) {
+          await setRefreshToken(refreshToken);
+          dispatch(setTokens({ accessToken }));
+          
+          const bootstrapResult = await dispatch(bootstrapAuthThunk());
+          
+          if (bootstrapAuthThunk.fulfilled.match(bootstrapResult)) {
+            if (bootstrapResult.payload.user.role === "MEMBER") {
+              await dispatch(logoutThunk());
+              Toast.show({ type: 'error', text1: "Use member login for member access" });
+              navigation.navigate("MemberLogin");
+              return;
+            }
+            Toast.show({ type: 'success', text1: "Signed in securely" });
+            navigation.replace("Dashboard");
+            return;
+          }
+        }
+        Toast.show({ type: 'error', text1: "Google Auth failed or missing tokens" });
+      }
+    } catch (e: any) {
+      Toast.show({ type: 'error', text1: e.message || "Google Auth failed" });
+    } finally {
+      setIsSimulating(false);
+    }
+  };
   const handlePasskey = () => { Toast.show({ type: 'success', text1: "Prompting for Passkey..." }); setTimeout(() => onFinalLogin(), 1500); };
   const handleMagicLink = () => { setStep("magic-link"); Toast.show({ type: 'success', text1: "Magic link sent to " + email }); };
   const handleSendOTP = () => { setStep("otp"); Toast.show({ type: 'success', text1: "OTP sent to " + email }); };
@@ -106,7 +148,7 @@ export function LoginScreen({ navigation }: any) {
               <Text className="text-foreground font-bold ml-2">Continue with Passkey</Text>
             </Button>
             <View className="flex-row gap-3">
-              <Button variant="outline" onPress={() => Alert.alert("Not configured", "Google Auth is not configured on the backend yet.")} className="flex-1 h-11 flex-row items-center justify-center">
+              <Button variant="outline" onPress={() => handleOAuth('google')} className="flex-1 h-11 flex-row items-center justify-center">
                 <Svg width={20} height={20} viewBox="0 0 24 24" className="mr-2">
                   <Path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
                   <Path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
@@ -134,6 +176,11 @@ export function LoginScreen({ navigation }: any) {
             <Controller control={controlPass} name="password" render={({ field: { onChange, value } }) => (
               <Input label="Password" secureTextEntry value={value} onChangeText={onChange} error={errPass.password?.message} />
             )} />
+            
+            <TouchableOpacity onPress={() => navigation.navigate("ForgotPassword")} className="self-end -mt-2">
+              <Text className="text-xs font-semibold text-primary">Forgot password?</Text>
+            </TouchableOpacity>
+
             <Button onPress={subPass(handlePassNext)} className="w-full h-11">
               <Text className="text-primary-foreground font-bold mr-2">Sign In</Text>
               <ArrowRight size={16} color={activeColors.primaryForeground} />
@@ -240,11 +287,23 @@ export function LoginScreen({ navigation }: any) {
             </View>
 
             <View className="mt-8 pt-6 border-t border-border">
-              <Text className="text-sm font-medium text-foreground">Member account?</Text>
-              <TouchableOpacity onPress={() => navigation.navigate("MemberLogin")} className="mt-2 flex-row items-center gap-2">
-                <Text className="text-sm font-bold text-primary">Use member portal</Text>
-                <ArrowRight size={16} color={activeColors.primary} />
-              </TouchableOpacity>
+              <View className="flex-row items-center justify-between">
+                <View>
+                  <Text className="text-sm font-medium text-foreground">Member account?</Text>
+                  <TouchableOpacity onPress={() => navigation.navigate("MemberLogin")} className="mt-2 flex-row items-center gap-2">
+                    <Text className="text-sm font-bold text-primary">Use member portal</Text>
+                    <ArrowRight size={16} color={activeColors.primary} />
+                  </TouchableOpacity>
+                </View>
+
+                <View>
+                  <Text className="text-sm font-medium text-foreground">New here?</Text>
+                  <TouchableOpacity onPress={() => navigation.navigate("Signup")} className="mt-2 flex-row items-center gap-2">
+                    <Text className="text-sm font-bold text-primary">Sign up</Text>
+                    <ArrowRight size={16} color={activeColors.primary} />
+                  </TouchableOpacity>
+                </View>
+              </View>
             </View>
 
           </SafeAreaView>

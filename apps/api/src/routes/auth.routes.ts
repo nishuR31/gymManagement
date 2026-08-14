@@ -102,6 +102,62 @@ export async function authRoutes(app: FastifyInstance, options: AuthRoutesOption
     });
   });
 
+  app.get("/google", async (request, reply) => {
+    const redirectUrl = (request.query as { redirect?: string }).redirect;
+    const url = options.authService.generateGoogleAuthUrl(redirectUrl);
+    reply.redirect(url);
+  });
+
+  app.get("/google/callback", async (request, reply) => {
+    const query = request.query as { code?: string; state?: string; error?: string };
+    
+    if (query.error) {
+      reply.redirect(`${options.env.CORS_ORIGIN}/login?error=${query.error}`);
+      return;
+    }
+    
+    if (!query.code) {
+      reply.redirect(`${options.env.CORS_ORIGIN}/login?error=invalid_request`);
+      return;
+    }
+
+    try {
+      let originalRedirect = options.env.CORS_ORIGIN;
+      if (query.state) {
+        try {
+          const stateObj = JSON.parse(Buffer.from(query.state, "base64").toString());
+          if (stateObj.redirect) {
+            originalRedirect = stateObj.redirect;
+          }
+        } catch (e) {
+          // Ignore invalid state
+        }
+      }
+
+      const result = await options.authService.googleLogin(query.code, getRequestContext(request));
+      
+      // For web, we set the refresh token in a cookie.
+      // For native (custom scheme), we pass tokens in the redirect URL.
+      const isNative = !originalRedirect.startsWith("http");
+
+      if (!isNative) {
+        setRefreshCookie(reply, result.tokens.refreshToken, options.env);
+        const callbackUrl = new URL(`${options.env.CORS_ORIGIN}/auth/callback`);
+        callbackUrl.searchParams.set("token", result.tokens.accessToken);
+        callbackUrl.searchParams.set("redirect", originalRedirect);
+        reply.redirect(callbackUrl.toString());
+      } else {
+        // Native app deep link
+        const callbackUrl = new URL(originalRedirect);
+        callbackUrl.searchParams.set("accessToken", result.tokens.accessToken);
+        callbackUrl.searchParams.set("refreshToken", result.tokens.refreshToken);
+        reply.redirect(callbackUrl.toString());
+      }
+    } catch (err) {
+      reply.redirect(`${options.env.CORS_ORIGIN}/login?error=auth_failed`);
+    }
+  });
+
   app.post("/login/passkey/generate", async (request, reply) => {
     const body = z.object({ email: emailSchema }).parse(request.body);
     const optionsResult = await options.authService.generatePasskeyAuthentication(body.email);
@@ -141,7 +197,7 @@ export async function authRoutes(app: FastifyInstance, options: AuthRoutesOption
   });
 
   app.post("/refresh", async (request, reply) => {
-    const refreshToken = request.cookies.refreshToken;
+    const refreshToken = request.cookies.refreshToken || (request.headers["x-refresh-token"] as string);
 
     if (!refreshToken) {
       throw errors.unauthorized("Refresh token missing");
@@ -157,7 +213,8 @@ export async function authRoutes(app: FastifyInstance, options: AuthRoutesOption
   });
 
   app.post("/logout", async (request, reply) => {
-    await options.authService.logout(request.cookies.refreshToken, getRequestContext(request));
+    const refreshToken = request.cookies.refreshToken || (request.headers["x-refresh-token"] as string);
+    await options.authService.logout(refreshToken, getRequestContext(request));
     clearRefreshCookie(reply, options.env);
     reply.status(204).send();
   });
@@ -246,7 +303,7 @@ export async function authRoutes(app: FastifyInstance, options: AuthRoutesOption
     const expectedChallenge = request.cookies.passkeyChallenge;
     if (!expectedChallenge) throw errors.badRequest("Missing passkey challenge");
 
-    await options.authService.verifyPasskeyRegistration(request.actor, request.body, expectedChallenge, getRequestContext(request));
+    await options.authService.verifyPasskeyRegistration(request.actor, request.body as any, expectedChallenge, getRequestContext(request));
     
     reply.clearCookie("passkeyChallenge", {
       httpOnly: true,

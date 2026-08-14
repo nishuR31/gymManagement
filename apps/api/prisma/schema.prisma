@@ -130,6 +130,7 @@ model User {
   lastName      String
   isActive      Boolean        @default(true)
   mustChangePassword Boolean   @default(false)
+  googleId        String?        @unique
   twoFactorSecret String?
   twoFactorEnabled Boolean     @default(false)
   roleId        String
