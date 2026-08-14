@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { APP_NAME } from "../utils/env";
 import { CheckCircle2, Smartphone } from "lucide-react";
-import { Button } from "../components/ui/Button";
 import { Card } from "../components/ui/Card";
 
 export function DownloadAppPage() {
@@ -27,15 +26,6 @@ export function DownloadAppPage() {
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed mb-10">
             Download our app for better services, easy access, and a more convenient gym experience. View timelines, track your classes, and manage your membership seamlessly.
           </p>
-
-          <div className="flex flex-wrap justify-center gap-4">
-            <Button className="h-14 px-8 text-base" onClick={() => setPlatform("ios")}>
-              Download for iOS
-            </Button>
-            <Button variant="secondary" className="h-14 px-8 text-base" onClick={() => setPlatform("android")}>
-              Download for Android
-            </Button>
-          </div>
         </div>
       </section>
 
@@ -58,7 +48,7 @@ export function DownloadAppPage() {
 
           <div className="relative mx-auto max-w-[320px]">
             <div className="absolute inset-0 bg-primary/20 blur-[100px] rounded-full" />
-            
+
             <div className="relative rounded-[2.5rem] border-[8px] border-zinc-900 bg-background shadow-2xl overflow-hidden transform rotate-2 hover:rotate-0 transition duration-500 aspect-[9/19.5] flex flex-col">
               {/* Dynamic Notch / Punch Hole */}
               <div className="absolute top-0 inset-x-0 flex justify-center z-20">
@@ -100,9 +90,9 @@ export function DownloadAppPage() {
 
                 {/* Bottom Home Indicator */}
                 {platform === "ios" && (
-                   <div className="absolute bottom-2 inset-x-0 flex justify-center">
-                     <div className="h-1 w-24 bg-zinc-300 dark:bg-zinc-700 rounded-full" />
-                   </div>
+                  <div className="absolute bottom-2 inset-x-0 flex justify-center">
+                    <div className="h-1 w-24 bg-zinc-300 dark:bg-zinc-700 rounded-full" />
+                  </div>
                 )}
               </div>
             </div>

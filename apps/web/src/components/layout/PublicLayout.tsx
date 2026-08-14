@@ -1,10 +1,14 @@
 import { Link, NavLink, Outlet } from "react-router-dom";
 import { useState } from "react";
 import { APP_NAME } from "../../utils/env";
-import { ChevronUp, Dumbbell, Settings, Smartphone, Menu, X } from "lucide-react";
+import { ChevronUp, Dumbbell, Settings, Smartphone, Menu, X, LogOut, LayoutDashboard } from "lucide-react";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { logoutThunk } from "../../features/auth/authSlice";
 
 export function PublicLayout() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const status = useAppSelector((state) => state.auth.status);
+  const dispatch = useAppDispatch();
 
   return (
     <div className="min-h-screen bg-transparent backdrop-blur-xs text-foreground flex flex-col">
@@ -22,8 +26,23 @@ export function PublicLayout() {
           {/* Desktop Nav */}
           <Link className="hidden md:inline-flex rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition hover:bg-card/10 hover:text-foreground focus-visible:focus-ring" to="/features" tabIndex={0}>Features</Link>
           <Link className="hidden md:inline-flex rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition hover:bg-card/10 hover:text-foreground focus-visible:focus-ring" to="/plans" tabIndex={0}>Plans</Link>
-          <Link className="hidden md:inline-flex rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition hover:bg-card/10 hover:text-foreground focus-visible:focus-ring" to="/member-login" tabIndex={0}>Member Login</Link>
-          <Link className="hidden md:inline-flex rounded-md border border-border bg-card/10 px-3 py-2 text-sm font-bold text-foreground transition hover:border-primary focus-visible:focus-ring" to="/login" tabIndex={0}>Admin</Link>
+          {status === "authenticated" ? (
+            <>
+              <Link className="hidden md:inline-flex rounded-md border border-border bg-card/10 px-3 py-2 text-sm font-bold text-foreground transition hover:border-primary focus-visible:focus-ring items-center" to="/dashboard" tabIndex={0}>
+                <LayoutDashboard className="h-4 w-4 mr-2" />
+                Dashboard
+              </Link>
+              <button onClick={() => void dispatch(logoutThunk())} className="hidden md:inline-flex rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition hover:bg-card/10 hover:text-foreground focus-visible:focus-ring items-center" tabIndex={0}>
+                <LogOut className="h-4 w-4 mr-2" />
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link className="hidden md:inline-flex rounded-md px-3 py-2 text-sm font-bold text-muted-foreground transition hover:bg-card/10 hover:text-foreground focus-visible:focus-ring" to="/member-login" tabIndex={0}>Member Login</Link>
+              <Link className="hidden md:inline-flex rounded-md border border-border bg-card/10 px-3 py-2 text-sm font-bold text-foreground transition hover:border-primary focus-visible:focus-ring" to="/login" tabIndex={0}>Admin</Link>
+            </>
+          )}
           <Link className="hidden md:inline-flex p-2 text-muted-foreground hover:text-primary transition rounded-md focus-visible:focus-ring" to="/settings" aria-label="Settings" tabIndex={0}>
             <Settings className="h-6 w-6 transition-transform duration-500 ease-in-out hover:rotate-180" />
           </Link>
@@ -44,8 +63,23 @@ export function PublicLayout() {
         <div className="fixed inset-x-0 top-[73px] bottom-0 z-40 bg-background/95 backdrop-blur-md md:hidden animate-fade-in flex flex-col p-6 gap-4">
           <Link onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-4 py-4 rounded-lg bg-card/50 border border-border text-lg font-bold text-foreground hover:bg-card hover:border-primary transition" to="/features">Features</Link>
           <Link onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-4 py-4 rounded-lg bg-card/50 border border-border text-lg font-bold text-foreground hover:bg-card hover:border-primary transition" to="/plans">Plans</Link>
-          <Link onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-4 py-4 rounded-lg bg-card/50 border border-border text-lg font-bold text-foreground hover:bg-card hover:border-primary transition" to="/member-login">Member Login</Link>
-          <Link onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-4 py-4 rounded-lg bg-card/50 border border-border text-lg font-bold text-foreground hover:bg-card hover:border-primary transition" to="/login">Admin Login</Link>
+          {status === "authenticated" ? (
+            <>
+              <Link onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-4 py-4 rounded-lg bg-card/50 border border-border text-lg font-bold text-foreground hover:bg-card hover:border-primary transition gap-3" to="/dashboard">
+                <LayoutDashboard className="h-5 w-5" />
+                Dashboard
+              </Link>
+              <button onClick={() => { setIsMobileMenuOpen(false); void dispatch(logoutThunk()); }} className="flex items-center px-4 py-4 rounded-lg bg-card/50 border border-border text-lg font-bold text-foreground hover:bg-card hover:border-primary transition gap-3 text-left">
+                <LogOut className="h-5 w-5" />
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-4 py-4 rounded-lg bg-card/50 border border-border text-lg font-bold text-foreground hover:bg-card hover:border-primary transition" to="/member-login">Member Login</Link>
+              <Link onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-4 py-4 rounded-lg bg-card/50 border border-border text-lg font-bold text-foreground hover:bg-card hover:border-primary transition" to="/login">Admin Login</Link>
+            </>
+          )}
           <Link onClick={() => setIsMobileMenuOpen(false)} className="flex items-center px-4 py-4 rounded-lg bg-card/50 border border-border text-lg font-bold text-foreground hover:bg-card hover:border-primary transition gap-3" to="/settings">
             <Settings className="h-5 w-5" />
             System Settings
