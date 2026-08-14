@@ -103,7 +103,7 @@ export async function authRoutes(app: FastifyInstance, options: AuthRoutesOption
     reply.setCookie("passkeyLoginChallenge", optionsResult.challenge, {
       httpOnly: true,
       secure: options.env.COOKIE_SECURE,
-      sameSite: "lax",
+      sameSite: options.env.COOKIE_SECURE ? "none" : "lax",
       path: "/auth/login/passkey"
     });
     
@@ -122,7 +122,7 @@ export async function authRoutes(app: FastifyInstance, options: AuthRoutesOption
     reply.clearCookie("passkeyLoginChallenge", {
       httpOnly: true,
       secure: options.env.COOKIE_SECURE,
-      sameSite: "lax",
+      sameSite: options.env.COOKIE_SECURE ? "none" : "lax",
       path: "/auth/login/passkey"
     });
 
@@ -227,7 +227,7 @@ export async function authRoutes(app: FastifyInstance, options: AuthRoutesOption
     reply.setCookie("passkeyChallenge", optionsResult.challenge, {
       httpOnly: true,
       secure: options.env.COOKIE_SECURE,
-      sameSite: "lax",
+      sameSite: options.env.COOKIE_SECURE ? "none" : "lax",
       path: "/auth/passkeys"
     });
     
@@ -246,7 +246,7 @@ export async function authRoutes(app: FastifyInstance, options: AuthRoutesOption
     reply.clearCookie("passkeyChallenge", {
       httpOnly: true,
       secure: options.env.COOKIE_SECURE,
-      sameSite: "lax",
+      sameSite: options.env.COOKIE_SECURE ? "none" : "lax",
       path: "/auth/passkeys"
     });
     
