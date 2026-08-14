@@ -4,6 +4,7 @@ import { api } from "../../services/api";
 export interface LoginPayload {
   email: string;
   password: string;
+  token?: string;
 }
 
 export interface AuthResponse {
@@ -75,4 +76,12 @@ export async function verifyPasswordResetWithPasskey(email: string, body: any): 
 
 export async function confirmPasswordReset(token: string, newPassword: string): Promise<void> {
   await api.post("/auth/password-reset/confirm", { token, newPassword });
+}
+
+export async function requestSecurityDisable(userId: string): Promise<void> {
+  await api.post(`/auth/users/${userId}/disable-security-request`);
+}
+
+export async function acceptSecurityDisable(): Promise<void> {
+  await api.post("/auth/me/security-disable/accept");
 }

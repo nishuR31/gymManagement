@@ -10,15 +10,17 @@ import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
 import { loginThunk, logoutThunk } from "../features/auth/authSlice";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-const emailSchema = z.object({ email: z.string().email("Enter a valid email") });
-const passwordSchema = z.object({ password: z.string().min(8, "Password must be at least 8 characters") });
+const loginSchema = z.object({
+  email: z.string().email("Enter a valid email"),
+  password: z.string()
+  // .min(8, "Password must be at least 8 characters").regex(/[a-z]/, "Password must contain at least one lowercase letter").regex(/\d/, "Password must contain at least one number").regex(/[A-Z]/, "Password must contain at least one uppercase letter").regex(/[@$!%*?&]/, "Password must contain at least one special character")
+});
 const codeSchema = z.object({ code: z.string().min(4, "Enter valid code") });
 
-type EmailFormValues = z.infer<typeof emailSchema>;
-type PasswordFormValues = z.infer<typeof passwordSchema>;
+type LoginFormValues = z.infer<typeof loginSchema>;
 type CodeFormValues = z.infer<typeof codeSchema>;
 
-type AuthStep = "email" | "password" | "2fa" | "otp" | "magic-link";
+type AuthStep = "login" | "2fa" | "otp" | "magic-link";
 
 interface LocationState {
   from?: { pathname?: string; };
@@ -32,14 +34,13 @@ export function LoginPage() {
   const state = location.state as LocationState | null;
   const destination = state?.from?.pathname ?? "/dashboard";
 
-  const [step, setStep] = useState<AuthStep>("email");
+  const [step, setStep] = useState<AuthStep>("login");
   const [email, setEmail] = useState("");
   const [passwordCache, setPasswordCache] = useState("");
   const [isSimulating, setIsSimulating] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const { register: regEmail, handleSubmit: subEmail, formState: { errors: errEmail } } = useForm<EmailFormValues>({ resolver: zodResolver(emailSchema) });
-  const { register: regPass, handleSubmit: subPass, formState: { errors: errPass } } = useForm<PasswordFormValues>({ resolver: zodResolver(passwordSchema) });
+  const { register: regLogin, handleSubmit: subLogin, formState: { errors: errLogin } } = useForm<LoginFormValues>({ resolver: zodResolver(loginSchema) });
   const { register: regCode, handleSubmit: subCode, formState: { errors: errCode } } = useForm<CodeFormValues>({ resolver: zodResolver(codeSchema) });
 
   const [searchParams] = useSearchParams();
@@ -56,9 +57,9 @@ export function LoginPage() {
   const onFinalLogin = async (pass?: string, code?: string) => {
     setIsSimulating(true);
     // In the future, pass the 2FA `code` to the backend if provided.
-    const result = await dispatch(loginThunk({ email: email || "admin@example.com", password: pass || "adminpassword" }));
+    const result = await dispatch(loginThunk({ email: email || "admin@example.com", password: pass || "adminpassword", token: code }));
     setIsSimulating(false);
-    
+
     if (loginThunk.fulfilled.match(result)) {
       if (result.payload.user.role === "MEMBER") {
         await dispatch(logoutThunk());
@@ -82,8 +83,7 @@ export function LoginPage() {
     toast.error("Authentication failed");
   };
 
-  const handleEmailNext = (v: EmailFormValues) => { setEmail(v.email); setStep("password"); };
-  const handlePassNext = (v: PasswordFormValues) => { onFinalLogin(v.password); };
+  const handleLoginSubmit = (v: LoginFormValues) => { setEmail(v.email); onFinalLogin(v.password); };
   const handleCodeSubmit = (v: CodeFormValues) => { onFinalLogin(passwordCache, v.code); };
 
   const handlePasskey = () => { toast.success("Prompting for Passkey..."); setTimeout(() => onFinalLogin(), 1500); };
@@ -91,14 +91,38 @@ export function LoginPage() {
   const handleSendOTP = () => { setStep("otp"); toast.success("OTP sent to " + email); };
 
   const renderStep = () => {
-    if (step === "email") {
+    if (step === "login") {
       return (
         <div className="animate-fade-in space-y-6">
-          <form className="grid gap-4" onSubmit={subEmail(handleEmailNext)}>
-            <Input label="Email" type="email" autoComplete="email" error={errEmail.email?.message} {...regEmail("email")} />
-            <Button type="submit" className="w-full h-11 btn-primary">Continue with Email <ArrowRight className="h-4 w-4" /></Button>
+          <form className="grid gap-4" onSubmit={subLogin(handleLoginSubmit)}>
+            <Input label="Email" type="email" placeholder="Email" autoComplete="email" error={errLogin.email?.message} {...regLogin("email")} />
+
+            <div className="space-y-1">
+              <Input
+                label="Password"
+                type={showPassword ? "text" : "password"}
+                placeholder="Password"
+                autoComplete="current-password"
+                error={errLogin.password?.message}
+                {...regLogin("password")}
+                rightElement={
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="p-1"
+                    tabIndex={-1}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                }
+              />
+            </div>
+
+            <Button type="submit" disabled={isSimulating} className="w-full h-11 btn-primary mt-2">
+              {isSimulating ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Sign In <ArrowRight className="h-4 w-4" /></>}
+            </Button>
           </form>
-          
+
           <div className="relative">
             <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-border" /></div>
             <div className="relative flex justify-center text-xs uppercase"><span className="bg-background px-2 text-muted-foreground">Or continue with</span></div>
@@ -107,46 +131,9 @@ export function LoginPage() {
           <div className="grid gap-3">
             <Button variant="outline" type="button" onClick={handlePasskey} className="w-full h-11 btn-outline"><Fingerprint className="w-5 h-5" /> Continue with Passkey</Button>
           </div>
-        </div>
-      );
-    }
 
-    if (step === "password") {
-      return (
-        <div className="animate-fade-in space-y-6">
-          <div className="flex items-center gap-2 pb-4">
-            <Button variant="ghost" className="h-8 w-8 p-0 rounded-full" onClick={() => setStep("email")}><ArrowLeft className="h-4 w-4" /></Button>
-            <span className="text-sm font-medium">{email}</span>
-          </div>
-          <form className="grid gap-4" onSubmit={subPass(handlePassNext)}>
-            <div className="flex justify-between items-center px-1">
-              <span className="text-sm font-medium">Password</span>
-            </div>
-            <Input 
-              type={showPassword ? "text" : "password"} 
-              placeholder="Password" 
-              autoComplete="current-password" 
-              error={errPass.password?.message} 
-              {...regPass("password")}
-              rightElement={
-                <button 
-                  type="button" 
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="p-1"
-                  tabIndex={-1}
-                >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-              }
-            />
-            <Button type="submit" disabled={isSimulating} className="w-full h-11 btn-primary">
-              {isSimulating ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Sign In <ArrowRight className="h-4 w-4" /></>}
-            </Button>
-          </form>
-          
           <div className="grid gap-3 pt-4 border-t border-border">
             <Button variant="outline" type="button" onClick={handleSendOTP} className="w-full h-11 btn-outline"><MessageSquare className="w-4 h-4" /> Send OTP to Email</Button>
-            <Button variant="outline" type="button" onClick={handleMagicLink} className="hidden w-full h-11 btn-outline"><Mail className="w-4 h-4" /> Send Magic Link</Button>
           </div>
         </div>
       );
@@ -156,7 +143,7 @@ export function LoginPage() {
       return (
         <div className="animate-fade-in space-y-6">
           <div className="flex items-center gap-2 pb-4">
-            <Button variant="ghost" className="h-8 w-8 p-0 rounded-full" onClick={() => setStep("password")}><ArrowLeft className="h-4 w-4" /></Button>
+            <Button variant="ghost" className="h-8 w-8 p-0 rounded-full" onClick={() => setStep("login")}><ArrowLeft className="h-4 w-4" /></Button>
             <span className="text-sm font-medium">{step === "2fa" ? "Two-Factor Authentication" : "One-Time Password"}</span>
           </div>
           <p className="text-sm text-muted-foreground">
@@ -180,7 +167,7 @@ export function LoginPage() {
           </div>
           <h3 className="text-xl font-bold">Check your email</h3>
           <p className="text-sm text-muted-foreground">We sent a magic link to <strong>{email}</strong>. Click the link inside to instantly sign in.</p>
-          <Button variant="outline" onClick={() => setStep("email")} className="mt-4 btn-outline">Back to Login</Button>
+          <Button variant="outline" onClick={() => setStep("login")} className="mt-4 btn-outline">Back to Login</Button>
         </div>
       );
     }
@@ -208,7 +195,7 @@ export function LoginPage() {
                 <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
                 Staff Operations
               </p>
-              <h1 className="mt-6 text-5xl font-black leading-[1.1] text-white">Elevate<br/>your gym's<br/>performance.</h1>
+              <h1 className="mt-6 text-5xl font-black leading-[1.1] text-white">Elevate<br />your gym's<br />performance.</h1>
               <div className="mt-8 grid gap-4">
                 <div className="flex items-center gap-3"><Users className="h-5 w-5 text-primary" /><span className="font-semibold">Member lifecycle controls</span></div>
                 <div className="flex items-center gap-3"><BarChart3 className="h-5 w-5 text-primary" /><span className="font-semibold">Reports and revenue snapshots</span></div>
@@ -232,7 +219,7 @@ export function LoginPage() {
             <div className="min-h-[300px]">
               {renderStep()}
             </div>
-            
+
             <div className="mt-8 pt-6 border-t border-border grid gap-4">
               <div>
                 <p className="text-sm font-medium text-foreground">Member account?</p>

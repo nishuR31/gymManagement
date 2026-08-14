@@ -1,3 +1,4 @@
+import 'react-native-reanimated';
 import './global.css';
 import { useEffect } from 'react';
 import { View, ActivityIndicator } from 'react-native';
@@ -34,6 +35,7 @@ import { loadThemeSettings } from './src/features/theme/themeSlice';
 import { bootstrapAuthThunk } from './src/features/auth/authSlice';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
 import { loadApiBaseUrl } from './src/services/api';
+import { registerForPushNotificationsAsync } from './src/services/notifications';
 
 import { themeColors } from './src/constants/colors';
 
@@ -53,6 +55,7 @@ function RootApp() {
       .finally(() => {
         dispatch(loadThemeSettings());
         dispatch(bootstrapAuthThunk());
+        registerForPushNotificationsAsync().catch(console.warn);
       });
   }, [dispatch]);
 

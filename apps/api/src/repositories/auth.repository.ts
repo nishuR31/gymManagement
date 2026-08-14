@@ -6,6 +6,7 @@ export interface AuthUserRecord extends AuthUserDto {
   passwordHash: string;
   isActive: boolean;
   memberId: string | null;
+  securityDisableRequested: boolean;
 }
 
 export interface SessionRecord {
@@ -90,6 +91,7 @@ export interface AuthRepository {
   addPasskey(input: PasskeyInput): Promise<void>;
   removePasskey(id: string): Promise<void>;
   findUserForSecurity(userId: string): Promise<(AuthUserRecord & { twoFactorSecret: string | null; passkeys: Passkey[] }) | null>;
+  updateSecurityDisableRequested(userId: string, value: boolean): Promise<void>;
   writeAuditLog(input: AuditLogInput): Promise<void>;
 }
 
@@ -261,6 +263,13 @@ export class PrismaAuthRepository implements AuthRepository {
     });
   }
 
+  public async updateSecurityDisableRequested(userId: string, value: boolean): Promise<void> {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { securityDisableRequested: value }
+    });
+  }
+
   public async findUserForSecurity(userId: string): Promise<(AuthUserRecord & { twoFactorSecret: string | null; passkeys: Passkey[] }) | null> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
@@ -298,6 +307,7 @@ function toAuthUserRecord(user: {
   isActive: boolean;
   mustChangePassword: boolean;
   twoFactorEnabled: boolean;
+  securityDisableRequested: boolean;
   memberProfile?: { id: string } | null;
   passkeys?: { id: string }[];
   role: { name: string };
@@ -313,7 +323,8 @@ function toAuthUserRecord(user: {
     mustChangePassword: user.mustChangePassword,
     twoFactorEnabled: user.twoFactorEnabled,
     hasPasskeys: (user.passkeys?.length ?? 0) > 0,
-    memberId: user.memberProfile?.id ?? null
+    memberId: user.memberProfile?.id ?? null,
+    securityDisableRequested: user.securityDisableRequested
   };
 }
 
@@ -335,6 +346,7 @@ function toRefreshTokenRecord(refreshToken: {
     isActive: boolean;
     mustChangePassword: boolean;
     twoFactorEnabled: boolean;
+    securityDisableRequested: boolean;
     memberProfile?: { id: string } | null;
     passkeys?: { id: string }[];
     role: { name: string };

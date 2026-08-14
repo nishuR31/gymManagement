@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Button } from "./Button";
+import { X } from "lucide-react";
 
 interface ModalProps {
   title: string;
@@ -19,8 +20,8 @@ export function Modal({ title, open, onClose, children, size = "default" }: Moda
       <section className={`bg-card max-h-[calc(100vh-2rem)] w-full min-w-0 overflow-hidden rounded-lg border border-border shadow-xl ${size === "wide" ? "max-w-5xl" : "max-w-lg"}`}>
         <div className="dark-band-gradient flex min-w-0 items-center justify-between gap-3 border-b border-border px-4 py-3">
           <h3 className="min-w-0 truncate text-base font-bold text-foreground">{title}</h3>
-          <Button type="button" variant="secondary" className="h-9 px-3" onClick={onClose}>
-            Close
+          <Button type="button" variant="ghost" className="h-9 w-9 p-0 text-muted-foreground hover:text-foreground" onClick={onClose}>
+            <X className="h-5 w-5" />
           </Button>
         </div>
         <div className="max-h-[calc(100vh-6rem)] overflow-y-auto p-4">{children}</div>

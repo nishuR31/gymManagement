@@ -63,7 +63,7 @@ const formSchema = z.object({
 });
 
 type MemberFormValues = z.infer<typeof formSchema>;
-type ConfirmAction = "suspend" | "restore" | "archive";
+type ConfirmAction = "suspend" | "restore" | "archive" | "disableSecurity";
 
 const defaultValues: MemberFormValues = {
   firstName: "",
@@ -102,6 +102,7 @@ export function MembersPage() {
   >([]);
   const [memberInvoices, setMemberInvoices] = useState<InvoiceDto[]>([]);
   const [editingMember, setEditingMember] = useState<MemberDto | null>(null);
+  const [isFormOpen, setIsFormOpen] = useState(false);
   const [qrPayload, setQrPayload] = useState<string | null>(null);
   const [loginSetup, setLoginSetup] = useState<MemberLoginSetupDto | null>(
     null,
@@ -218,6 +219,7 @@ export function MembersPage() {
       }
       reset(defaultValues);
       setEditingMember(null);
+      setIsFormOpen(false);
       await loadMembers();
     } catch {
       toast.error("Could not save member");
@@ -226,6 +228,7 @@ export function MembersPage() {
 
   const startEdit = (member: MemberDto): void => {
     setEditingMember(member);
+    setIsFormOpen(true);
     setSelectedMember(member);
     setQrPayload(null);
     reset({
@@ -372,6 +375,20 @@ export function MembersPage() {
     }
   };
 
+  const requestSecurityDisableSelected = async (): Promise<void> => {
+    if (!selectedMember || !selectedMember.userId) {
+      return;
+    }
+    try {
+      const { requestSecurityDisable } = await import("../features/auth/authApi");
+      await requestSecurityDisable(selectedMember.userId);
+      toast.success("Security disable requested successfully");
+      setConfirmAction(null);
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, "Failed to request security disable"));
+    }
+  };
+
   return (
     <section className="grid max-w-7xl min-w-0 gap-6 animate-fade-in">
       <div className="bg-card grid gap-4 rounded-lg border border-border p-4 shadow-sm md:grid-cols-[minmax(0,1fr)_minmax(280px,auto)] md:items-end">
@@ -419,7 +436,7 @@ export function MembersPage() {
         </form>
       </div>
 
-      <div className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(360px,420px)]">
+      <div className="grid min-w-0 gap-6">
         <div className="min-w-0 rounded-lg border border-border bg-card shadow-sm">
           <div className="grid gap-3 p-3 md:hidden">
             {members.map((member) => (
@@ -459,6 +476,11 @@ export function MembersPage() {
                 </div>
               </div>
             ))}
+            <div className="pt-2">
+              <Button onClick={() => setIsFormOpen(true)} className="w-full">
+                + Add New Member
+              </Button>
+            </div>
             {!isLoading && members.length === 0 ? (
               <EmptyState
                 title="No members found"
@@ -466,8 +488,8 @@ export function MembersPage() {
               />
             ) : null}
           </div>
-          <div className="hidden overflow-hidden md:block">
-            <table className="w-full table-fixed text-left text-sm">
+          <div className="hidden overflow-x-auto md:block">
+            <table className="w-full table-fixed min-w-[800px] text-left text-sm">
               <colgroup>
                 <col className="w-[160px]" />
                 <col />
@@ -514,119 +536,115 @@ export function MembersPage() {
                 />
               </div>
             ) : null}
+            <div className="p-4 mt-2">
+              <Button onClick={() => setIsFormOpen(true)}>
+                + Add New Member
+              </Button>
+            </div>
           </div>
         </div>
-
-        <div className="grid gap-4">
-          <section className="min-w-0 rounded-lg border border-border bg-card p-4 shadow-sm">
-            <div className="mb-4 flex items-center justify-between gap-3">
-              <h3 className="text-base font-bold">
-                {editingMember ? "Edit Member" : "New Member"}
-              </h3>
-              {editingMember ? (
-                <Button
-                  type="button"
-                  variant="secondary"
-                  className="h-9 px-3"
-                  onClick={() => {
-                    setEditingMember(null);
-                    reset(defaultValues);
-                  }}
-                >
-                  Clear
-                </Button>
-              ) : null}
-            </div>
-            <form
-              className="grid gap-3"
-              // @ts-ignore
-              onSubmit={(event) => void handleSubmit(onSubmit)(event)}
-            >
-              <div className="grid gap-3 sm:grid-cols-2">
-                <Input
-                  label="First name"
-                  error={errors.firstName?.message}
-                  {...register("firstName")}
-                />
-                <Input
-                  label="Last name"
-                  error={errors.lastName?.message}
-                  {...register("lastName")}
-                />
-              </div>
-              <Input
-                label="Phone"
-                error={errors.phone?.message}
-                {...register("phone")}
-              />
-              <Input
-                label="Email"
-                type="email"
-                error={errors.email?.message}
-                {...register("email")}
-              />
-              <div className="grid gap-3 sm:grid-cols-2">
-                <Input
-                  label="Date of birth"
-                  type="date"
-                  error={errors.dateOfBirth?.message}
-                  {...register("dateOfBirth")}
-                />
-                <Input
-                  label="Gender"
-                  error={errors.gender?.message}
-                  {...register("gender")}
-                />
-              </div>
-              <Input
-                label="Address"
-                error={errors.address?.message}
-                {...register("address")}
-              />
-              <div className="grid gap-3 sm:grid-cols-2">
-                <Input
-                  label="Emergency name"
-                  error={errors.emergencyContactName?.message}
-                  {...register("emergencyContactName")}
-                />
-                <Input
-                  label="Emergency phone"
-                  error={errors.emergencyContactPhone?.message}
-                  {...register("emergencyContactPhone")}
-                />
-              </div>
-              <div className="grid gap-3 sm:grid-cols-2">
-                <Input
-                  label="Height cm"
-                  type="number"
-                  step="0.1"
-                  error={errors.heightCm?.message}
-                  {...register("heightCm")}
-                />
-                <Input
-                  label="Weight kg"
-                  type="number"
-                  step="0.1"
-                  error={errors.weightKg?.message}
-                  {...register("weightKg")}
-                />
-              </div>
-              {canManageMedicalNotes ? (
-                <label className="grid min-w-0 gap-2 text-sm font-semibold text-foreground">
-                  <span>Medical notes</span>
-                  <textarea
-                    className="min-h-24 w-full rounded-md border border-border bg-surface/70 px-3 py-2 text-sm outline-none transition hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/25"
-                    {...register("medicalNotes")}
-                  />
-                </label>
-              ) : null}
-              <Button type="submit" disabled={isSubmitting}>
-                {editingMember ? "Save Changes" : "Create Member"}
-              </Button>
-            </form>
-          </section>
-        </div>
       </div>
+      
+      <Modal 
+        title={editingMember ? "Edit Member" : "New Member"}
+        open={isFormOpen}
+        onClose={() => {
+          setIsFormOpen(false);
+          setEditingMember(null);
+          reset(defaultValues);
+        }}
+      >
+        <form
+          className="grid gap-4"
+          // @ts-ignore
+          onSubmit={(event) => void handleSubmit(onSubmit)(event)}
+        >
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Input
+              label="First name"
+              error={errors.firstName?.message}
+              {...register("firstName")}
+            />
+            <Input
+              label="Last name"
+              error={errors.lastName?.message}
+              {...register("lastName")}
+            />
+          </div>
+          <Input
+            label="Phone"
+            error={errors.phone?.message}
+            {...register("phone")}
+          />
+          <Input
+            label="Email"
+            type="email"
+            error={errors.email?.message}
+            {...register("email")}
+          />
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Input
+              label="Date of birth"
+              type="date"
+              error={errors.dateOfBirth?.message}
+              {...register("dateOfBirth")}
+            />
+            <Input
+              label="Gender"
+              error={errors.gender?.message}
+              {...register("gender")}
+            />
+          </div>
+          <Input
+            label="Address"
+            error={errors.address?.message}
+            {...register("address")}
+          />
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Input
+              label="Emergency name"
+              error={errors.emergencyContactName?.message}
+              {...register("emergencyContactName")}
+            />
+            <Input
+              label="Emergency phone"
+              error={errors.emergencyContactPhone?.message}
+              {...register("emergencyContactPhone")}
+            />
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Input
+              label="Height cm"
+              type="number"
+              step="0.1"
+              error={errors.heightCm?.message}
+              {...register("heightCm")}
+            />
+            <Input
+              label="Weight kg"
+              type="number"
+              step="0.1"
+              error={errors.weightKg?.message}
+              {...register("weightKg")}
+            />
+          </div>
+          {canManageMedicalNotes ? (
+            <label className="grid min-w-0 gap-2 text-sm font-semibold text-foreground">
+              <span>Medical notes</span>
+              <textarea
+                className="min-h-24 w-full rounded-md border border-border bg-surface/70 px-3 py-2 text-sm outline-none transition hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/25"
+                {...register("medicalNotes")}
+              />
+            </label>
+          ) : null}
+          <div className="flex justify-end pt-2">
+            <Button type="submit" disabled={isSubmitting}>
+              {editingMember ? "Save Changes" : "Create Member"}
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
       <MemberDetailModal
         member={selectedMember}
         detailTab={detailTab}
@@ -638,6 +656,7 @@ export function MembersPage() {
         invoices={memberInvoices}
         qrPayload={qrPayload}
         canManageLifecycle={canManageLifecycle}
+        isSuperAdmin={user?.role === "SUPER_ADMIN"}
         onClose={() => setSelectedMember(null)}
         onCancelSubscription={() => void cancelCurrentSubscription()}
         onSuspend={() => setConfirmAction("suspend")}
@@ -645,6 +664,7 @@ export function MembersPage() {
         onRegenerateQr={() => void regenerateQr()}
         onCreateLogin={() => void createLogin()}
         onArchive={() => setConfirmAction("archive")}
+        onDisableSecurity={() => setConfirmAction("disableSecurity")}
       />
       <MemberLoginModal
         login={loginSetup}
@@ -666,6 +686,8 @@ export function MembersPage() {
             void restoreSelected();
           } else if (confirmAction === "archive") {
             void archiveSelected();
+          } else if (confirmAction === "disableSecurity") {
+            void requestSecurityDisableSelected();
           }
         }}
       />
@@ -700,6 +722,10 @@ function MemberLifecycleModal({
     archive: {
       title: "Archive Member",
       body: "This member will leave active operations and should only be restored from records if needed.",
+    },
+    disableSecurity: {
+      title: "Request Security Disable",
+      body: "Are you sure you want to request this member to disable their 2FA and Passkeys? They will be notified when they log in.",
     },
   };
   const content = action ? copy[action] : null;
@@ -771,6 +797,7 @@ function MemberDetailModal({
   invoices: InvoiceDto[];
   qrPayload: string | null;
   canManageLifecycle: boolean;
+  isSuperAdmin?: boolean;
   onClose: () => void;
   onCancelSubscription: () => void;
   onSuspend: () => void;
@@ -778,6 +805,7 @@ function MemberDetailModal({
   onRegenerateQr: () => void;
   onCreateLogin: () => void;
   onArchive: () => void;
+  onDisableSecurity: () => void;
 }) {
   return (
     <Modal
@@ -1015,6 +1043,16 @@ function MemberDetailModal({
                 <Archive className="h-4 w-4" aria-hidden="true" />
                 Delete Member
               </Button>
+              {member.userId && isSuperAdmin ? (
+                <Button
+                  variant="secondary"
+                  className="h-9 px-3 text-destructive border-destructive/20 hover:bg-destructive/10 hover:border-destructive/30"
+                  onClick={onDisableSecurity}
+                >
+                  <ShieldOff className="h-4 w-4" aria-hidden="true" />
+                  Request 2FA Disable
+                </Button>
+              ) : null}
             </div>
           ) : null}
         </div>

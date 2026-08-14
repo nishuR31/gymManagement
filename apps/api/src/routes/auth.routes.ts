@@ -12,7 +12,8 @@ const passwordSchema = z.string().min(8).max(128);
 
 const loginBodySchema = z.object({
   email: emailSchema,
-  password: passwordSchema
+  password: passwordSchema,
+  token: z.string().optional()
 });
 
 const registerBodySchema = z.object({
@@ -67,7 +68,7 @@ export async function authRoutes(app: FastifyInstance, options: AuthRoutesOption
     }
   }, async (request, reply) => {
     const body = loginBodySchema.parse(request.body);
-    const result = await options.authService.login(body.email, body.password, getRequestContext(request));
+    const result = await options.authService.login(body.email, body.password, body.token, getRequestContext(request));
     setRefreshCookie(reply, result.tokens.refreshToken, options.env);
     reply.send({
       user: result.user,
@@ -85,7 +86,7 @@ export async function authRoutes(app: FastifyInstance, options: AuthRoutesOption
     }
   }, async (request, reply) => {
     const body = loginBodySchema.parse(request.body);
-    const result = await options.authService.memberLogin(body.email, body.password, getRequestContext(request));
+    const result = await options.authService.memberLogin(body.email, body.password, body.token, getRequestContext(request));
     setRefreshCookie(reply, result.tokens.refreshToken, options.env);
     reply.send({
       user: result.user,
@@ -261,6 +262,23 @@ export async function authRoutes(app: FastifyInstance, options: AuthRoutesOption
     reply.status(204).send();
   });
 
+  app.post("/users/:userId/disable-security-request", {
+    preHandler: app.authorize(["SUPER_ADMIN"])
+  }, async (request, reply) => {
+    if (!request.actor) throw errors.unauthorized();
+    const params = z.object({ userId: z.string() }).parse(request.params);
+    await options.authService.requestSecurityDisable(params.userId, request.actor, getRequestContext(request));
+    reply.status(204).send();
+  });
+
+  app.post("/me/security-disable/accept", {
+    preHandler: app.authenticate
+  }, async (request, reply) => {
+    if (!request.actor) throw errors.unauthorized();
+    await options.authService.acceptSecurityDisable(request.actor, getRequestContext(request));
+    reply.status(204).send();
+  });
+
 
   app.post("/first-password", {
     preHandler: app.authenticate
@@ -284,7 +302,7 @@ function setRefreshCookie(reply: FastifyReply, token: string, env: Env): void {
   reply.setCookie("refreshToken", token, {
     httpOnly: true,
     secure: env.COOKIE_SECURE,
-    sameSite: "lax",
+    sameSite: env.COOKIE_SECURE ? "none" : "lax",
     path: "/auth",
     maxAge: env.REFRESH_TOKEN_TTL_DAYS * 24 * 60 * 60
   });
@@ -294,7 +312,7 @@ function clearRefreshCookie(reply: FastifyReply, env: Env): void {
   reply.clearCookie("refreshToken", {
     httpOnly: true,
     secure: env.COOKIE_SECURE,
-    sameSite: "lax",
+    sameSite: env.COOKIE_SECURE ? "none" : "lax",
     path: "/auth"
   });
 }

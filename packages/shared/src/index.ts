@@ -11,6 +11,7 @@ export interface AuthUserDto {
   mustChangePassword: boolean;
   twoFactorEnabled: boolean;
   hasPasskeys: boolean;
+  securityDisableRequested: boolean;
 }
 
 export interface PasskeyDto {

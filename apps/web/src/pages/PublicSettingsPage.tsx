@@ -30,23 +30,23 @@ export function PublicSettingsPage() {
         
         <div className="grid gap-6">
           <div className="p-6 rounded-lg border border-border bg-card shadow-sm">
-            <div className="flex items-start gap-4">
-              <div className="p-3 bg-primary/10 text-primary rounded-md border border-primary/20">
+            <div className="flex flex-col sm:flex-row items-start gap-4">
+              <div className="p-3 bg-primary/10 text-primary rounded-md border border-primary/20 shrink-0">
                 {theme === "amoled" ? <MoonStar className="h-6 w-6" /> : theme === "dark" ? <Moon className="h-6 w-6" /> : <Sun className="h-6 w-6" />}
               </div>
-              <div className="flex-1">
+              <div className="flex-1 w-full">
                 <h2 className="text-xl font-bold text-foreground mb-2">Color Scheme</h2>
                 <p className="text-sm text-muted-foreground mb-4">
                   Switch between light and dark mode.
                 </p>
-                <div className="flex flex-wrap items-center gap-3">
-                  <Button variant={theme === "light" ? "primary" : "secondary"} onClick={() => setTheme("light")} className="flex-1 min-w-[100px]">
+                <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-3">
+                  <Button variant={theme === "light" ? "primary" : "secondary"} onClick={() => setTheme("light")} className="w-full sm:w-auto">
                     Light
                   </Button>
-                  <Button variant={theme === "dark" ? "primary" : "secondary"} onClick={() => setTheme("dark")} className="flex-1 min-w-[100px]">
+                  <Button variant={theme === "dark" ? "primary" : "secondary"} onClick={() => setTheme("dark")} className="w-full sm:w-auto">
                     Dark
                   </Button>
-                  <Button variant={theme === "amoled" ? "primary" : "secondary"} onClick={() => setTheme("amoled")} className="flex-1 min-w-[120px]">
+                  <Button variant={theme === "amoled" ? "primary" : "secondary"} onClick={() => setTheme("amoled")} className="w-full sm:w-auto col-span-2">
                     AMOLED (Beta)
                   </Button>
                 </div>
@@ -55,23 +55,23 @@ export function PublicSettingsPage() {
           </div>
 
           <div className="p-6 rounded-lg border border-border bg-card shadow-sm">
-            <div className="flex items-start gap-4">
-              <div className="p-3 bg-primary/10 text-primary rounded-md border border-primary/20">
+            <div className="flex flex-col sm:flex-row items-start gap-4">
+              <div className="p-3 bg-primary/10 text-primary rounded-md border border-primary/20 shrink-0">
                 <Palette className="h-6 w-6" />
               </div>
-              <div className="flex-1">
+              <div className="flex-1 w-full">
                 <h2 className="text-xl font-bold text-foreground mb-2">Styling Paradigm</h2>
                 <p className="text-sm text-muted-foreground mb-4">
                   Change the overall shape and feel of UI components.
                 </p>
-                <div className="flex flex-wrap items-center gap-3">
-                  <Button variant={styleMode === "minimal" ? "primary" : "secondary"} onClick={() => setStyleMode("minimal")}>
+                <div className="flex flex-col sm:flex-row flex-wrap gap-3">
+                  <Button variant={styleMode === "minimal" ? "primary" : "secondary"} onClick={() => setStyleMode("minimal")} className="w-full sm:w-auto">
                     Minimalist (Default)
                   </Button>
-                  <Button variant={styleMode === "glass" ? "primary" : "secondary"} onClick={() => setStyleMode("glass")}>
+                  <Button variant={styleMode === "glass" ? "primary" : "secondary"} onClick={() => setStyleMode("glass")} className="w-full sm:w-auto">
                     Glassmorphism
                   </Button>
-                  <Button variant={styleMode === "clay" ? "primary" : "secondary"} onClick={() => setStyleMode("clay")}>
+                  <Button variant={styleMode === "clay" ? "primary" : "secondary"} onClick={() => setStyleMode("clay")} className="w-full sm:w-auto">
                     Claymorphism
                   </Button>
                 </div>
@@ -80,16 +80,16 @@ export function PublicSettingsPage() {
           </div>
 
           <div className="p-6 rounded-lg border border-border bg-card shadow-sm">
-            <div className="flex items-start gap-4">
-              <div className="p-3 bg-primary/10 text-primary rounded-md border border-primary/20">
+            <div className="flex flex-col sm:flex-row items-start gap-4">
+              <div className="p-3 bg-primary/10 text-primary rounded-md border border-primary/20 shrink-0">
                 <HardDrive className="h-6 w-6" />
               </div>
-              <div className="flex-1">
+              <div className="flex-1 w-full">
                 <h2 className="text-xl font-bold text-foreground mb-2">Troubleshooting & Cache</h2>
                 <p className="text-sm text-muted-foreground mb-4">
                   If you are experiencing issues with the app, such as pages not loading properly or stale data, clearing your local cache can force the app to download the latest updates. You will need to log in again after doing this.
                 </p>
-                <Button onClick={handleClearCache} className="flex items-center gap-2 px-5">
+                <Button onClick={handleClearCache} className="w-full sm:w-auto flex justify-center items-center gap-2 px-5">
                   <RefreshCw className="h-4 w-4" />
                   Clear Cache & Reload
                 </Button>

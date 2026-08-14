@@ -1,5 +1,5 @@
 import { startRegistration } from "@simplewebauthn/browser";
-import { ShieldAlert, ShieldCheck, Key, UserRound, Smartphone, Moon, Sun, MoonStar, Palette } from "lucide-react";
+import { ShieldAlert, ShieldCheck, Key, UserRound, Smartphone, Moon, Sun, MoonStar, Palette, AlertTriangle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "../components/ui/Button";
@@ -157,6 +157,20 @@ export function ProfileSettingsPage() {
     }
   };
 
+  const handleAcceptSecurityDisable = async () => {
+    try {
+      const { acceptSecurityDisable } = await import("../features/auth/authApi");
+      await acceptSecurityDisable();
+      if (user) {
+        dispatch(setCredentials({ user: { ...user, twoFactorEnabled: false, hasPasskeys: false, securityDisableRequested: false } }));
+      }
+      toast.success("Security measures disabled successfully");
+      void loadPasskeys();
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, "Failed to disable security"));
+    }
+  };
+
   if (!user) return null;
 
   return (
@@ -166,6 +180,21 @@ export function ProfileSettingsPage() {
         <h2 className="mt-2 text-3xl font-black text-foreground">Profile Settings</h2>
         <p className="mt-1 text-sm font-semibold text-muted-foreground">Manage your personal information and security preferences.</p>
       </div>
+
+      {user.securityDisableRequested && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 rounded-md border border-warning/50 bg-warning/10 p-4">
+          <div className="flex items-center gap-3 text-warning">
+            <AlertTriangle className="h-6 w-6" />
+            <div>
+              <p className="font-bold">Security Disable Requested</p>
+              <p className="text-sm font-medium">An administrator has requested that you disable your Two-Factor Authentication and Passkeys.</p>
+            </div>
+          </div>
+          <Button variant="secondary" className="whitespace-nowrap bg-warning text-warning-foreground hover:bg-warning/90" onClick={handleAcceptSecurityDisable}>
+            Accept & Disable Security
+          </Button>
+        </div>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-[1fr_400px]">
         <div className="grid gap-6">

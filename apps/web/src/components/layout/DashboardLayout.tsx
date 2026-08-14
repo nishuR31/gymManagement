@@ -161,10 +161,15 @@ export function DashboardLayout() {
                 <p className="text-base font-black">{user ? `${user.firstName} ${user.lastName}` : "Signed in"}</p>
               </div>
             </div>
-            <Button variant="secondary" onClick={() => void handleLogout()}>
-              <LogOut className="h-4 w-4" aria-hidden="true" />
-              Sign out
-            </Button>
+            <div className="flex items-center gap-3">
+              <Link to="/settings" className="p-2 text-muted-foreground hover:text-primary transition rounded-md focus-visible:focus-ring" aria-label="Settings" title="Theming & Cache Settings">
+                <Settings className="h-5 w-5 transition-transform duration-500 ease-in-out hover:rotate-180" />
+              </Link>
+              <Button variant="secondary" onClick={() => void handleLogout()}>
+                <LogOut className="h-4 w-4" aria-hidden="true" />
+                Sign out
+              </Button>
+            </div>
           </div>
           <nav className="mx-auto mt-3 flex max-w-7xl gap-2 overflow-x-auto pb-1 lg:hidden">
             {visibleNavItems.map((item) => (

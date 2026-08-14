@@ -11,37 +11,37 @@ import { Input } from "../components/ui/Input";
 import { memberLoginThunk } from "../features/auth/authSlice";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 
-const emailSchema = z.object({ email: z.string().email("Enter a valid email") });
-const passwordSchema = z.object({ password: z.string().min(8, "Password must be at least 8 characters") });
+const loginSchema = z.object({ 
+  email: z.string().email("Enter a valid email"),
+  password: z.string().min(8, "Password must be at least 8 characters") 
+});
 const codeSchema = z.object({ code: z.string().min(4, "Enter valid code") });
 
-type EmailFormValues = z.infer<typeof emailSchema>;
-type PasswordFormValues = z.infer<typeof passwordSchema>;
+type LoginFormValues = z.infer<typeof loginSchema>;
 type CodeFormValues = z.infer<typeof codeSchema>;
 
-type AuthStep = "email" | "password" | "2fa" | "otp" | "magic-link";
+type AuthStep = "login" | "2fa" | "otp" | "magic-link";
 
 export function MemberLoginPage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const status = useAppSelector((state) => state.auth.status);
 
-  const [step, setStep] = useState<AuthStep>("email");
+  const [step, setStep] = useState<AuthStep>("login");
   const [email, setEmail] = useState("");
   const [passwordCache, setPasswordCache] = useState("");
   const [isSimulating, setIsSimulating] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const { register: regEmail, handleSubmit: subEmail, formState: { errors: errEmail } } = useForm<EmailFormValues>({ resolver: zodResolver(emailSchema) });
-  const { register: regPass, handleSubmit: subPass, formState: { errors: errPass } } = useForm<PasswordFormValues>({ resolver: zodResolver(passwordSchema) });
+  const { register: regLogin, handleSubmit: subLogin, formState: { errors: errLogin } } = useForm<LoginFormValues>({ resolver: zodResolver(loginSchema) });
   const { register: regCode, handleSubmit: subCode, formState: { errors: errCode } } = useForm<CodeFormValues>({ resolver: zodResolver(codeSchema) });
 
   if (status === "authenticated") return <Navigate to="/dashboard" replace />;
   if (status === "password_change_required") return <Navigate to="/member/first-password" replace />;
 
-  const onFinalLogin = async (pass?: string) => {
+  const onFinalLogin = async (pass?: string, code?: string) => {
     setIsSimulating(true);
-    const result = await dispatch(memberLoginThunk({ email: email || "john@example.com", password: pass || "password123" }));
+    const result = await dispatch(memberLoginThunk({ email: email || "john@example.com", password: pass || "password123", token: code }));
     setIsSimulating(false);
 
     if (memberLoginThunk.fulfilled.match(result)) {
@@ -54,6 +54,13 @@ export function MemberLoginPage() {
       return;
     }
 
+    if (memberLoginThunk.rejected.match(result) && result.payload === "2FA_REQUIRED") {
+      setPasswordCache(pass || "password123");
+      setStep("2fa");
+      toast.success("Password accepted. Enter 2FA code.");
+      return;
+    }
+
     if (result.payload === "NOT_A_MEMBER") {
       toast.error(`You are not a member of ${APP_NAME}`);
       return;
@@ -62,9 +69,8 @@ export function MemberLoginPage() {
     toast.error("Authentication failed");
   };
 
-  const handleEmailNext = (v: EmailFormValues) => { setEmail(v.email); setStep("password"); };
-  const handlePassNext = (v: PasswordFormValues) => { setPasswordCache(v.password); setStep("2fa"); toast.success("Password accepted. Enter 2FA code."); };
-  const handleCodeSubmit = () => { onFinalLogin(passwordCache); };
+  const handleLoginSubmit = (v: LoginFormValues) => { setEmail(v.email); setPasswordCache(v.password); onFinalLogin(v.password); };
+  const handleCodeSubmit = (v: CodeFormValues) => { onFinalLogin(passwordCache, v.code); };
 
   const handleOAuth = (provider: string) => { toast.success(`Redirecting to ${provider}...`); setTimeout(() => onFinalLogin(), 1500); };
   const handlePasskey = () => { toast.success("Prompting for Passkey..."); setTimeout(() => onFinalLogin(), 1500); };
@@ -72,12 +78,36 @@ export function MemberLoginPage() {
   const handleSendOTP = () => { setStep("otp"); toast.success("OTP sent to " + email); };
 
   const renderStep = () => {
-    if (step === "email") {
+    if (step === "login") {
       return (
         <div className="animate-fade-in space-y-6">
-          <form className="grid gap-4" onSubmit={subEmail(handleEmailNext)}>
-            <Input label="Member Email" type="email" autoComplete="email" error={errEmail.email?.message} {...regEmail("email")} />
-            <Button type="submit" className="w-full h-11 btn-primary">Continue with Email <ArrowRight className="h-4 w-4" /></Button>
+          <form className="grid gap-4" onSubmit={subLogin(handleLoginSubmit)}>
+            <Input label="Member Email" type="email" placeholder="Email" autoComplete="email" error={errLogin.email?.message} {...regLogin("email")} />
+            
+            <div className="space-y-1">
+              <Input 
+                label="Password" 
+                type={showPassword ? "text" : "password"} 
+                placeholder="Password"
+                autoComplete="current-password" 
+                error={errLogin.password?.message} 
+                {...regLogin("password")} 
+                rightElement={
+                  <button 
+                    type="button" 
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="p-1"
+                    tabIndex={-1}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                }
+              />
+            </div>
+
+            <Button type="submit" disabled={isSimulating} className="w-full h-11 btn-primary mt-2">
+              {isSimulating ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Sign In <ArrowRight className="h-4 w-4" /></>}
+            </Button>
           </form>
 
           <div className="relative">
@@ -99,43 +129,9 @@ export function MemberLoginPage() {
               </Button>
             </div>
           </div>
-        </div>
-      );
-    }
-
-    if (step === "password") {
-      return (
-        <div className="animate-fade-in space-y-6">
-          <div className="flex items-center gap-2 pb-4">
-            <Button variant="ghost" className="h-8 w-8 p-0 rounded-full" onClick={() => setStep("email")}><ArrowLeft className="h-4 w-4" /></Button>
-            <span className="text-sm font-medium">{email}</span>
-          </div>
-          <form className="grid gap-4" onSubmit={subPass(handlePassNext)}>
-            <Input 
-              label="Password" 
-              type={showPassword ? "text" : "password"} 
-              autoComplete="current-password" 
-              error={errPass.password?.message} 
-              {...regPass("password")} 
-              rightElement={
-                <button 
-                  type="button" 
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="p-1"
-                  tabIndex={-1}
-                >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-              }
-            />
-            <Button type="submit" disabled={isSimulating} className="w-full h-11 btn-primary">
-              {isSimulating ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Sign In <ArrowRight className="h-4 w-4" /></>}
-            </Button>
-          </form>
-
+          
           <div className="grid gap-3 pt-4 border-t border-border">
             <Button variant="outline" type="button" onClick={handleSendOTP} className="w-full h-11 btn-outline"><MessageSquare className="w-4 h-4" /> Send OTP to Email</Button>
-            <Button variant="outline" type="button" onClick={handleMagicLink} className="hidden w-full h-11 btn-outline"><Mail className="w-4 h-4" /> Send Magic Link</Button>
           </div>
         </div>
       );
@@ -145,7 +141,7 @@ export function MemberLoginPage() {
       return (
         <div className="animate-fade-in space-y-6">
           <div className="flex items-center gap-2 pb-4">
-            <Button variant="ghost" className="h-8 w-8 p-0 rounded-full" onClick={() => setStep("password")}><ArrowLeft className="h-4 w-4" /></Button>
+            <Button variant="ghost" className="h-8 w-8 p-0 rounded-full" onClick={() => setStep("login")}><ArrowLeft className="h-4 w-4" /></Button>
             <span className="text-sm font-medium">{step === "2fa" ? "Two-Factor Authentication" : "One-Time Password"}</span>
           </div>
           <p className="text-sm text-muted-foreground">
@@ -169,7 +165,7 @@ export function MemberLoginPage() {
           </div>
           <h3 className="text-xl font-bold">Check your email</h3>
           <p className="text-sm text-muted-foreground">We sent a magic link to <strong>{email}</strong>. Click the link inside to instantly sign in.</p>
-          <Button variant="outline" onClick={() => setStep("email")} className="mt-4 btn-outline">Back to Login</Button>
+          <Button variant="outline" onClick={() => setStep("login")} className="mt-4 btn-outline">Back to Login</Button>
         </div>
       );
     }

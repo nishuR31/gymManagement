@@ -77,7 +77,7 @@ export class AuthService {
     return toUserDto(user);
   }
 
-  public async login(email: string, password: string, context: RequestContext): Promise<AuthResult> {
+  public async login(email: string, password: string, token: string | undefined, context: RequestContext): Promise<AuthResult> {
     const user = await this.repository.findUserByEmail(email.toLowerCase());
 
     if (!user || !user.isActive) {
@@ -87,6 +87,20 @@ export class AuthService {
     const passwordMatches = await verifyPassword(password, user.passwordHash);
     if (!passwordMatches) {
       throw errors.unauthorized("Invalid email or password");
+    }
+
+    const securityUser = await this.repository.findUserForSecurity(user.id);
+    if (securityUser?.twoFactorEnabled) {
+      if (!token) {
+        throw errors.domain(403, "2FA_REQUIRED", "Two-factor authentication code required");
+      }
+      if (!securityUser.twoFactorSecret) {
+        throw errors.unauthorized("Two-factor authentication is improperly configured");
+      }
+      const isValid = authenticator.verify({ token, secret: securityUser.twoFactorSecret });
+      if (!isValid) {
+        throw errors.unauthorized("Invalid two-factor code");
+      }
     }
 
     const tokens = await this.issueTokens(user, context);
@@ -104,7 +118,7 @@ export class AuthService {
     };
   }
 
-  public async memberLogin(email: string, password: string, context: RequestContext): Promise<AuthResult> {
+  public async memberLogin(email: string, password: string, token: string | undefined, context: RequestContext): Promise<AuthResult> {
     const user = await this.repository.findUserByEmail(email.toLowerCase());
 
     if (!user || user.role !== "MEMBER" || !user.memberId) {
@@ -118,6 +132,20 @@ export class AuthService {
     const passwordMatches = await verifyPassword(password, user.passwordHash);
     if (!passwordMatches) {
       throw errors.unauthorized("Invalid email or password");
+    }
+
+    const securityUser = await this.repository.findUserForSecurity(user.id);
+    if (securityUser?.twoFactorEnabled) {
+      if (!token) {
+        throw errors.domain(403, "2FA_REQUIRED", "Two-factor authentication code required");
+      }
+      if (!securityUser.twoFactorSecret) {
+        throw errors.unauthorized("Two-factor authentication is improperly configured");
+      }
+      const isValid = authenticator.verify({ token, secret: securityUser.twoFactorSecret });
+      if (!isValid) {
+        throw errors.unauthorized("Invalid two-factor code");
+      }
     }
 
     const tokens = await this.issueTokens(user, context);
@@ -709,6 +737,40 @@ export class AuthService {
     }
   }
 
+  public async requestSecurityDisable(userId: string, actor: RequestActor, context: RequestContext): Promise<void> {
+    const user = await this.repository.findUserById(userId);
+    if (!user) throw errors.notFound("User not found");
+    await this.repository.updateSecurityDisableRequested(userId, true);
+    await this.repository.writeAuditLog({
+      userId: actor.id,
+      action: "SECURITY_DISABLE_REQUESTED",
+      entity: "User",
+      entityId: userId,
+      ...context
+    });
+  }
+
+  public async acceptSecurityDisable(actor: RequestActor, context: RequestContext): Promise<void> {
+    const user = await this.repository.findUserForSecurity(actor.id);
+    if (!user || !user.securityDisableRequested) throw errors.badRequest("No security disable request pending");
+    
+    if (user.twoFactorEnabled) {
+      await this.repository.disableTwoFactor(actor.id);
+    }
+    for (const pk of user.passkeys) {
+      await this.repository.removePasskey(pk.id);
+    }
+    await this.repository.updateSecurityDisableRequested(actor.id, false);
+
+    await this.repository.writeAuditLog({
+      userId: actor.id,
+      action: "SECURITY_DISABLE_ACCEPTED",
+      entity: "User",
+      entityId: actor.id,
+      ...context
+    });
+  }
+
   public async completeFirstPassword(actor: RequestActor, newPassword: string, context: RequestContext): Promise<AuthResult> {
     const user = await this.repository.findUserById(actor.id);
 
@@ -777,7 +839,8 @@ function toUserDto(user: AuthUserRecord): AuthUserDto {
     role: user.role,
     mustChangePassword: user.mustChangePassword,
     twoFactorEnabled: user.twoFactorEnabled,
-    hasPasskeys: user.hasPasskeys
+    hasPasskeys: user.hasPasskeys,
+    securityDisableRequested: user.securityDisableRequested
   };
 }
 

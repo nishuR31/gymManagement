@@ -133,6 +133,7 @@ model User {
   googleId        String?        @unique
   twoFactorSecret String?
   twoFactorEnabled Boolean     @default(false)
+  securityDisableRequested Boolean @default(false)
   roleId        String
   role          Role           @relation(fields: [roleId], references: [id])
   refreshTokens RefreshToken[]
