@@ -1,7 +1,7 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const DEFAULT_API_URL = process.env.EXPO_PUBLIC_API_URL ?? "http://192.168.29.149:4000";
+const DEFAULT_API_URL = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:4000";
 const API_URL_KEY = '@api_base_url';
 
 let accessToken: string | null = null;

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ImageBackground, ScrollView, Dimensions, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, ImageBackground, ScrollView, Dimensions, KeyboardAvoidingView, Platform, ActivityIndicator, Alert } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -104,7 +104,7 @@ export function MemberLoginScreen() {
             </Button>
             <View className="flex-row gap-3 mt-3">
               <View className="flex-1">
-                <Button variant="outline" onPress={() => handleOAuth("Google")}>
+                <Button variant="outline" onPress={() => Alert.alert("Not configured", "Google Auth is not configured on the backend yet.")}>
                   <View className="flex-row items-center justify-center">
                     <Svg width={20} height={20} viewBox="0 0 24 24" className="mr-2">
                       <Path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -113,16 +113,6 @@ export function MemberLoginScreen() {
                       <Path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
                     </Svg>
                     <Text className="text-foreground font-bold">Google</Text>
-                  </View>
-                </Button>
-              </View>
-              <View className="flex-1">
-                <Button variant="outline" onPress={() => handleOAuth("Facebook")}>
-                  <View className="flex-row items-center justify-center">
-                    <Svg width={20} height={20} viewBox="0 0 24 24" className="mr-2 text-[#1877F2]">
-                      <Path fill="currentColor" d="M9.101 23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085 1.848-5.978 5.858-5.978.401 0 .955.042 1.468.103a8.68 8.68 0 0 1 1.141.195v3.325a8.623 8.623 0 0 0-.653-.036 26.805 26.805 0 0 0-.733-.009c-1.125 0-2.517.236-2.517 1.426v2.54h3.82l-.369 3.667h-3.451v7.98h-4.566z" />
-                    </Svg>
-                    <Text className="text-foreground font-bold">Facebook</Text>
                   </View>
                 </Button>
               </View>

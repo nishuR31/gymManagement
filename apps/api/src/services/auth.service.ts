@@ -4,9 +4,9 @@ import * as otplib from "otplib";
 const authenticator = otplib.authenticator;
 import qrcode from "qrcode";
 // @ts-ignore
-import { generateRegistrationOptions, verifyRegistrationResponse } from "@simplewebauthn/server";
+import { generateRegistrationOptions, verifyRegistrationResponse, generateAuthenticationOptions, verifyAuthenticationResponse } from "@simplewebauthn/server";
 // @ts-ignore
-import type { VerifiedRegistrationResponse, RegistrationResponseJSON } from "@simplewebauthn/server";
+import type { VerifiedRegistrationResponse, RegistrationResponseJSON, VerifiedAuthenticationResponse, AuthenticationResponseJSON } from "@simplewebauthn/server";
 import type { AuthUserDto, RoleName, TwoFactorSetupResponse } from "@gym/shared";
 import { canManageRole } from "../config/auth.js";
 import type { Env } from "../config/env.js";
@@ -263,6 +263,35 @@ export class AuthService {
     });
   }
 
+  public async verifyPasswordResetWith2FA(email: string, token: string, context: RequestContext): Promise<{ resetToken: string }> {
+    const user = await this.repository.findUserByEmail(email.toLowerCase());
+
+    if (!user || !user.isActive || !user.twoFactorEnabled || !user.twoFactorSecret) {
+      throw errors.unauthorized("Invalid user or 2FA not configured");
+    }
+
+    const isValid = authenticator.verify({ token, secret: user.twoFactorSecret });
+    if (!isValid) {
+      throw errors.unauthorized("Invalid two-factor code");
+    }
+
+    const resetToken = this.tokenService.signPasswordResetToken(
+      user.id,
+      passwordFingerprint(user.passwordHash),
+      `${this.env.PASSWORD_RESET_TOKEN_TTL_MINUTES}m`
+    );
+
+    await this.repository.writeAuditLog({
+      userId: user.id,
+      action: "PASSWORD_RESET_2FA_VERIFIED",
+      entity: "User",
+      entityId: user.id,
+      ...context
+    });
+
+    return { resetToken };
+  }
+
   public async me(actor: RequestActor): Promise<AuthUserDto> {
     const user = await this.repository.findUserById(actor.id);
     if (!user) throw errors.unauthorized();
@@ -443,13 +472,134 @@ export class AuthService {
     if (!passkey) throw errors.badRequest("Passkey not found");
 
     await this.repository.removePasskey(passkeyId);
-    await this.repository.writeAuditLog({
-      userId: user.id,
-      action: "PASSKEY_REMOVED",
-      entity: "User",
-      entityId: user.id,
       ...context
     });
+  }
+
+  public async generatePasskeyAuthentication(email: string) {
+    const user = await this.repository.findUserByEmail(email.toLowerCase());
+    if (!user || !user.isActive) throw errors.unauthorized("Invalid user");
+
+    const userForSecurity = await this.repository.findUserForSecurity(user.id);
+    if (!userForSecurity || userForSecurity.passkeys.length === 0) {
+      throw errors.unauthorized("No passkeys registered for this user");
+    }
+
+    const options = await generateAuthenticationOptions({
+      rpID: this.env.PASSKEY_RP_ID,
+      allowCredentials: userForSecurity.passkeys.map(pk => ({
+        id: Buffer.from(pk.credentialId, 'base64url'),
+        type: "public-key"
+      })),
+      userVerification: "preferred"
+    });
+
+    return options;
+  }
+
+  public async verifyPasskeyAuthentication(email: string, body: AuthenticationResponseJSON, expectedChallenge: string, context: RequestContext): Promise<AuthResult> {
+    const user = await this.repository.findUserByEmail(email.toLowerCase());
+    if (!user || !user.isActive) throw errors.unauthorized("Invalid user");
+
+    const userForSecurity = await this.repository.findUserForSecurity(user.id);
+    if (!userForSecurity || userForSecurity.passkeys.length === 0) {
+      throw errors.unauthorized("No passkeys registered for this user");
+    }
+
+    const passkey = userForSecurity.passkeys.find(pk => pk.credentialId === body.id);
+    if (!passkey) {
+      throw errors.unauthorized("Passkey not found for this user");
+    }
+
+    let verification: VerifiedAuthenticationResponse;
+    try {
+      verification = await verifyAuthenticationResponse({
+        response: body,
+        expectedChallenge,
+        expectedOrigin: this.env.PASSKEY_EXPECTED_ORIGIN,
+        expectedRPID: this.env.PASSKEY_RP_ID,
+        credential: {
+          id: Buffer.from(passkey.credentialId, 'base64url'),
+          publicKey: passkey.publicKey,
+          counter: Number(passkey.counter),
+          transports: passkey.transports as any,
+        }
+      });
+    } catch (error: any) {
+      throw errors.badRequest(error.message);
+    }
+
+    if (verification.verified) {
+      // Passkey auth successful
+      const tokens = await this.issueTokens(user, context);
+      await this.repository.writeAuditLog({
+        userId: user.id,
+        action: "AUTH_LOGIN_PASSKEY",
+        entity: "Session",
+        entityId: tokens.refreshToken.slice(0, 8),
+        ...context
+      });
+
+      return {
+        user: toUserDto(user),
+        tokens
+      };
+    } else {
+      throw errors.unauthorized("Passkey verification failed");
+    }
+  }
+
+  public async verifyPasswordResetWithPasskey(email: string, body: AuthenticationResponseJSON, expectedChallenge: string, context: RequestContext): Promise<{ resetToken: string }> {
+    const user = await this.repository.findUserByEmail(email.toLowerCase());
+    if (!user || !user.isActive) throw errors.unauthorized("Invalid user");
+
+    const userForSecurity = await this.repository.findUserForSecurity(user.id);
+    if (!userForSecurity || userForSecurity.passkeys.length === 0) {
+      throw errors.unauthorized("No passkeys registered for this user");
+    }
+
+    const passkey = userForSecurity.passkeys.find(pk => pk.credentialId === body.id);
+    if (!passkey) {
+      throw errors.unauthorized("Passkey not found for this user");
+    }
+
+    let verification: VerifiedAuthenticationResponse;
+    try {
+      verification = await verifyAuthenticationResponse({
+        response: body,
+        expectedChallenge,
+        expectedOrigin: this.env.PASSKEY_EXPECTED_ORIGIN,
+        expectedRPID: this.env.PASSKEY_RP_ID,
+        credential: {
+          id: Buffer.from(passkey.credentialId, 'base64url'),
+          publicKey: passkey.publicKey,
+          counter: Number(passkey.counter),
+          transports: passkey.transports as any,
+        }
+      });
+    } catch (error: any) {
+      throw errors.badRequest(error.message);
+    }
+
+    if (verification.verified) {
+      const resetToken = this.tokenService.signPasswordResetToken(
+        user.id,
+        passwordFingerprint(user.passwordHash),
+        `${this.env.PASSWORD_RESET_TOKEN_TTL_MINUTES}m`
+      );
+
+      await this.repository.writeAuditLog({
+        userId: user.id,
+        action: "PASSWORD_RESET_PASSKEY_VERIFIED",
+        entity: "User",
+        entityId: user.id,
+        ...context
+      });
+
+      return { resetToken };
+    } else {
+      throw errors.unauthorized("Passkey verification failed");
+    }
   }
 
   public async completeFirstPassword(actor: RequestActor, newPassword: string, context: RequestContext): Promise<AuthResult> {

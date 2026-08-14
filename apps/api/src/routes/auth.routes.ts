@@ -102,6 +102,44 @@ export async function authRoutes(app: FastifyInstance, options: AuthRoutesOption
     });
   });
 
+  app.post("/login/passkey/generate", async (request, reply) => {
+    const body = z.object({ email: emailSchema }).parse(request.body);
+    const optionsResult = await options.authService.generatePasskeyAuthentication(body.email);
+    
+    reply.setCookie("passkeyLoginChallenge", optionsResult.challenge, {
+      httpOnly: true,
+      secure: options.env.COOKIE_SECURE,
+      sameSite: "lax",
+      path: "/auth/login/passkey"
+    });
+    
+    return optionsResult;
+  });
+
+  app.post("/login/passkey/verify", async (request, reply) => {
+    const expectedChallenge = request.cookies.passkeyLoginChallenge;
+    if (!expectedChallenge) throw errors.badRequest("Missing passkey challenge");
+
+    const email = (request.query as any).email || (request.body as any).email;
+    if (!email) throw errors.badRequest("Missing email");
+
+    const result = await options.authService.verifyPasskeyAuthentication(email, request.body as any, expectedChallenge, getRequestContext(request));
+    
+    reply.clearCookie("passkeyLoginChallenge", {
+      httpOnly: true,
+      secure: options.env.COOKIE_SECURE,
+      sameSite: "lax",
+      path: "/auth/login/passkey"
+    });
+
+    setRefreshCookie(reply, result.tokens.refreshToken, options.env);
+    reply.send({
+      user: result.user,
+      accessToken: result.tokens.accessToken,
+      expiresIn: result.tokens.expiresIn
+    });
+  });
+
   app.post("/refresh", async (request, reply) => {
     const refreshToken = request.cookies.refreshToken;
 
@@ -243,6 +281,31 @@ export async function authRoutes(app: FastifyInstance, options: AuthRoutesOption
       message: "If an active account exists for that email, a reset link will be sent.",
       ...result
     };
+  });
+
+  app.post("/password-reset/passkey/verify", async (request, reply) => {
+    const expectedChallenge = request.cookies.passkeyLoginChallenge; // reused challenge cookie
+    if (!expectedChallenge) throw errors.badRequest("Missing passkey challenge");
+
+    const email = (request.query as any).email || (request.body as any).email;
+    if (!email) throw errors.badRequest("Missing email");
+
+    const result = await options.authService.verifyPasswordResetWithPasskey(email, request.body as any, expectedChallenge, getRequestContext(request));
+    
+    reply.clearCookie("passkeyLoginChallenge", {
+      httpOnly: true,
+      secure: options.env.COOKIE_SECURE,
+      sameSite: "lax",
+      path: "/auth/login/passkey"
+    });
+
+    reply.send(result);
+  });
+
+  app.post("/password-reset/2fa/verify", async (request, reply) => {
+    const body = z.object({ email: emailSchema, token: tokenSchema.shape.token }).parse(request.body);
+    const result = await options.authService.verifyPasswordResetWith2FA(body.email, body.token, getRequestContext(request));
+    reply.send(result);
   });
 
   app.post("/password-reset/confirm", async (request, reply) => {
