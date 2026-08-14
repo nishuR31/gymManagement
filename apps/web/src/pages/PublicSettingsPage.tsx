@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Dumbbell, HardDrive, Moon, RefreshCw, Sun, MoonStar } from "lucide-react";
+import { Dumbbell, HardDrive, Moon, RefreshCw, Sun, MoonStar, Palette } from "lucide-react";
 import { Button } from "../components/ui/Button";
 import { useTheme } from "../hooks/useTheme";
 
@@ -39,14 +39,14 @@ export function PublicSettingsPage() {
                 <p className="text-sm text-muted-foreground mb-4">
                   Switch between light and dark mode.
                 </p>
-                <div className="flex items-center gap-3">
-                  <Button variant={theme === "light" ? "primary" : "secondary"} onClick={() => setTheme("light")} className="w-24">
+                <div className="flex flex-wrap items-center gap-3">
+                  <Button variant={theme === "light" ? "primary" : "secondary"} onClick={() => setTheme("light")} className="flex-1 min-w-[100px]">
                     Light
                   </Button>
-                  <Button variant={theme === "dark" ? "primary" : "secondary"} onClick={() => setTheme("dark")} className="w-24">
+                  <Button variant={theme === "dark" ? "primary" : "secondary"} onClick={() => setTheme("dark")} className="flex-1 min-w-[100px]">
                     Dark
                   </Button>
-                  <Button variant={theme === "amoled" ? "primary" : "secondary"} onClick={() => setTheme("amoled")}>
+                  <Button variant={theme === "amoled" ? "primary" : "secondary"} onClick={() => setTheme("amoled")} className="flex-1 min-w-[120px]">
                     AMOLED (Beta)
                   </Button>
                 </div>
@@ -57,7 +57,7 @@ export function PublicSettingsPage() {
           <div className="p-6 rounded-lg border border-border bg-card shadow-sm">
             <div className="flex items-start gap-4">
               <div className="p-3 bg-primary/10 text-primary rounded-md border border-primary/20">
-                <Sun className="h-6 w-6" />
+                <Palette className="h-6 w-6" />
               </div>
               <div className="flex-1">
                 <h2 className="text-xl font-bold text-foreground mb-2">Styling Paradigm</h2>

@@ -1,5 +1,5 @@
 import { startRegistration } from "@simplewebauthn/browser";
-import { ShieldAlert, ShieldCheck, Key, UserRound, Smartphone, Moon, Sun, MoonStar } from "lucide-react";
+import { ShieldAlert, ShieldCheck, Key, UserRound, Smartphone, Moon, Sun, MoonStar, Palette } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "../components/ui/Button";
@@ -203,21 +203,24 @@ export function ProfileSettingsPage() {
                   {theme === "amoled" ? <MoonStar className="h-4 w-4" /> : theme === "dark" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
                   Color Scheme
                 </h3>
-                <div className="flex items-center gap-3">
-                  <Button variant={theme === "light" ? "primary" : "secondary"} onClick={() => setTheme("light")} className="w-24">
+                <div className="flex flex-wrap items-center gap-3">
+                  <Button variant={theme === "light" ? "primary" : "secondary"} onClick={() => setTheme("light")} className="flex-1 min-w-[100px]">
                     Light
                   </Button>
-                  <Button variant={theme === "dark" ? "primary" : "secondary"} onClick={() => setTheme("dark")} className="w-24">
+                  <Button variant={theme === "dark" ? "primary" : "secondary"} onClick={() => setTheme("dark")} className="flex-1 min-w-[100px]">
                     Dark
                   </Button>
-                  <Button variant={theme === "amoled" ? "primary" : "secondary"} onClick={() => setTheme("amoled")}>
+                  <Button variant={theme === "amoled" ? "primary" : "secondary"} onClick={() => setTheme("amoled")} className="flex-1 min-w-[120px]">
                     AMOLED (Beta)
                   </Button>
                 </div>
               </div>
 
               <div className="flex flex-col gap-2">
-                <h3 className="text-sm font-bold text-foreground">Styling Paradigm</h3>
+                <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+                  <Palette className="h-4 w-4" />
+                  Styling Paradigm
+                </h3>
                 <div className="flex flex-wrap items-center gap-3">
                   <Button variant={styleMode === "minimal" ? "primary" : "secondary"} onClick={() => setStyleMode("minimal")}>
                     Minimalist
