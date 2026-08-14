@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { APP_NAME } from "../utils/env";
-import { ArrowRight, BadgeCheck, Dumbbell, KeyRound, UserRound, Fingerprint, Mail, MessageSquare, ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowRight, BadgeCheck, Dumbbell, KeyRound, UserRound, Fingerprint, Mail, MessageSquare, ArrowLeft, Loader2, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, Navigate, useNavigate } from "react-router-dom";
@@ -30,6 +30,7 @@ export function MemberLoginPage() {
   const [email, setEmail] = useState("");
   const [passwordCache, setPasswordCache] = useState("");
   const [isSimulating, setIsSimulating] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const { register: regEmail, handleSubmit: subEmail, formState: { errors: errEmail } } = useForm<EmailFormValues>({ resolver: zodResolver(emailSchema) });
   const { register: regPass, handleSubmit: subPass, formState: { errors: errPass } } = useForm<PasswordFormValues>({ resolver: zodResolver(passwordSchema) });
@@ -110,8 +111,26 @@ export function MemberLoginPage() {
             <span className="text-sm font-medium">{email}</span>
           </div>
           <form className="grid gap-4" onSubmit={subPass(handlePassNext)}>
-            <Input label="Password" type="password" autoComplete="current-password" error={errPass.password?.message} {...regPass("password")} />
-            <Button type="submit" className="w-full h-11 btn-primary">Sign In <ArrowRight className="h-4 w-4" /></Button>
+            <Input 
+              label="Password" 
+              type={showPassword ? "text" : "password"} 
+              autoComplete="current-password" 
+              error={errPass.password?.message} 
+              {...regPass("password")} 
+              rightElement={
+                <button 
+                  type="button" 
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="p-1"
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              }
+            />
+            <Button type="submit" disabled={isSimulating} className="w-full h-11 btn-primary">
+              {isSimulating ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Sign In <ArrowRight className="h-4 w-4" /></>}
+            </Button>
           </form>
 
           <div className="grid gap-3 pt-4 border-t border-border">

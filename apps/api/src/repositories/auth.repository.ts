@@ -94,7 +94,7 @@ export interface AuthRepository {
 }
 
 export class PrismaAuthRepository implements AuthRepository {
-  public constructor(private readonly prisma: PrismaClient) {}
+  public constructor(private readonly prisma: PrismaClient) { }
 
   public async findUserByEmail(email: string): Promise<AuthUserRecord | null> {
     const user = await this.prisma.user.findUnique({

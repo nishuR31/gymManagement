@@ -60,6 +60,13 @@ export async function staffRoutes(app: FastifyInstance, options: StaffRoutesOpti
     return { profile: await options.staffService.updateProfile(params.id, body, actor, getRequestContext(request)) };
   });
 
+  app.post("/profiles/:id/login", async (request, reply) => {
+    const actor = requireActor(request);
+    const params = idParamsSchema.parse(request.params);
+    const login = await options.staffService.createOrRegenerateLogin(params.id, actor, getRequestContext(request));
+    reply.status(201).send({ login });
+  });
+
   app.post("/profiles/:id/check-in", async (request, reply) => {
     const actor = requireActor(request);
     const params = idParamsSchema.parse(request.params);

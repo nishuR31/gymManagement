@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { View, Text, ScrollView, ActivityIndicator } from 'react-native';
-import { Beef, CalendarClock, Clock3, CreditCard, Dumbbell, MapPin, Phone, UserRound, WalletCards } from 'lucide-react-native';
+import { CalendarClock, Clock3, MapPin, Phone, UserRound, WalletCards } from 'lucide-react-native';
 import { APP_NAME } from '../utils/env';
 import Toast from 'react-native-toast-message';
 import { EmptyState } from '../components/ui/EmptyState';
@@ -116,7 +116,7 @@ export function MemberAccountScreen({ route }: any) {
               )}
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardContent className="pt-6">
               <Text className="text-xl font-black text-foreground mb-4">Recent Orders</Text>

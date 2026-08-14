@@ -47,6 +47,28 @@
     --ring: 38 52% 43%;
   }
 
+  .amoled {
+    --background: 0 0% 0%;
+    --foreground: 60 9.1% 97.8%;
+    --card: 24 9.8% 3%;
+    --card-foreground: 60 9.1% 97.8%;
+    --popover: 0 0% 0%;
+    --popover-foreground: 60 9.1% 97.8%;
+    --primary: 38 52% 43%;
+    --primary-foreground: 60 9.1% 97.8%;
+    --secondary: 0 0% 5%;
+    --secondary-foreground: 60 9.1% 97.8%;
+    --muted: 0 0% 5%;
+    --muted-foreground: 24 5.4% 63.9%;
+    --accent: 0 0% 5%;
+    --accent-foreground: 60 9.1% 97.8%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 60 9.1% 97.8%;
+    --border: 0 0% 10%;
+    --input: 0 0% 10%;
+    --ring: 38 52% 43%;
+  }
+
   /* Basic Themes approximation for native since gradients aren't fully supported via css */
   .theme-clay {
     --background: 210 20% 98%;

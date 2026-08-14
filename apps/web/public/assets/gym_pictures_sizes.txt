@@ -1,0 +1,28 @@
+Gym Pictures Sizes Guide
+========================
+
+Please place the corresponding images in the `/public/assets` directory of the `apps/web` project to populate the homepage.
+
+1. gym_hero_desktop.jpg
+   - Location: /public/assets/gym_hero_desktop.jpg
+   - Usage: Main top hero background on desktop and tablet devices.
+   - Recommended Size: 2400x1600 pixels (Landscape)
+   - Aspect Ratio: 3:2 or 16:9
+
+2. gym_hero_mobile.jpg
+   - Location: /public/assets/gym_hero_mobile.jpg
+   - Usage: Main top hero background specifically cropped for mobile devices so the subject is clearly in frame.
+   - Recommended Size: 800x1600 pixels (Portrait)
+   - Aspect Ratio: 1:2
+
+3. gym_secondary_desktop.jpg
+   - Location: /public/assets/gym_secondary_desktop.jpg
+   - Usage: Secondary background for the bottom section of the homepage on desktop.
+   - Recommended Size: 2400x1600 pixels (Landscape)
+   - Aspect Ratio: 3:2 or 16:9
+
+4. gym_secondary_mobile.jpg
+   - Location: /public/assets/gym_secondary_mobile.jpg
+   - Usage: Secondary background for the bottom section of the homepage on mobile devices.
+   - Recommended Size: 800x1600 pixels (Portrait)
+   - Aspect Ratio: 1:2

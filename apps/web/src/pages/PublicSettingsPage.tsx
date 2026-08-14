@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Dumbbell, HardDrive, Moon, RefreshCw, Sun } from "lucide-react";
+import { Dumbbell, HardDrive, Moon, RefreshCw, Sun, MoonStar } from "lucide-react";
 import { Button } from "../components/ui/Button";
 import { useTheme } from "../hooks/useTheme";
 
@@ -32,7 +32,7 @@ export function PublicSettingsPage() {
           <div className="p-6 rounded-lg border border-border bg-card shadow-sm">
             <div className="flex items-start gap-4">
               <div className="p-3 bg-primary/10 text-primary rounded-md border border-primary/20">
-                {theme === "dark" ? <Moon className="h-6 w-6" /> : <Sun className="h-6 w-6" />}
+                {theme === "amoled" ? <MoonStar className="h-6 w-6" /> : theme === "dark" ? <Moon className="h-6 w-6" /> : <Sun className="h-6 w-6" />}
               </div>
               <div className="flex-1">
                 <h2 className="text-xl font-bold text-foreground mb-2">Color Scheme</h2>
@@ -45,6 +45,9 @@ export function PublicSettingsPage() {
                   </Button>
                   <Button variant={theme === "dark" ? "primary" : "secondary"} onClick={() => setTheme("dark")} className="w-24">
                     Dark
+                  </Button>
+                  <Button variant={theme === "amoled" ? "primary" : "secondary"} onClick={() => setTheme("amoled")}>
+                    AMOLED (Beta)
                   </Button>
                 </div>
               </div>

@@ -138,6 +138,39 @@
 
     color-scheme: dark;
   }
+
+  /* AMOLED mode overrides (Beta) */
+  .amoled {
+    --background: 0 0% 0%;
+    --foreground: 60 9.1% 97.8%;
+
+    --card: 24 9.8% 3%;
+    --card-foreground: 60 9.1% 97.8%;
+
+    --popover: 0 0% 0%;
+    --popover-foreground: 60 9.1% 97.8%;
+
+    --primary: 38 52% 43%;
+    --primary-foreground: 60 9.1% 97.8%;
+
+    --secondary: 0 0% 5%;
+    --secondary-foreground: 60 9.1% 97.8%;
+
+    --muted: 0 0% 5%;
+    --muted-foreground: 24 5.4% 63.9%;
+
+    --accent: 0 0% 5%;
+    --accent-foreground: 60 9.1% 97.8%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 60 9.1% 97.8%;
+
+    --border: 0 0% 10%;
+    --input: 0 0% 10%;
+    --ring: 38 52% 43%;
+
+    color-scheme: dark;
+  }
 }
 
 @layer base {
@@ -236,7 +269,7 @@
 
 /* Layout Elements */
 @utility layout-header {
-  @apply sticky top-0 z-50 flex items-center justify-between gap-4 border-b border-border bg-background/80 px-4 py-3 shadow-sm backdrop-blur-md transition-all duration-300;
+  @apply sticky top-0 z-50 flex items-center justify-between gap-4 border-b border-border bg-background/80 px-4 py-3 shadow-sm backdrop-blur-md transition-all duration-300 rounded-b-2xl;
 }
 @utility layout-footer {
   @apply border-t border-border mt-auto py-6 bg-background transition-all duration-300;
@@ -245,7 +278,7 @@
   @apply fixed inset-y-0 left-0 hidden w-72 overflow-hidden border-r border-border bg-background/80 shadow-sm backdrop-blur-md transition-all duration-300 lg:flex lg:flex-col z-40;
 }
 @utility layout-dashboard-header {
-  @apply sticky top-0 z-20 border-b border-border bg-background/80 px-4 py-3 shadow-sm backdrop-blur-md transition-all duration-300 md:px-6;
+  @apply sticky top-0 z-20 border-b border-border bg-background/80 px-4 py-3 shadow-sm backdrop-blur-md transition-all duration-300 md:px-6 rounded-b-2xl;
 }
 
 @keyframes spin-reverse {

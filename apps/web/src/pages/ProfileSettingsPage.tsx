@@ -1,5 +1,5 @@
 import { startRegistration } from "@simplewebauthn/browser";
-import { ShieldAlert, ShieldCheck, Key, UserRound, Smartphone } from "lucide-react";
+import { ShieldAlert, ShieldCheck, Key, UserRound, Smartphone, Moon, Sun, MoonStar } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "../components/ui/Button";
@@ -11,11 +11,13 @@ import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { getApiErrorMessage } from "../utils/apiError";
 import { formatDateTime } from "../utils/format";
 import { setCredentials } from "../features/auth/authSlice";
+import { useTheme } from "../hooks/useTheme";
 import type { PasskeyDto } from "@gym/shared";
 
 export function ProfileSettingsPage() {
   const user = useAppSelector((state) => state.auth.user);
   const dispatch = useAppDispatch();
+  const { theme, setTheme, styleMode, setStyleMode } = useTheme();
   
   const [firstName, setFirstName] = useState(user?.firstName || "");
   const [lastName, setLastName] = useState(user?.lastName || "");
@@ -192,6 +194,43 @@ export function ProfileSettingsPage() {
                 </Button>
               </div>
             </form>
+          </Card>
+
+          <Card title="App Appearance">
+            <div className="grid gap-6">
+              <div className="flex flex-col gap-2">
+                <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+                  {theme === "amoled" ? <MoonStar className="h-4 w-4" /> : theme === "dark" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+                  Color Scheme
+                </h3>
+                <div className="flex items-center gap-3">
+                  <Button variant={theme === "light" ? "primary" : "secondary"} onClick={() => setTheme("light")} className="w-24">
+                    Light
+                  </Button>
+                  <Button variant={theme === "dark" ? "primary" : "secondary"} onClick={() => setTheme("dark")} className="w-24">
+                    Dark
+                  </Button>
+                  <Button variant={theme === "amoled" ? "primary" : "secondary"} onClick={() => setTheme("amoled")}>
+                    AMOLED (Beta)
+                  </Button>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <h3 className="text-sm font-bold text-foreground">Styling Paradigm</h3>
+                <div className="flex flex-wrap items-center gap-3">
+                  <Button variant={styleMode === "minimal" ? "primary" : "secondary"} onClick={() => setStyleMode("minimal")}>
+                    Minimalist
+                  </Button>
+                  <Button variant={styleMode === "glass" ? "primary" : "secondary"} onClick={() => setStyleMode("glass")}>
+                    Glassmorphism
+                  </Button>
+                  <Button variant={styleMode === "clay" ? "primary" : "secondary"} onClick={() => setStyleMode("clay")}>
+                    Claymorphism
+                  </Button>
+                </div>
+              </div>
+            </div>
           </Card>
         </div>
 

@@ -12,7 +12,9 @@ import type {
   WorkoutExerciseDto,
   WorkoutPlanTemplateDto
 } from "@gym/shared";
+import crypto from "node:crypto";
 import { AppError, errors } from "../errors/app-error.js";
+import { hashPassword } from "../utils/password.js";
 import type { AuthRepository } from "../repositories/auth.repository.js";
 import type { MemberRepository } from "../repositories/member.repository.js";
 import {
@@ -74,6 +76,42 @@ export class StaffService {
     await this.auditWriter.writeAuditLog({ userId: actor.id, action: "STAFF_PROFILE_UPDATED", entity: "StaffProfile", entityId: profile.id, ...context });
     await invalidateDashboardAndReports(this.dashboardReportCache);
     return toStaffProfileDto(profile, true);
+  }
+
+  public async createOrRegenerateLogin(staffProfileId: string, actor: RequestActor, context: RequestContext): Promise<{ temporaryPassword: string; user: { id: string; email: string; firstName: string; lastName: string } }> {
+    ensureAdminOrAbove(actor.role);
+    const profile = await this.staffRepository.findProfileById(staffProfileId);
+    if (!profile) {
+      throw errors.notFound("Staff profile not found");
+    }
+    const user = await this.authRepository.findUserById(profile.userId);
+    if (!user) {
+      throw errors.notFound("Associated user not found");
+    }
+
+    const temporaryPassword = createTemporaryPassword();
+    const passwordHash = await hashPassword(temporaryPassword);
+    
+    // Update the password and require the user to change it on next login
+    await this.authRepository.updatePassword(user.id, passwordHash, true);
+    
+    await this.auditWriter.writeAuditLog({ 
+      userId: actor.id, 
+      action: "STAFF_LOGIN_REGENERATED", 
+      entity: "StaffProfile", 
+      entityId: profile.id, 
+      ...context 
+    });
+    
+    return { 
+      temporaryPassword,
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName
+      }
+    };
   }
 
   public async checkIn(staffProfileId: string, actor: RequestActor, context: RequestContext): Promise<StaffAttendanceDto> {
@@ -395,3 +433,10 @@ function toDietTemplateDto(template: DietPlanTemplateRecord): DietPlanTemplateDt
 function toMemberDietPlanDto(plan: MemberDietPlanRecord): MemberDietPlanDto {
   return { ...plan, startDate: plan.startDate.toISOString() };
 }
+
+function createTemporaryPassword(): string {
+  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const bytes = crypto.randomBytes(10);
+  return Array.from(bytes, (byte) => alphabet[byte % alphabet.length]).join("");
+}
+

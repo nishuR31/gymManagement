@@ -56,21 +56,18 @@ export function PublicHomePage() {
   return (
     <main className="min-h-screen bg-background overflow-y-auto snap-y snap-proximity scroll-smooth text-foreground">
       <section className="sticky top-0 snap-start flex h-screen items-stretch overflow-hidden -mt-17 pt-17">
-        <img
-          src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=1800&q=85"
-          srcSet="
-            https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=800&q=80 800w,
-            https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=1200&q=85 1200w,
-            https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=1800&q=85 1800w,
-            https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=2400&q=85 2400w
-          "
-          sizes="100vw"
-          alt=""
-          className="absolute inset-0 h-full w-full scale-105 object-cover motion-safe:animate-fade-in"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/40 to-transparent pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent pointer-events-none" />
-        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-background to-transparent pointer-events-none" />
+        <picture className="absolute inset-0 h-full w-full pointer-events-none">
+          <source media="(max-width: 768px)" srcSet="/assets/gym_hero_mobile.jpg" />
+          <source media="(min-width: 769px)" srcSet="/assets/gym_hero_desktop.jpg" />
+          <img
+            src="/assets/gym_hero_desktop.jpg"
+            alt="Hero Background"
+            className="h-full w-full scale-105 object-cover object-[80%_center] md:object-center motion-safe:animate-fade-in"
+          />
+        </picture>
+        <div className="absolute inset-0 bg-linear-to-r from-background/90 via-background/40 to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-linear-to-t from-background/90 via-transparent to-transparent pointer-events-none" />
+        <div className="absolute inset-x-0 bottom-0 h-32 bg-linear-to-t from-background to-transparent pointer-events-none" />
         <div className="relative mx-auto flex w-full max-w-7xl flex-col px-4 pb-14 pt-5 md:px-6">
           <div className="grid gap-8 pb-4 pt-20 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-end">
             <FadeIn className="max-w-4xl" delay={100}>
@@ -105,19 +102,15 @@ export function PublicHomePage() {
 
       <div className="relative z-10 w-full snap-start overflow-hidden bg-background shadow-2xl">
         {/* Background image for bottom components */}
-        <img
-          src="https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=1800&q=85"
-          srcSet="
-            https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=800&q=80 800w,
-            https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=1200&q=85 1200w,
-            https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=1800&q=85 1800w,
-            https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=2400&q=85 2400w
-          "
-          sizes="100vw"
-          alt="Male training"
-          className="absolute inset-0  h-full w-full object-cover backdrop-blur-sm opacity-60 dark:opacity-100"
-          style={{ objectPosition: "center 20%" }}
-        />
+        <picture className="absolute inset-0 h-full w-full opacity-60 dark:opacity-100 pointer-events-none">
+          <source media="(max-width: 768px)" srcSet="/assets/gym_secondary_mobile.jpg" />
+          <source media="(min-width: 769px)" srcSet="/assets/gym_secondary_desktop.jpg" />
+          <img
+            src="/assets/gym_secondary_desktop.jpg"
+            alt="Male training"
+            className="h-full w-full object-cover object-[65%_center] md:object-[center_20%] backdrop-blur-sm"
+          />
+        </picture>
         {/* Gradient overlays to blend into the main background */}
         <div className="absolute inset-0 bg-background/10" />
         <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background" />
@@ -157,46 +150,46 @@ export function PublicHomePage() {
 
             <FadeIn delay={200}>
               <Card title={`Contact ${APP_NAME}`} className="ring-1 ring-primary/15 bg-card/90 backdrop-blur-sm">
-              <form
-                className="grid gap-4"
-                onSubmit={handleSubmit(onSubmit)}
-              >
-                <Input
-                  label="Name"
-                  {...register("name")}
-                  error={errors.name?.message}
-                />
-                <Input
-                  label="Email"
-                  type="email"
-                  {...register("email", { required: "Email is required" })}
-                  error={errors.email?.message}
-                />
-                <Input
-                  label="Phone"
-                  type="tel"
-                  {...register("phone", {
-                    onChange: (e) => {
-                      e.target.value = e.target.value.replace(/[^\d\s\+\-\(\)]/g, "");
-                    }
-                  })}
-                  error={errors.phone?.message}
-                />
-                <label className="grid gap-2 text-sm font-medium text-foreground">
-                  <span>Message</span>
-                  <textarea
-                    className={`input-base min-h-32 resize-y ${errors.message ? "border-red-500 focus-visible:ring-red-500" : ""}`}
-                    {...register("message")}
+                <form
+                  className="grid gap-4"
+                  onSubmit={handleSubmit(onSubmit)}
+                >
+                  <Input
+                    label="Name"
+                    {...register("name")}
+                    error={errors.name?.message}
                   />
-                  {errors.message?.message && (
-                    <span className="text-sm font-medium text-red-500">{errors.message.message as string}</span>
-                  )}
-                </label>
-                <Button type="submit" className="mt-2" isLoading={isSubmitting}>
-                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                  {isSubmitting ? "Sending" : "Send Inquiry"}
-                </Button>
-              </form>
+                  <Input
+                    label="Email"
+                    type="email"
+                    {...register("email", { required: "Email is required" })}
+                    error={errors.email?.message}
+                  />
+                  <Input
+                    label="Phone"
+                    type="tel"
+                    {...register("phone", {
+                      onChange: (e) => {
+                        e.target.value = e.target.value.replace(/[^\d\s\+\-\(\)]/g, "");
+                      }
+                    })}
+                    error={errors.phone?.message}
+                  />
+                  <label className="grid gap-2 text-sm font-medium text-foreground">
+                    <span>Message</span>
+                    <textarea
+                      className={`input-base min-h-32 resize-y ${errors.message ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                      {...register("message")}
+                    />
+                    {errors.message?.message && (
+                      <span className="text-sm font-medium text-red-500">{errors.message.message as string}</span>
+                    )}
+                  </label>
+                  <Button type="submit" className="mt-2" isLoading={isSubmitting}>
+                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                    {isSubmitting ? "Sending" : "Send Inquiry"}
+                  </Button>
+                </form>
               </Card>
             </FadeIn>
           </section>
@@ -279,5 +272,47 @@ function FadeIn({ children, delay = 0, className = "" }: { children: React.React
     >
       {children}
     </div>
+  );
+}
+
+function ProgressiveBackground({
+  mobileLocalSrc,
+  desktopLocalSrc,
+  mobileFallbackSrc,
+  desktopFallbackSrc,
+  alt,
+  className
+}: {
+  mobileLocalSrc: string;
+  desktopLocalSrc: string;
+  mobileFallbackSrc: string;
+  desktopFallbackSrc: string;
+  alt: string;
+  className: string;
+}) {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [hasError, setHasError] = useState(false);
+
+  return (
+    <>
+      <picture className="absolute inset-0 h-full w-full pointer-events-none">
+        <source media="(max-width: 768px)" srcSet={mobileFallbackSrc} />
+        <source media="(min-width: 769px)" srcSet={desktopFallbackSrc} />
+        <img src={desktopFallbackSrc} alt={alt} className={className} />
+      </picture>
+      {!hasError && (
+        <picture className="absolute inset-0 h-full w-full pointer-events-none">
+          <source media="(max-width: 768px)" srcSet={mobileLocalSrc} />
+          <source media="(min-width: 769px)" srcSet={desktopLocalSrc} />
+          <img
+            src={desktopLocalSrc}
+            alt={alt}
+            className={`${className} transition-opacity duration-1000 ${isLoaded ? "opacity-100" : "opacity-0"}`}
+            onLoad={() => setIsLoaded(true)}
+            onError={() => setHasError(true)}
+          />
+        </picture>
+      )}
+    </>
   );
 }

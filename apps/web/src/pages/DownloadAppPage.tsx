@@ -17,7 +17,7 @@ export function DownloadAppPage() {
       <section className="relative px-6 py-20 md:py-24 overflow-hidden border-b border-border">
         <div className="absolute inset-0 bg-primary/5 blur-[120px] rounded-full" />
         <div className="relative mx-auto max-w-4xl text-center">
-          <span className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-4 py-1.5 text-xs font-black uppercase tracking-[0.18em] text-primary-foreground shadow-sm mb-6">
+          <span className="inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/10 px-4 py-1.5 text-xs font-black uppercase tracking-[0.18em] text-primary shadow-sm mb-6">
             <Smartphone className="h-4 w-4" aria-hidden="true" />
             {APP_NAME} App
           </span>
@@ -48,42 +48,62 @@ export function DownloadAppPage() {
             </div>
 
             <div className="space-y-6">
-              <Step number="01" title="Download & Install" description="Get the app from the App Store or Google Play." />
-              <Step number="02" title="Sign In" description="Use your member email and password." />
-              <Step number="03" title="Scan & Go" description="Use the app barcode to quickly scan in at the front desk." />
+              <Step number="01" title="Download" description="Get the app from the App Store or Google Play." />
+              <Step number="02" title="Get Credentials" description="Get your login ID and temporary password from the owner, a staff member, or an authorized person." />
+              <Step number="03" title="Login & Secure" description="Log in and change your password immediately. Enabling 2FA is highly recommended for security." />
+              <Step number="04" title="Explore & Configure" description="Check out the app and configure it yourself. If you don't understand something, ask a staff member or other users for help (sorry for the inconvenience!)." />
+              <Step number="05" title="You're All Set!" description="Thank you for using our services. Enjoy your gym experience." />
             </div>
           </div>
 
-          <div className="relative">
+          <div className="relative mx-auto max-w-[320px]">
             <div className="absolute inset-0 bg-primary/20 blur-[100px] rounded-full" />
-            <div className="card-base relative p-6 shadow-xl mx-auto max-w-sm transform rotate-2 hover:rotate-0 transition duration-500">
-              <div className="border border-border/50 bg-background rounded-2xl p-4 h-150 flex flex-col items-center justify-center text-center">
-                <div className="flex gap-1 p-1 card-base rounded-lg mb-8">
+            
+            <div className="relative rounded-[2.5rem] border-[8px] border-zinc-900 bg-background shadow-2xl overflow-hidden transform rotate-2 hover:rotate-0 transition duration-500 aspect-[9/19.5] flex flex-col">
+              {/* Dynamic Notch / Punch Hole */}
+              <div className="absolute top-0 inset-x-0 flex justify-center z-20">
+                {platform === "ios" ? (
+                  <div className="h-7 w-28 bg-zinc-900 rounded-b-2xl shadow-inner" /> // iPhone Notch
+                ) : (
+                  <div className="h-5 w-5 mt-2 bg-zinc-900 rounded-full shadow-inner" /> // Android Punch Hole
+                )}
+              </div>
+
+              {/* Screen Content */}
+              <div className="flex-1 flex flex-col items-center justify-center text-center p-6 relative pt-12">
+                <div className="flex gap-1 p-1 rounded-full mb-8 bg-secondary ring-1 ring-border/50">
                   <button
                     onClick={() => setPlatform("ios")}
-                    className={`px-4 py-2 text-sm font-bold rounded-md transition flex items-center gap-2 ${platform === "ios" ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+                    className={`px-5 py-2 text-sm font-bold rounded-full transition flex items-center gap-2 ${platform === "ios" ? "bg-primary text-primary-foreground shadow-md" : "text-muted-foreground hover:text-foreground"}`}
                   >
                     iOS
                   </button>
                   <button
                     onClick={() => setPlatform("android")}
-                    className={`px-4 py-2 text-sm font-bold rounded-md transition flex items-center gap-2 ${platform === "android" ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+                    className={`px-5 py-2 text-sm font-bold rounded-full transition flex items-center gap-2 ${platform === "android" ? "bg-primary text-primary-foreground shadow-md" : "text-muted-foreground hover:text-foreground"}`}
                   >
                     Android
                   </button>
                 </div>
 
-                <div className="bg-white p-3 rounded-xl shadow-sm mb-6">
-                  <img src={qrCodeUrl} alt={`QR Code for ${platform}`} className="h-36 w-36" />
+                <div className="bg-white p-3 rounded-2xl shadow-lg mb-6 ring-1 ring-border/10">
+                  <img src={qrCodeUrl} alt={`QR Code for ${platform}`} className="h-40 w-40" />
                 </div>
 
-                <h3 className="text-xl font-bold text-foreground mb-2">Scan to download</h3>
-                <p className="text-sm text-muted-foreground mb-8">Point your camera to get the {platform === "ios" ? "iOS" : "Android"} app</p>
+                <h3 className="text-xl font-bold text-foreground mb-2 tracking-tight">Scan to download</h3>
+                <p className="text-sm text-muted-foreground mb-10 leading-relaxed">Point your camera to get the {platform === "ios" ? "iOS" : "Android"} app</p>
 
-                <div className="w-full space-y-3">
-                  <div className="h-12 card-base w-full animate-pulse bg-primary/5" />
-                  <div className="h-12 card-base w-full animate-pulse bg-primary/5" />
+                <div className="w-full space-y-4 px-2">
+                  <div className="h-12 rounded-xl w-full animate-pulse bg-primary/10" />
+                  <div className="h-12 rounded-xl w-4/5 mx-auto animate-pulse bg-primary/10" />
                 </div>
+
+                {/* Bottom Home Indicator */}
+                {platform === "ios" && (
+                   <div className="absolute bottom-2 inset-x-0 flex justify-center">
+                     <div className="h-1 w-24 bg-zinc-300 dark:bg-zinc-700 rounded-full" />
+                   </div>
+                )}
               </div>
             </div>
           </div>

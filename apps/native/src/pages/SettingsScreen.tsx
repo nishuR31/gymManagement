@@ -1,13 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput } from 'react-native';
-import { Building2, Clock3, FileText, Percent, Settings as SettingsIcon } from 'lucide-react-native';
+import { Building2, Clock3, FileText, Percent, Settings as SettingsIcon, Moon, Sun, MoonStar, Paintbrush } from 'lucide-react-native';
 import Toast from 'react-native-toast-message';
 import { Button } from '../components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
 import { EmptyState } from '../components/ui/EmptyState';
 import { Input } from '../components/ui/Input';
 import * as settingsApi from '../features/settings/settingsApi';
-import { useAppSelector } from '../store/hooks';
+import { useAppSelector, useAppDispatch } from '../store/hooks';
+import { setTheme, setStyleMode } from '../features/theme/themeSlice';
 import { getApiErrorMessage } from '../utils/apiError';
 import { formatDateTime, readableStatus } from '../utils/format';
 import { isAdminRole } from '../utils/roles';
@@ -20,7 +21,9 @@ const firstDefaultKey = defaultKeys[0];
 export function SettingsScreen() {
   const role = useAppSelector((state) => state.auth.user?.role);
   const theme = useAppSelector((state) => state.theme.theme);
-  const activeColors = themeColors[theme === 'dark' ? 'dark' : 'light'];
+  const styleMode = useAppSelector((state) => state.theme.styleMode);
+  const dispatch = useAppDispatch();
+  const activeColors = themeColors[theme === 'dark' || theme === 'amoled' ? 'dark' : 'light'];
 
   const [settings, setSettings] = useState<SettingDto[]>([]);
   const [selectedKey, setSelectedKey] = useState<string>(firstDefaultKey);
@@ -78,6 +81,37 @@ export function SettingsScreen() {
           <Text className="text-xs font-black uppercase tracking-[2px] text-primary">Control Room</Text>
           <Text className="mt-2 text-3xl font-black text-foreground">Settings</Text>
           <Text className="mt-1 text-sm font-semibold text-muted-foreground">Gym details, business rules, receipts, and runtime config.</Text>
+        </CardContent>
+      </Card>
+
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>App Appearance</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <View className="mb-4">
+            <View className="flex-row items-center gap-2 mb-3">
+              {theme === 'amoled' ? <MoonStar size={16} color={activeColors.foreground} /> : theme === 'dark' ? <Moon size={16} color={activeColors.foreground} /> : <Sun size={16} color={activeColors.foreground} />}
+              <Text className="text-sm font-bold text-foreground">Color Scheme</Text>
+            </View>
+            <View className="flex-row gap-2">
+              <Button variant={theme === 'light' ? 'primary' : 'secondary'} onPress={() => dispatch(setTheme('light'))} className="flex-1">Light</Button>
+              <Button variant={theme === 'dark' ? 'primary' : 'secondary'} onPress={() => dispatch(setTheme('dark'))} className="flex-1">Dark</Button>
+              <Button variant={theme === 'amoled' ? 'primary' : 'secondary'} onPress={() => dispatch(setTheme('amoled'))} className="flex-1">AMOLED</Button>
+            </View>
+          </View>
+          
+          <View>
+            <View className="flex-row items-center gap-2 mb-3">
+              <Paintbrush size={16} color={activeColors.foreground} />
+              <Text className="text-sm font-bold text-foreground">Styling Paradigm</Text>
+            </View>
+            <View className="flex-row gap-2 flex-wrap">
+              <Button variant={styleMode === 'minimal' ? 'primary' : 'secondary'} onPress={() => dispatch(setStyleMode('minimal'))} className="flex-1 min-w-[100px]">Minimalist</Button>
+              <Button variant={styleMode === 'glass' ? 'primary' : 'secondary'} onPress={() => dispatch(setStyleMode('glass'))} className="flex-1 min-w-[100px]">Glass</Button>
+              <Button variant={styleMode === 'clay' ? 'primary' : 'secondary'} onPress={() => dispatch(setStyleMode('clay'))} className="flex-1 min-w-[100px]">Clay</Button>
+            </View>
+          </View>
         </CardContent>
       </Card>
 

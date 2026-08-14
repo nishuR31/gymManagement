@@ -23,14 +23,6 @@ const registerBodySchema = z.object({
   role: z.enum(roleNames)
 });
 
-const passwordResetRequestBodySchema = z.object({
-  email: emailSchema
-});
-
-const passwordResetConfirmBodySchema = z.object({
-  token: z.string().min(20),
-  newPassword: passwordSchema
-});
 
 const profileUpdateSchema = z.object({
   firstName: z.string().trim().min(1).max(80),
@@ -102,61 +94,6 @@ export async function authRoutes(app: FastifyInstance, options: AuthRoutesOption
     });
   });
 
-  app.get("/google", async (request, reply) => {
-    const redirectUrl = (request.query as { redirect?: string }).redirect;
-    const url = options.authService.generateGoogleAuthUrl(redirectUrl);
-    reply.redirect(url);
-  });
-
-  app.get("/google/callback", async (request, reply) => {
-    const query = request.query as { code?: string; state?: string; error?: string };
-    
-    if (query.error) {
-      reply.redirect(`${options.env.CORS_ORIGIN}/login?error=${query.error}`);
-      return;
-    }
-    
-    if (!query.code) {
-      reply.redirect(`${options.env.CORS_ORIGIN}/login?error=invalid_request`);
-      return;
-    }
-
-    try {
-      let originalRedirect = options.env.CORS_ORIGIN;
-      if (query.state) {
-        try {
-          const stateObj = JSON.parse(Buffer.from(query.state, "base64").toString());
-          if (stateObj.redirect) {
-            originalRedirect = stateObj.redirect;
-          }
-        } catch (e) {
-          // Ignore invalid state
-        }
-      }
-
-      const result = await options.authService.googleLogin(query.code, getRequestContext(request));
-      
-      // For web, we set the refresh token in a cookie.
-      // For native (custom scheme), we pass tokens in the redirect URL.
-      const isNative = !originalRedirect.startsWith("http");
-
-      if (!isNative) {
-        setRefreshCookie(reply, result.tokens.refreshToken, options.env);
-        const callbackUrl = new URL(`${options.env.CORS_ORIGIN}/auth/callback`);
-        callbackUrl.searchParams.set("token", result.tokens.accessToken);
-        callbackUrl.searchParams.set("redirect", originalRedirect);
-        reply.redirect(callbackUrl.toString());
-      } else {
-        // Native app deep link
-        const callbackUrl = new URL(originalRedirect);
-        callbackUrl.searchParams.set("accessToken", result.tokens.accessToken);
-        callbackUrl.searchParams.set("refreshToken", result.tokens.refreshToken);
-        reply.redirect(callbackUrl.toString());
-      }
-    } catch (err) {
-      reply.redirect(`${options.env.CORS_ORIGIN}/login?error=auth_failed`);
-    }
-  });
 
   app.post("/login/passkey/generate", async (request, reply) => {
     const body = z.object({ email: emailSchema }).parse(request.body);
@@ -324,52 +261,6 @@ export async function authRoutes(app: FastifyInstance, options: AuthRoutesOption
     reply.status(204).send();
   });
 
-  app.post("/password-reset/request", {
-    config: {
-      rateLimit: {
-        max: 5,
-        timeWindow: "1 minute"
-      }
-    }
-  }, async (request) => {
-    const body = passwordResetRequestBodySchema.parse(request.body);
-    const result = await options.authService.requestPasswordReset(body.email, getRequestContext(request));
-    return {
-      message: "If an active account exists for that email, a reset link will be sent.",
-      ...result
-    };
-  });
-
-  app.post("/password-reset/passkey/verify", async (request, reply) => {
-    const expectedChallenge = request.cookies.passkeyLoginChallenge; // reused challenge cookie
-    if (!expectedChallenge) throw errors.badRequest("Missing passkey challenge");
-
-    const email = (request.query as any).email || (request.body as any).email;
-    if (!email) throw errors.badRequest("Missing email");
-
-    const result = await options.authService.verifyPasswordResetWithPasskey(email, request.body as any, expectedChallenge, getRequestContext(request));
-    
-    reply.clearCookie("passkeyLoginChallenge", {
-      httpOnly: true,
-      secure: options.env.COOKIE_SECURE,
-      sameSite: "lax",
-      path: "/auth/login/passkey"
-    });
-
-    reply.send(result);
-  });
-
-  app.post("/password-reset/2fa/verify", async (request, reply) => {
-    const body = z.object({ email: emailSchema, token: tokenSchema.shape.token }).parse(request.body);
-    const result = await options.authService.verifyPasswordResetWith2FA(body.email, body.token, getRequestContext(request));
-    reply.send(result);
-  });
-
-  app.post("/password-reset/confirm", async (request, reply) => {
-    const body = passwordResetConfirmBodySchema.parse(request.body);
-    await options.authService.confirmPasswordReset(body.token, body.newPassword, getRequestContext(request));
-    reply.status(204).send();
-  });
 
   app.post("/first-password", {
     preHandler: app.authenticate

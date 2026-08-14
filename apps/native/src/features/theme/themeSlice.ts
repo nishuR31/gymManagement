@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk, type PayloadAction } from "@reduxjs/tool
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Appearance } from "react-native";
 
-export type Theme = "light" | "dark";
+export type Theme = "light" | "dark" | "amoled";
 export type StyleMode = "minimal" | "glass" | "clay";
 
 export interface ThemeState {
@@ -25,7 +25,7 @@ export const loadThemeSettings = createAsyncThunk("theme/loadSettings", async ()
   const style = await AsyncStorage.getItem(STYLE_STORAGE_KEY);
   const systemTheme = Appearance.getColorScheme() === "dark" ? "dark" : "light";
   return {
-    theme: (theme === "light" || theme === "dark") ? theme : systemTheme,
+    theme: (theme === "light" || theme === "dark" || theme === "amoled") ? theme : systemTheme,
     styleMode: (style === "minimal" || style === "glass" || style === "clay") ? style : "minimal"
   };
 });

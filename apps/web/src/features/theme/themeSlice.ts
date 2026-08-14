@@ -1,6 +1,6 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
-export type Theme = "light" | "dark";
+export type Theme = "light" | "dark" | "amoled";
 export type StyleMode = "minimal" | "glass" | "clay";
 
 export interface ThemeState {
@@ -19,7 +19,7 @@ function getSystemTheme(): Theme {
 function getStoredTheme(): Theme | null {
   try {
     const v = localStorage.getItem(STORAGE_KEY);
-    return v === "light" || v === "dark" ? v : null;
+    return v === "light" || v === "dark" || v === "amoled" ? v : null;
   } catch {
     return null;
   }

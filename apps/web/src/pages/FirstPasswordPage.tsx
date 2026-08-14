@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowRight, BadgeCheck, Dumbbell, KeyRound, ShieldCheck } from "lucide-react";
+import { ArrowRight, BadgeCheck, Dumbbell, KeyRound, ShieldCheck, Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -79,9 +79,12 @@ export function FirstPasswordPage() {
             error={errors.confirmPassword?.message}
             {...register("confirmPassword")}
           />
-          <Button type="submit" disabled={isSubmitting || status === "loading"} className="mt-2 w-full">
-            {status === "loading" ? "Saving" : "Set Password"}
-            <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          <Button type="submit" disabled={isSubmitting || status === "loading"} className="mt-2 w-full h-11 btn-primary">
+            {status === "loading" ? (
+              <><Loader2 className="h-4 w-4 animate-spin" /> Saving</>
+            ) : (
+              <><ArrowRight className="h-4 w-4" aria-hidden="true" /> Set Password</>
+            )}
           </Button>
         </form>
         <div className="mt-6 grid gap-2 rounded-lg border border-border bg-surface/70 p-4 text-sm font-semibold text-muted-foreground">
