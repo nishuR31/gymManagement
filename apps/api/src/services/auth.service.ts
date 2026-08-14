@@ -17,7 +17,7 @@ import { addDays } from "../utils/dates.js";
 import { hashPassword, verifyPassword } from "../utils/password.js";
 import { createRefreshToken, hashRefreshToken } from "../utils/refresh-token.js";
 import { TokenService } from "./token.service.js";
-import { OAuth2Client } from "google-auth-library";
+
 export interface AuthTokens {
   accessToken: string;
   refreshToken: string;
@@ -163,102 +163,7 @@ export class AuthService {
     };
   }
 
-  public generateGoogleAuthUrl(redirect?: string): string {
-    if (!this.env.GOOGLE_CLIENT_ID || !this.env.GOOGLE_CLIENT_SECRET) {
-      throw errors.badRequest("Google Auth is not configured");
-    }
 
-    const client = new OAuth2Client(
-      this.env.GOOGLE_CLIENT_ID as string,
-      this.env.GOOGLE_CLIENT_SECRET as string,
-      this.env.GOOGLE_REDIRECT_URI as string
-    );
-
-    const state = redirect ? Buffer.from(JSON.stringify({ redirect })).toString("base64") : undefined;
-
-    const options: any = {
-      access_type: 'offline',
-      prompt: 'consent',
-      scope: ['https://www.googleapis.com/auth/userinfo.profile', 'https://www.googleapis.com/auth/userinfo.email'],
-    };
-    if (state) options.state = state;
-    return client.generateAuthUrl(options);
-  }
-
-  public async googleLogin(code: string, context: RequestContext): Promise<AuthResult> {
-    if (!this.env.GOOGLE_CLIENT_ID || !this.env.GOOGLE_CLIENT_SECRET) {
-      throw errors.badRequest("Google Auth is not configured");
-    }
-
-    const client = new OAuth2Client(
-      this.env.GOOGLE_CLIENT_ID as string,
-      this.env.GOOGLE_CLIENT_SECRET as string,
-      this.env.GOOGLE_REDIRECT_URI as string
-    );
-
-    const { tokens: googleTokens } = await client.getToken(code);
-    client.setCredentials(googleTokens);
-
-    if (!googleTokens.id_token) {
-      throw errors.unauthorized("Failed to retrieve ID token from Google");
-    }
-
-    const ticket = await client.verifyIdToken({
-      idToken: googleTokens.id_token as string,
-      audience: this.env.GOOGLE_CLIENT_ID as string
-    });
-    
-    const payload = ticket.getPayload();
-    if (!payload || !payload.email) {
-      throw errors.unauthorized("Invalid Google token");
-    }
-
-    const email = (payload.email as string).toLowerCase();
-    let user = await this.repository.findUserByEmail(email);
-
-    if (user) {
-      if (!user.isActive) {
-        throw errors.unauthorized("Invalid email or password"); // Or user disabled
-      }
-    } else {
-      // Register user
-      const passwordHash = await hashPassword(crypto.randomUUID());
-      const firstName = payload.given_name || "Google";
-      const lastName = payload.family_name || "User";
-      
-      user = await this.repository.createUser({
-        email,
-        passwordHash,
-        firstName,
-        lastName,
-        roleName: "MEMBER" // Default role for public signups
-      });
-
-      // We should ideally set googleId here, but the AuthRepository interface might not have it yet.
-      await this.repository.writeAuditLog({
-        userId: user.id,
-        action: "USER_REGISTERED_GOOGLE",
-        entity: "User",
-        entityId: user.id,
-        metadata: { role: "MEMBER" },
-        ...context
-      });
-    }
-
-    const tokens = await this.issueTokens(user, context);
-    await this.repository.writeAuditLog({
-      userId: user.id,
-      action: "AUTH_LOGIN_GOOGLE",
-      entity: "Session",
-      entityId: tokens.refreshToken.slice(0, 8),
-      ...context
-    });
-
-    return {
-      user: toUserDto(user),
-      tokens
-    };
-  }
 
   public async refresh(refreshToken: string, context: RequestContext): Promise<AuthResult> {
     const tokenHash = hashRefreshToken(refreshToken);
