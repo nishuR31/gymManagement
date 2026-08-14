@@ -13,18 +13,27 @@
     },
     "preview": {
       "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://gymmanagement-kejr.onrender.com"
+      },
       "android": {
         "buildType": "apk"
       }
     },
     "production-apk": {
       "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://gymmanagement-kejr.onrender.com"
+      },
       "android": {
         "buildType": "apk"
       }
     },
     "production": {
       "distribution": "store",
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://gymmanagement-kejr.onrender.com"
+      },
       "android": {
         "buildType": "app-bundle"
       }
