@@ -23,6 +23,11 @@
         "ACCESS_NETWORK_STATE",
         "POST_NOTIFICATIONS",
         "VIBRATE",
+        "RECEIVE_BOOT_COMPLETED",
+        "INTERNET",
+        "ACCESS_NETWORK_STATE",
+        "POST_NOTIFICATIONS",
+        "VIBRATE",
         "RECEIVE_BOOT_COMPLETED"
       ]
     },
@@ -40,6 +45,12 @@
         "projectId": "9317d332-0724-43a2-8e8b-eb862bb2efed"
       }
     },
-    "owner": "dream691"
+    "owner": "dream691",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/9317d332-0724-43a2-8e8b-eb862bb2efed"
+    }
   }
 }

@@ -38,11 +38,8 @@ const envSchema = z.object({
   COOKIE_SECURE: z.coerce.boolean().default(false),
   API_PORT: z.coerce.number().int().positive().default(4000),
   PASSKEY_EXPECTED_ORIGIN: z.string().url().default("http://localhost:5173"),
-  PASSKEY_RP_ID: z.string().default("localhost"),
-  PASSKEY_RP_NAME: z.string().default("ValorFitness"),
-  GOOGLE_CLIENT_ID: z.string().optional(),
-  GOOGLE_CLIENT_SECRET: z.string().optional(),
-  GOOGLE_REDIRECT_URI: z.string().default("http://localhost:4000/api/auth/google/callback")
+  PASSKEY_RP_ID: z.string().default("valor-fitness.vercel.app"),
+  PASSKEY_RP_NAME: z.string().default("ValorFitness")
 });
 
 export type Env = z.infer<typeof envSchema>;
