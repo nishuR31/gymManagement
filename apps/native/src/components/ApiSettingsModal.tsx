@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, Modal, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
-import { X, RefreshCw, Sun, Moon, HardDrive } from 'lucide-react-native';
+import { X, RefreshCw, Sun, Moon, MoonStar, HardDrive } from 'lucide-react-native';
 import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -18,7 +18,7 @@ export function ApiSettingsModal({ visible, onClose }: ApiSettingsModalProps) {
   const dispatch = useAppDispatch();
   const theme = useAppSelector((state) => state.theme.theme);
   const styleMode = useAppSelector((state) => state.theme.styleMode);
-  const activeColors = themeColors[theme === 'dark' ? 'dark' : 'light'];
+  const activeColors = themeColors[theme === 'dark' || theme === 'amoled' ? 'dark' : 'light'];
   
   const handleClearCache = async () => {
     try {
@@ -55,7 +55,7 @@ export function ApiSettingsModal({ visible, onClose }: ApiSettingsModalProps) {
               <View className="mb-6 p-4 rounded-xl border border-border bg-card shadow-sm">
                 <View className="flex-row items-center gap-3 mb-3">
                   <View className="p-2 bg-primary/10 rounded-md">
-                    {theme === 'dark' ? <Moon size={20} color={activeColors.primary} /> : <Sun size={20} color={activeColors.primary} />}
+                    {theme === 'amoled' ? <MoonStar size={20} color={activeColors.primary} /> : theme === 'dark' ? <Moon size={20} color={activeColors.primary} /> : <Sun size={20} color={activeColors.primary} />}
                   </View>
                   <Text className="text-lg font-bold text-foreground">Color Scheme</Text>
                 </View>
@@ -68,6 +68,11 @@ export function ApiSettingsModal({ visible, onClose }: ApiSettingsModalProps) {
                   </Button>
                   <Button variant={theme === "dark" ? "primary" : "secondary"} onPress={() => dispatch(setTheme("dark"))} className="flex-1 h-10">
                     <Text className={theme === "dark" ? "text-primary-foreground font-bold" : "text-foreground font-medium"}>Dark</Text>
+                  </Button>
+                </View>
+                <View className="flex-row gap-3 mt-2">
+                  <Button variant={theme === "amoled" ? "primary" : "secondary"} onPress={() => dispatch(setTheme("amoled"))} className="flex-1 h-10">
+                    <Text className={theme === "amoled" ? "text-primary-foreground font-bold" : "text-foreground font-medium"}>AMOLED (Beta)</Text>
                   </Button>
                 </View>
               </View>

@@ -1,20 +1,16 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ImageBackground, ScrollView, Dimensions, KeyboardAvoidingView, Platform, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, ImageBackground, ScrollView, Dimensions, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Dumbbell, ShieldCheck, Users, BarChart3, LockKeyhole, ArrowRight, ArrowLeft, Fingerprint, MessageSquare, Mail } from 'lucide-react-native';
 import Toast from 'react-native-toast-message';
-import Svg, { Path } from 'react-native-svg';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
-import { loginThunk, logoutThunk, setTokens, bootstrapAuthThunk } from '../features/auth/authSlice';
+import { loginThunk, logoutThunk } from '../features/auth/authSlice';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { setRefreshToken } from '../services/api';
-import * as WebBrowser from 'expo-web-browser';
-import * as Linking from 'expo-linking';
 import { APP_NAME } from '../utils/env';
 import { themeColors } from '../constants/colors';
 
@@ -33,7 +29,7 @@ type AuthStep = "email" | "password" | "2fa" | "otp" | "magic-link";
 export function LoginScreen({ navigation }: any) {
   const dispatch = useAppDispatch();
   const theme = useAppSelector((state) => state.theme.theme);
-  const activeColors = themeColors[theme === 'dark' ? 'dark' : 'light'];
+  const activeColors = themeColors[theme === 'amoled' ? 'amoled' : theme === 'dark' ? 'dark' : 'light'];
 
   const [step, setStep] = useState<AuthStep>("email");
   const [email, setEmail] = useState("");
@@ -48,7 +44,7 @@ export function LoginScreen({ navigation }: any) {
     setIsSimulating(true);
     const result = await dispatch(loginThunk({ email: email || "admin@example.com", password: pass || "adminpassword" }));
     setIsSimulating(false);
-    
+
     if (loginThunk.fulfilled.match(result)) {
       if (result.payload.user.role === "MEMBER") {
         await dispatch(logoutThunk());
@@ -75,48 +71,8 @@ export function LoginScreen({ navigation }: any) {
   const handlePassNext = (v: PasswordFormValues) => { onFinalLogin(v.password); };
   const handleCodeSubmit = (v: CodeFormValues) => { onFinalLogin(passwordCache, v.code); };
 
-  const handleOAuth = async (provider: string) => {
-    if (provider !== 'google') return;
-    try {
-      setIsSimulating(true);
-      const redirectUrl = Linking.createURL('/auth/callback');
-      const authUrl = `http://localhost:4000/api/auth/google?redirect=${encodeURIComponent(redirectUrl)}`;
-
-      const result = await WebBrowser.openAuthSessionAsync(authUrl, redirectUrl);
-
-      if (result.type === 'success' && result.url) {
-        const urlObj = new URL(result.url);
-        const accessToken = urlObj.searchParams.get('accessToken');
-        const refreshToken = urlObj.searchParams.get('refreshToken');
-        
-        if (accessToken && refreshToken) {
-          await setRefreshToken(refreshToken);
-          dispatch(setTokens({ accessToken }));
-          
-          const bootstrapResult = await dispatch(bootstrapAuthThunk());
-          
-          if (bootstrapAuthThunk.fulfilled.match(bootstrapResult)) {
-            if (bootstrapResult.payload.user.role === "MEMBER") {
-              await dispatch(logoutThunk());
-              Toast.show({ type: 'error', text1: "Use member login for member access" });
-              navigation.navigate("MemberLogin");
-              return;
-            }
-            Toast.show({ type: 'success', text1: "Signed in securely" });
-            navigation.replace("Dashboard");
-            return;
-          }
-        }
-        Toast.show({ type: 'error', text1: "Google Auth failed or missing tokens" });
-      }
-    } catch (e: any) {
-      Toast.show({ type: 'error', text1: e.message || "Google Auth failed" });
-    } finally {
-      setIsSimulating(false);
-    }
-  };
   const handlePasskey = () => { Toast.show({ type: 'success', text1: "Prompting for Passkey..." }); setTimeout(() => onFinalLogin(), 1500); };
-  const handleMagicLink = () => { setStep("magic-link"); Toast.show({ type: 'success', text1: "Magic link sent to " + email }); };
+  // const handleMagicLink = () => { setStep("magic-link"); Toast.show({ type: 'success', text1: "Magic link sent to " + email }); };
   const handleSendOTP = () => { setStep("otp"); Toast.show({ type: 'success', text1: "OTP sent to " + email }); };
 
   const renderStep = () => {
@@ -132,7 +88,7 @@ export function LoginScreen({ navigation }: any) {
               <ArrowRight size={16} color={activeColors.primaryForeground} />
             </Button>
           </View>
-          
+
           <View className="relative flex-row items-center justify-center my-2">
             <View className="absolute inset-0 flex-row items-center justify-center">
               <View className="flex-1 h-[1px] bg-border" />
@@ -172,7 +128,7 @@ export function LoginScreen({ navigation }: any) {
               <ArrowRight size={16} color={activeColors.primaryForeground} />
             </Button>
           </View>
-          
+
           <View className="gap-3 pt-4 border-t border-border mt-2">
             <Button variant="outline" onPress={handleSendOTP} className="w-full h-11">
               <MessageSquare size={16} color={activeColors.foreground} />
@@ -258,7 +214,7 @@ export function LoginScreen({ navigation }: any) {
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} className={`flex-1 items-center justify-center bg-card ${isTablet ? 'border-l border-border max-w-[500px]' : ''}`}>
         <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }} className="w-full" keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets={true}>
           <SafeAreaView className="w-full px-8 py-12 max-w-[450px] self-center">
-            
+
             <View className="mb-8">
               <TouchableOpacity onPress={() => navigation.navigate("Home")} className="flex-row items-center gap-2 mb-6">
                 <ArrowLeft size={16} color={activeColors.mutedForeground} />

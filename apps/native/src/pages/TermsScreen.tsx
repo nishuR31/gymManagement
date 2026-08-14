@@ -10,7 +10,7 @@ import { APP_NAME } from '../utils/env';
 export function TermsScreen() {
   const navigation = useNavigation<any>();
   const theme = useAppSelector((state) => state.theme.theme);
-  const activeColors = themeColors[theme === 'dark' ? 'dark' : 'light'];
+  const activeColors = themeColors[theme === 'amoled' ? 'amoled' : theme === 'dark' ? 'dark' : 'light'];
 
   return (
     <SafeAreaView className="flex-1 bg-background" edges={['top', 'left', 'right']}>

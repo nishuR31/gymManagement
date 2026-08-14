@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { AuthUserDto } from "@gym/shared";
-import { setAccessToken } from "../../services/api";
+import { setAccessToken, clearRefreshToken } from "../../services/api";
 import { getApiErrorCode } from "../../utils/apiError";
 import * as authApi from "./authApi";
 
@@ -59,7 +59,6 @@ export const bootstrapAuthThunk = createAsyncThunk("auth/bootstrap", async () =>
 
 export const logoutThunk = createAsyncThunk("auth/logout", async () => {
   await authApi.logout();
-  const { clearRefreshToken } = require("../../services/api");
   await clearRefreshToken();
 });
 

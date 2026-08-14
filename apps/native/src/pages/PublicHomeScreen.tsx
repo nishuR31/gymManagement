@@ -41,7 +41,7 @@ import { themeColors } from '../constants/colors';
 export function PublicHomeScreen() {
   const navigation = useNavigation<any>();
   const theme = useAppSelector((state) => state.theme.theme);
-  const activeColors = themeColors[theme === 'dark' ? 'dark' : 'light'];
+  const activeColors = themeColors[theme === 'amoled' ? 'amoled' : theme === 'dark' ? 'dark' : 'light'];
   
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 

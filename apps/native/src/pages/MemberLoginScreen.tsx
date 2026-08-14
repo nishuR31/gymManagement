@@ -31,7 +31,7 @@ export function MemberLoginScreen() {
   const dispatch = useAppDispatch();
   const navigation = useNavigation<any>();
   const theme = useAppSelector((state) => state.theme.theme);
-  const activeColors = themeColors[theme === 'dark' ? 'dark' : 'light'];
+  const activeColors = themeColors[theme === 'amoled' ? 'amoled' : theme === 'dark' ? 'dark' : 'light'];
 
   const [step, setStep] = useState<AuthStep>("email");
   const [email, setEmail] = useState("");

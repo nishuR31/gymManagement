@@ -13,7 +13,7 @@ import { formatCents } from '../utils/format';
 
 export function ReportsScreen() {
   const theme = useAppSelector((state) => state.theme.theme);
-  const activeColors = themeColors[theme === 'dark' ? 'dark' : 'light'];
+  const activeColors = themeColors[theme === 'amoled' ? 'amoled' : theme === 'dark' ? 'dark' : 'light'];
 
   const [financials, setFinancials] = useState<FinancialSummaryDto | null>(null);
   const [memberStats, setMemberStats] = useState<MembershipStatsDto | null>(null);

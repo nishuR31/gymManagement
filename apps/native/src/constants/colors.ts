@@ -12,5 +12,12 @@ export const themeColors = {
     background: '#0c0a09',
     foreground: '#fafaf9',
     mutedForeground: '#a8a29e',
+  },
+  amoled: {
+    primary: '#a77d35',
+    primaryForeground: '#ffffff',
+    background: '#000000',
+    foreground: '#fafaf9',
+    mutedForeground: '#a8a29e',
   }
 };

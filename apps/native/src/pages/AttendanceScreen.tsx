@@ -16,7 +16,7 @@ import { formatDateTime } from '../utils/format';
 
 export function AttendanceScreen() {
   const theme = useAppSelector((state) => state.theme.theme);
-  const activeColors = themeColors[theme === 'dark' ? 'dark' : 'light'];
+  const activeColors = themeColors[theme === 'amoled' ? 'amoled' : theme === 'dark' ? 'dark' : 'light'];
 
   const [currentAttendances, setCurrentAttendances] = useState<AttendanceDto[]>([]);
   const [dailyStats, setDailyStats] = useState<DailyAttendanceDto | null>(null);

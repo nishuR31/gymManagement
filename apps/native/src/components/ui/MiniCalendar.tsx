@@ -7,7 +7,7 @@ import { themeColors } from '../../constants/colors';
 export function MiniCalendar() {
   const [time, setTime] = useState(new Date());
   const theme = useAppSelector((state) => state.theme.theme);
-  const activeColors = themeColors[theme === 'dark' ? 'dark' : 'light'];
+  const activeColors = themeColors[theme === 'amoled' ? 'amoled' : theme === 'dark' ? 'dark' : 'light'];
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);

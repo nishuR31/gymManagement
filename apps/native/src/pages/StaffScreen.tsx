@@ -15,7 +15,7 @@ import { formatDateTime } from '../utils/format';
 
 export function StaffScreen() {
   const theme = useAppSelector((state) => state.theme.theme);
-  const activeColors = themeColors[theme === 'dark' ? 'dark' : 'light'];
+  const activeColors = themeColors[theme === 'amoled' ? 'amoled' : theme === 'dark' ? 'dark' : 'light'];
 
   const [staff, setStaff] = useState<StaffDto[]>([]);
   const [search, setSearch] = useState("");

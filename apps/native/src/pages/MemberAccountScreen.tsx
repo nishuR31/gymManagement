@@ -24,7 +24,7 @@ export function MemberAccountScreen({ route }: any) {
   const mode: MemberAccountMode = route?.params?.mode ?? 'profile';
 
   const theme = useAppSelector((state) => state.theme.theme);
-  const activeColors = themeColors[theme === 'dark' ? 'dark' : 'light'];
+  const activeColors = themeColors[theme === 'amoled' ? 'amoled' : theme === 'dark' ? 'dark' : 'light'];
 
   const [member, setMember] = useState<MemberDto | null>(null);
   const [subscriptions, setSubscriptions] = useState<MembershipSubscriptionDto[]>([]);

@@ -15,7 +15,7 @@ import { formatDateTime } from '../utils/format';
 
 export function MembersScreen() {
   const theme = useAppSelector((state) => state.theme.theme);
-  const activeColors = themeColors[theme === 'dark' ? 'dark' : 'light'];
+  const activeColors = themeColors[theme === 'amoled' ? 'amoled' : theme === 'dark' ? 'dark' : 'light'];
 
   const [members, setMembers] = useState<MemberDto[]>([]);
   const [search, setSearch] = useState("");

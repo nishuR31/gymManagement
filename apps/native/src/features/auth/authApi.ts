@@ -1,4 +1,5 @@
 import type { AuthUserDto } from "@gym/shared";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { api } from "../../services/api";
 
 export interface LoginPayload {
@@ -56,7 +57,6 @@ export async function getCurrentUser(): Promise<AuthUserDto> {
 }
 
 export async function logout(): Promise<void> {
-  const AsyncStorage = require('@react-native-async-storage/async-storage').default;
   const storedRefreshToken = await AsyncStorage.getItem('@refresh_token');
   const headers: any = {};
   if (storedRefreshToken) {

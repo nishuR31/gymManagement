@@ -13,7 +13,7 @@ interface EmptyStateProps {
 
 export function EmptyState({ title, description, icon: Icon = Inbox, action }: EmptyStateProps) {
   const theme = useAppSelector((state) => state.theme.theme);
-  const activeColors = themeColors[theme === 'dark' ? 'dark' : 'light'];
+  const activeColors = themeColors[theme === 'amoled' ? 'amoled' : theme === 'dark' ? 'dark' : 'light'];
 
   return (
     <View className="flex min-h-[128px] items-center justify-center rounded-md border border-dashed border-border bg-surface/75 px-4 py-8">

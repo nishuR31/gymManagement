@@ -42,7 +42,7 @@ type AssignFormValues = z.infer<typeof assignSchema>;
 
 export function MembershipsScreen() {
   const theme = useAppSelector((state) => state.theme.theme);
-  const activeColors = themeColors[theme === 'dark' ? 'dark' : 'light'];
+  const activeColors = themeColors[theme === 'amoled' ? 'amoled' : theme === 'dark' ? 'dark' : 'light'];
 
   const [plans, setPlans] = useState<MembershipPlanDto[]>([]);
   const [subscriptions, setSubscriptions] = useState<MembershipSubscriptionDto[]>([]);

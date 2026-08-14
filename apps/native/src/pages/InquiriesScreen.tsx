@@ -15,7 +15,7 @@ import { formatDateTime } from '../utils/format';
 
 export function InquiriesScreen() {
   const theme = useAppSelector((state) => state.theme.theme);
-  const activeColors = themeColors[theme === 'dark' ? 'dark' : 'light'];
+  const activeColors = themeColors[theme === 'amoled' ? 'amoled' : theme === 'dark' ? 'dark' : 'light'];
 
   const [inquiries, setInquiries] = useState<PublicInquiryDto[]>([]);
   const [search, setSearch] = useState("");

@@ -20,7 +20,7 @@ type EditableTemplate = WorkoutPlanTemplateDto | DietPlanTemplateDto | null;
 export function PlansScreen() {
   const user = useAppSelector((state) => state.auth.user);
   const theme = useAppSelector((state) => state.theme.theme);
-  const activeColors = themeColors[theme === 'dark' ? 'dark' : 'light'];
+  const activeColors = themeColors[theme === 'amoled' ? 'amoled' : theme === 'dark' ? 'dark' : 'light'];
 
   const [workouts, setWorkouts] = useState<WorkoutPlanTemplateDto[]>([]);
   const [diets, setDiets] = useState<DietPlanTemplateDto[]>([]);

@@ -11,7 +11,7 @@ export function FloatingDock() {
   const route = useRoute();
   const theme = useAppSelector((state) => state.theme.theme);
   const user = useAppSelector((state) => state.auth.user);
-  const activeColors = themeColors[theme === 'dark' ? 'dark' : 'light'];
+  const activeColors = themeColors[theme === 'amoled' ? 'amoled' : theme === 'dark' ? 'dark' : 'light'];
   
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 

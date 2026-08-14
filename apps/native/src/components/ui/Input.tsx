@@ -13,7 +13,7 @@ interface InputProps extends TextInputProps {
 export function Input({ label, error, className, secureTextEntry, ...props }: InputProps) {
   const styleMode = useAppSelector((state) => state.theme.styleMode);
   const theme = useAppSelector((state) => state.theme.theme);
-  const activeColors = themeColors[theme === 'dark' ? 'dark' : 'light'];
+  const activeColors = themeColors[theme === 'amoled' ? 'amoled' : theme === 'dark' ? 'dark' : 'light'];
   
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   

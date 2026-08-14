@@ -48,16 +48,13 @@ function RootApp() {
   const activeColors = themeColors[theme === 'dark' || theme === 'amoled' ? 'dark' : 'light'];
 
   useEffect(() => {
-    loadApiBaseUrl().then(() => {
-      dispatch(loadThemeSettings());
-      dispatch(bootstrapAuthThunk());
-    });
+    loadApiBaseUrl()
+      .catch(() => console.warn("Failed to load API base URL, using default"))
+      .finally(() => {
+        dispatch(loadThemeSettings());
+        dispatch(bootstrapAuthThunk());
+      });
   }, [dispatch]);
-
-  // Temporarily isolate notification initialization during debugging
-  useEffect(() => {
-    // registerForPushNotificationsAsync();
-  }, []);
 
   if (!isLoaded) {
     return (

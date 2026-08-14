@@ -26,16 +26,7 @@
         "RECEIVE_BOOT_COMPLETED"
       ]
     },
-    "plugins": [
-      [
-        "expo-notifications",
-        {
-          "icon": "./assets/android-icon-foreground.png",
-          "color": "#6366f1"
-        }
-      ],
-      "expo-web-browser"
-    ],
+    "plugins": [],
     "extra": {
       "eas": {
         "projectId": "9317d332-0724-43a2-8e8b-eb862bb2efed"

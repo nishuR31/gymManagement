@@ -10,7 +10,7 @@ export function PublicFloatingDock() {
   const route = useRoute();
   const theme = useAppSelector((state) => state.theme.theme);
   const styleMode = useAppSelector((state) => state.theme.styleMode);
-  const activeColors = themeColors[theme === 'dark' ? 'dark' : 'light'];
+  const activeColors = themeColors[theme === 'amoled' ? 'amoled' : theme === 'dark' ? 'dark' : 'light'];
   
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const currentRoute = route.name;

@@ -16,7 +16,7 @@ export function DashboardScreen({ navigation }: any) {
   const theme = useAppSelector((state) => state.theme.theme);
   const dispatch = useAppDispatch();
 
-  const activeColors = themeColors[theme === 'dark' ? 'dark' : 'light'];
+  const activeColors = themeColors[theme === 'amoled' ? 'amoled' : theme === 'dark' ? 'dark' : 'light'];
 
   const handleLogout = () => {
     dispatch(logoutThunk());

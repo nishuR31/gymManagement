@@ -15,7 +15,7 @@ import { formatCents, formatDateTime } from '../utils/format';
 
 export function OrdersScreen() {
   const theme = useAppSelector((state) => state.theme.theme);
-  const activeColors = themeColors[theme === 'dark' ? 'dark' : 'light'];
+  const activeColors = themeColors[theme === 'amoled' ? 'amoled' : theme === 'dark' ? 'dark' : 'light'];
 
   const [orders, setOrders] = useState<ProductOrderDto[]>([]);
   const [search, setSearch] = useState("");
