@@ -41,15 +41,17 @@ export class SettingsService {
   public async update(key: string, value: unknown, actor: RequestActor, context: RequestContext): Promise<SettingDto> {
     ensureAdminOrAbove(actor.role);
     const setting = await this.repository.upsert(key, value, actor.id);
-    await this.auditWriter.writeAuditLog({
+    await Promise.all([
+      this.auditWriter.writeAuditLog({
       userId: actor.id,
       action: "SETTING_UPDATED",
       entity: "Setting",
       entityId: key,
       metadata: { key },
       ...context
-    });
-    await invalidateDashboardAndReports(this.dashboardReportCache);
+    }),
+      invalidateDashboardAndReports(this.dashboardReportCache)
+    ]);
     return toSettingDto(setting);
   }
 }

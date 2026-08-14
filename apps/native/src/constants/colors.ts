@@ -5,6 +5,12 @@ export const themeColors = {
     background: '#f6f2e9',
     foreground: '#0c0a09',
     mutedForeground: '#78716c',
+    card: '#ffffff',
+    border: '#e7e4de',
+    secondary: '#f5f5f0',
+    destructive: '#ef4444',
+    warning: '#f59e0b',
+    success: '#22c55e',
   },
   dark: {
     primary: '#a77d35',
@@ -12,6 +18,12 @@ export const themeColors = {
     background: '#0c0a09',
     foreground: '#fafaf9',
     mutedForeground: '#a8a29e',
+    card: '#1c1917',
+    border: '#292524',
+    secondary: '#262120',
+    destructive: '#ef4444',
+    warning: '#f59e0b',
+    success: '#22c55e',
   },
   amoled: {
     primary: '#a77d35',
@@ -19,5 +31,11 @@ export const themeColors = {
     background: '#000000',
     foreground: '#fafaf9',
     mutedForeground: '#a8a29e',
+    card: '#080808',
+    border: '#1a1a1a',
+    secondary: '#0d0d0d',
+    destructive: '#ef4444',
+    warning: '#f59e0b',
+    success: '#22c55e',
   }
 };

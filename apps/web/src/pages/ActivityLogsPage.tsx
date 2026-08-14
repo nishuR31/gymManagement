@@ -73,7 +73,7 @@ export function ActivityLogsPage() {
         {loading ? <SkeletonRows /> : null}
         {!loading && (logs?.data.length ?? 0) === 0 ? <EmptyState title="No activity found" /> : null}
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
+          <table className="min-w-[800px] w-full text-left text-sm">
             <thead className="text-xs uppercase text-muted-foreground">
               <tr>
                 <th className="px-3 py-2">Action</th>

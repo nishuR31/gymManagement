@@ -22,7 +22,7 @@ export function Toaster({ ...props }: ToasterProps) {
       toastOptions={{
         classNames: {
           toast:
-            "group toast group-[.toaster]:card-base group-[.toaster]:shadow-lg group-[.toaster]:p-4 group-[.toaster]:flex group-[.toaster]:gap-3 group-[.toaster]:w-full group-[.toaster]:items-start",
+            "group toast group-[.toaster]:shadow-lg group-[.toaster]:p-4 group-[.toaster]:flex group-[.toaster]:gap-3 group-[.toaster]:items-start group-[.toaster]:rounded-xl group-[.toaster]:border group-[.toaster]:bg-background group-[.toaster]:text-foreground",
           description: "group-[.toast]:text-muted-foreground",
           actionButton: "group-[.toast]:btn-primary group-[.toast]:h-8 group-[.toast]:px-3 group-[.toast]:text-xs",
           cancelButton: "group-[.toast]:btn-secondary group-[.toast]:h-8 group-[.toast]:px-3 group-[.toast]:text-xs",

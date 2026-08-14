@@ -49,9 +49,11 @@ export interface AttendanceRepository {
   findById(id: string): Promise<AttendanceRecord | null>;
   closeAttendance(input: CloseAttendanceInput): Promise<AttendanceRecord>;
   listCurrent(): Promise<AttendanceRecord[]>;
+  countCurrent(): Promise<number>;
   countOpenForMember(memberId: string): Promise<number>;
   findOpenBefore(cutoff: Date): Promise<AttendanceRecord[]>;
   getAttendanceForDate(startInclusive: Date, endExclusive: Date): Promise<AttendanceRecord[]>;
+  countAttendanceForDate(startInclusive: Date, endExclusive: Date): Promise<number>;
   listForMember(memberId: string, page: number, pageSize: number): Promise<{ attendances: AttendanceRecord[]; total: number }>;
   countByCheckInDay(startInclusive: Date, endExclusive: Date): Promise<{ date: string; count: number }[]>;
 }
@@ -112,6 +114,12 @@ export class PrismaAttendanceRepository implements AttendanceRepository {
     return rows.map(toAttendanceRecord);
   }
 
+  public async countCurrent(): Promise<number> {
+    return this.prisma.attendance.count({
+      where: { checkOutAt: null }
+    });
+  }
+
   public async countOpenForMember(memberId: string): Promise<number> {
     return this.prisma.attendance.count({
       where: { memberId, checkOutAt: null }
@@ -142,6 +150,17 @@ export class PrismaAttendanceRepository implements AttendanceRepository {
       orderBy: { checkInAt: "asc" }
     });
     return rows.map(toAttendanceRecord);
+  }
+
+  public async countAttendanceForDate(startInclusive: Date, endExclusive: Date): Promise<number> {
+    return this.prisma.attendance.count({
+      where: {
+        checkInAt: {
+          gte: startInclusive,
+          lt: endExclusive
+        }
+      }
+    });
   }
 
   public async listForMember(

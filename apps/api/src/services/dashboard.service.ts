@@ -36,46 +36,51 @@ export class DashboardService {
       return cached;
     }
 
-    const now = this.clock();
-    const todayStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-    const tomorrowStart = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000);
-    const [
-      currentAttendance,
-      todaysAttendance,
-      todaysRevenueEvents,
-      monthlyRevenueEvents,
-      pendingDues,
-      expiring,
-      recentPayments,
-      lowStock,
-      recentActivity
-    ] = await Promise.all([
-      this.attendanceRepository.listCurrent(),
-      this.attendanceRepository.getAttendanceForDate(todayStart, tomorrowStart),
-      this.paymentRepository.listRevenueEvents("daily", now),
-      this.paymentRepository.listRevenueEvents("monthly", now),
-      this.paymentRepository.listPendingDues(),
-      this.membershipRepository.listExpiringSoon(now, new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)),
-      this.paymentRepository.listRecentPayments(8),
-      this.inventoryRepository.listLowStock(),
-      this.activityLogRepository.recent(10)
-    ]);
+    try {
+      const now = this.clock();
+      const todayStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+      const tomorrowStart = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000);
+      const [
+        currentAttendance,
+        todaysAttendance,
+        todaysRevenueEvents,
+        monthlyRevenueEvents,
+        pendingDues,
+        expiring,
+        recentPayments,
+        lowStock,
+        recentActivity
+      ] = await Promise.all([
+        this.attendanceRepository.countCurrent(),
+        this.attendanceRepository.countAttendanceForDate(todayStart, tomorrowStart),
+        this.paymentRepository.sumRevenueEvents("daily", now),
+        this.paymentRepository.sumRevenueEvents("monthly", now),
+        this.paymentRepository.summarizePendingDues(),
+        this.membershipRepository.listExpiringSoon(now, new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)),
+        this.paymentRepository.listRecentPayments(8),
+        this.inventoryRepository.listLowStock(),
+        this.activityLogRepository.recent(10)
+      ]);
 
-    const result: DashboardSummaryDto = {
-      membersCurrentlyInGym: currentAttendance.length,
-      todaysAttendance: todaysAttendance.length,
-      todaysRevenueCents: todaysRevenueEvents.reduce((total, event) => total + event.amountCents, 0),
-      monthlyRevenueCents: monthlyRevenueEvents.reduce((total, event) => total + event.amountCents, 0),
-      pendingDuesCents: pendingDues.reduce((total, invoice) => total + invoice.remainingCents, 0),
-      pendingDuesCount: pendingDues.length,
-      membershipsExpiringSoon: expiring.map(toSubscriptionDto),
-      recentPayments: recentPayments.map(toPaymentDto),
-      lowStockAlerts: lowStock.map(toProductDto),
-      recentActivity: recentActivity.map(toAuditLogDto)
-    };
+      const result: DashboardSummaryDto = {
+        membersCurrentlyInGym: currentAttendance,
+        todaysAttendance: todaysAttendance,
+        todaysRevenueCents: todaysRevenueEvents,
+        monthlyRevenueCents: monthlyRevenueEvents,
+        pendingDuesCents: pendingDues.totalCents,
+        pendingDuesCount: pendingDues.count,
+        membershipsExpiringSoon: expiring.map(toSubscriptionDto),
+        recentPayments: recentPayments.map(toPaymentDto),
+        lowStockAlerts: lowStock.map(toProductDto),
+        recentActivity: recentActivity.map(toAuditLogDto)
+      };
 
-    await this.cache.set(cacheKey, result);
-    return result;
+      await this.cache.set(cacheKey, result);
+      return result;
+    } catch (error) {
+      console.error("[DashboardService] Error generating summary:", error);
+      throw new Error("Failed to generate dashboard summary");
+    }
   }
 }
 

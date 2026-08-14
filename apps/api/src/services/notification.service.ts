@@ -31,15 +31,17 @@ export class NotificationService {
       title: notification.title,
       category: notification.category
     });
-    await this.auditWriter.writeAuditLog({
+    await Promise.all([
+      this.auditWriter.writeAuditLog({
       userId: actor.id,
       action: "NOTIFICATION_CREATED",
       entity: "Notification",
       entityId: notification.id,
       metadata: { targetUserId: notification.userId, category: notification.category, priority: notification.priority },
       ...context
-    });
-    await invalidateDashboardAndReports(this.dashboardReportCache);
+    }),
+      invalidateDashboardAndReports(this.dashboardReportCache)
+    ]);
     return toNotificationDto(notification);
   }
 
@@ -71,14 +73,16 @@ export class NotificationService {
       throw errors.forbidden();
     }
     const notification = await this.repository.markRead(id, this.clock());
-    await this.auditWriter.writeAuditLog({
+    await Promise.all([
+      this.auditWriter.writeAuditLog({
       userId: actor.id,
       action: "NOTIFICATION_READ",
       entity: "Notification",
       entityId: notification.id,
       ...context
-    });
-    await invalidateDashboardAndReports(this.dashboardReportCache);
+    }),
+      invalidateDashboardAndReports(this.dashboardReportCache)
+    ]);
     return toNotificationDto(notification);
   }
 }

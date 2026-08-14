@@ -9,7 +9,7 @@ interface CardProps {
 
 export function Card({ title, action, children, className = "" }: CardProps) {
   return (
-    <div className={`card-base ${className}`}>
+    <div className={`card-base min-w-0 ${className}`}>
       {title || action ? (
         <div className="flex items-center justify-between gap-3 border-b px-6 py-4">
           {title ? <h3 className="text-lg font-semibold leading-none tracking-tight">{title}</h3> : <span />}

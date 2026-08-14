@@ -35,7 +35,7 @@ export function CardHeader({ children, className, ...props }: CardProps) {
 
 export function CardTitle({ children, className, ...props }: TextProps & { children: React.ReactNode, className?: string }) {
   return (
-    <Text className={`text-2xl font-semibold leading-none tracking-tight text-foreground ${className || ''}`} {...props}>
+    <Text className={`text-lg font-bold leading-tight tracking-tight text-foreground ${className || ''}`} {...props}>
       {children}
     </Text>
   );

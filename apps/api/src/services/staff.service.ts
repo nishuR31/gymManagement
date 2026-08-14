@@ -53,8 +53,10 @@ export class StaffService {
       throw errors.badRequest("Staff profile user must have ADMIN or STAFF role");
     }
     const profile = await this.staffRepository.createProfile(input);
-    await this.auditWriter.writeAuditLog({ userId: actor.id, action: "STAFF_PROFILE_CREATED", entity: "StaffProfile", entityId: profile.id, ...context });
-    await invalidateDashboardAndReports(this.dashboardReportCache);
+    await Promise.all([
+      this.auditWriter.writeAuditLog({ userId: actor.id, action: "STAFF_PROFILE_CREATED", entity: "StaffProfile", entityId: profile.id, ...context }),
+      invalidateDashboardAndReports(this.dashboardReportCache)
+    ]);
     return toStaffProfileDto(profile, true);
   }
 
@@ -73,8 +75,10 @@ export class StaffService {
   ): Promise<StaffProfileDto> {
     ensureAdminOrAbove(actor.role);
     const profile = await this.staffRepository.updateProfile(id, input);
-    await this.auditWriter.writeAuditLog({ userId: actor.id, action: "STAFF_PROFILE_UPDATED", entity: "StaffProfile", entityId: profile.id, ...context });
-    await invalidateDashboardAndReports(this.dashboardReportCache);
+    await Promise.all([
+      this.auditWriter.writeAuditLog({ userId: actor.id, action: "STAFF_PROFILE_UPDATED", entity: "StaffProfile", entityId: profile.id, ...context }),
+      invalidateDashboardAndReports(this.dashboardReportCache)
+    ]);
     return toStaffProfileDto(profile, true);
   }
 
@@ -118,14 +122,16 @@ export class StaffService {
     await this.ensureCanManageStaffAttendance(staffProfileId, actor);
     try {
       const attendance = await this.staffRepository.createOpenAttendance({ staffProfileId, checkInAt: this.clock() });
-      await this.auditWriter.writeAuditLog({
+      await Promise.all([
+      this.auditWriter.writeAuditLog({
         userId: actor.id,
         action: "STAFF_ATTENDANCE_CHECKED_IN",
         entity: "StaffAttendance",
         entityId: attendance.id,
         ...context
-      });
-      await invalidateDashboardAndReports(this.dashboardReportCache);
+      }),
+      invalidateDashboardAndReports(this.dashboardReportCache)
+    ]);
       return toStaffAttendanceDto(attendance);
     } catch (error: unknown) {
       if (error instanceof DuplicateOpenStaffAttendanceError) {
@@ -144,14 +150,16 @@ export class StaffService {
     const checkOutAt = this.clock();
     const durationMinutes = Math.max(0, Math.round((checkOutAt.getTime() - attendance.checkInAt.getTime()) / 60000));
     const closed = await this.staffRepository.closeAttendance({ id: attendance.id, checkOutAt, durationMinutes });
-    await this.auditWriter.writeAuditLog({
+    await Promise.all([
+      this.auditWriter.writeAuditLog({
       userId: actor.id,
       action: "STAFF_ATTENDANCE_CHECKED_OUT",
       entity: "StaffAttendance",
       entityId: closed.id,
       ...context
-    });
-    await invalidateDashboardAndReports(this.dashboardReportCache);
+    }),
+      invalidateDashboardAndReports(this.dashboardReportCache)
+    ]);
     return toStaffAttendanceDto(closed);
   }
 
@@ -179,8 +187,10 @@ export class StaffService {
   ): Promise<LeaveRequestDto> {
     await this.ensureCanManageOwnStaffRecord(input.staffProfileId, actor);
     const request = await this.staffRepository.createLeaveRequest(input);
-    await this.auditWriter.writeAuditLog({ userId: actor.id, action: "LEAVE_REQUEST_CREATED", entity: "LeaveRequest", entityId: request.id, ...context });
-    await invalidateDashboardAndReports(this.dashboardReportCache);
+    await Promise.all([
+      this.auditWriter.writeAuditLog({ userId: actor.id, action: "LEAVE_REQUEST_CREATED", entity: "LeaveRequest", entityId: request.id, ...context }),
+      invalidateDashboardAndReports(this.dashboardReportCache)
+    ]);
     return toLeaveRequestDto(request);
   }
 
@@ -192,8 +202,10 @@ export class StaffService {
   ): Promise<LeaveRequestDto> {
     ensureAdminOrAbove(actor.role);
     const request = await this.staffRepository.reviewLeaveRequest({ id, status, reviewedBy: actor.id, reviewedAt: this.clock() });
-    await this.auditWriter.writeAuditLog({ userId: actor.id, action: "LEAVE_REQUEST_REVIEWED", entity: "LeaveRequest", entityId: request.id, metadata: { status }, ...context });
-    await invalidateDashboardAndReports(this.dashboardReportCache);
+    await Promise.all([
+      this.auditWriter.writeAuditLog({ userId: actor.id, action: "LEAVE_REQUEST_REVIEWED", entity: "LeaveRequest", entityId: request.id, metadata: { status }, ...context }),
+      invalidateDashboardAndReports(this.dashboardReportCache)
+    ]);
     return toLeaveRequestDto(request);
   }
 
@@ -214,8 +226,10 @@ export class StaffService {
   ): Promise<WorkoutPlanTemplateDto> {
     ensureTrainerOrAdmin(actor.role);
     const template = await this.staffRepository.createWorkoutTemplate(input);
-    await this.auditWriter.writeAuditLog({ userId: actor.id, action: "WORKOUT_TEMPLATE_CREATED", entity: "WorkoutPlanTemplate", entityId: template.id, ...context });
-    await invalidateDashboardAndReports(this.dashboardReportCache);
+    await Promise.all([
+      this.auditWriter.writeAuditLog({ userId: actor.id, action: "WORKOUT_TEMPLATE_CREATED", entity: "WorkoutPlanTemplate", entityId: template.id, ...context }),
+      invalidateDashboardAndReports(this.dashboardReportCache)
+    ]);
     return toWorkoutTemplateDto(template);
   }
 
@@ -236,8 +250,10 @@ export class StaffService {
     if (!template) {
       throw errors.notFound("Workout template not found");
     }
-    await this.auditWriter.writeAuditLog({ userId: actor.id, action: "WORKOUT_TEMPLATE_UPDATED", entity: "WorkoutPlanTemplate", entityId: template.id, ...context });
-    await invalidateDashboardAndReports(this.dashboardReportCache);
+    await Promise.all([
+      this.auditWriter.writeAuditLog({ userId: actor.id, action: "WORKOUT_TEMPLATE_UPDATED", entity: "WorkoutPlanTemplate", entityId: template.id, ...context }),
+      invalidateDashboardAndReports(this.dashboardReportCache)
+    ]);
     return toWorkoutTemplateDto(template);
   }
 
@@ -249,8 +265,10 @@ export class StaffService {
     const trainerId = await this.resolveTrainerId(input.trainerId, actor);
     await this.ensureMemberExists(input.memberId);
     const plan = await this.staffRepository.assignWorkoutPlan({ ...input, trainerId });
-    await this.auditWriter.writeAuditLog({ userId: actor.id, action: "WORKOUT_PLAN_ASSIGNED", entity: "MemberWorkoutPlan", entityId: plan.id, ...context });
-    await invalidateDashboardAndReports(this.dashboardReportCache);
+    await Promise.all([
+      this.auditWriter.writeAuditLog({ userId: actor.id, action: "WORKOUT_PLAN_ASSIGNED", entity: "MemberWorkoutPlan", entityId: plan.id, ...context }),
+      invalidateDashboardAndReports(this.dashboardReportCache)
+    ]);
     return toMemberWorkoutPlanDto(plan);
   }
 
@@ -264,8 +282,10 @@ export class StaffService {
   public async createDietTemplate(input: { name: string; meals: DietMealDto[] }, actor: RequestActor, context: RequestContext): Promise<DietPlanTemplateDto> {
     ensureTrainerOrAdmin(actor.role);
     const template = await this.staffRepository.createDietTemplate(input);
-    await this.auditWriter.writeAuditLog({ userId: actor.id, action: "DIET_TEMPLATE_CREATED", entity: "DietPlanTemplate", entityId: template.id, ...context });
-    await invalidateDashboardAndReports(this.dashboardReportCache);
+    await Promise.all([
+      this.auditWriter.writeAuditLog({ userId: actor.id, action: "DIET_TEMPLATE_CREATED", entity: "DietPlanTemplate", entityId: template.id, ...context }),
+      invalidateDashboardAndReports(this.dashboardReportCache)
+    ]);
     return toDietTemplateDto(template);
   }
 
@@ -280,8 +300,10 @@ export class StaffService {
     if (!template) {
       throw errors.notFound("Diet template not found");
     }
-    await this.auditWriter.writeAuditLog({ userId: actor.id, action: "DIET_TEMPLATE_UPDATED", entity: "DietPlanTemplate", entityId: template.id, ...context });
-    await invalidateDashboardAndReports(this.dashboardReportCache);
+    await Promise.all([
+      this.auditWriter.writeAuditLog({ userId: actor.id, action: "DIET_TEMPLATE_UPDATED", entity: "DietPlanTemplate", entityId: template.id, ...context }),
+      invalidateDashboardAndReports(this.dashboardReportCache)
+    ]);
     return toDietTemplateDto(template);
   }
 
@@ -299,8 +321,10 @@ export class StaffService {
     const trainerId = await this.resolveTrainerId(input.trainerId, actor);
     await this.ensureMemberExists(input.memberId);
     const plan = await this.staffRepository.assignDietPlan({ ...input, trainerId });
-    await this.auditWriter.writeAuditLog({ userId: actor.id, action: "DIET_PLAN_ASSIGNED", entity: "MemberDietPlan", entityId: plan.id, ...context });
-    await invalidateDashboardAndReports(this.dashboardReportCache);
+    await Promise.all([
+      this.auditWriter.writeAuditLog({ userId: actor.id, action: "DIET_PLAN_ASSIGNED", entity: "MemberDietPlan", entityId: plan.id, ...context }),
+      invalidateDashboardAndReports(this.dashboardReportCache)
+    ]);
     return toMemberDietPlanDto(plan);
   }
 

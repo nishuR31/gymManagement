@@ -3,6 +3,7 @@ import { Beef, CalendarClock, Clock3, CreditCard, Dumbbell, MapPin, Phone, UserR
 import { useEffect, useMemo, useState } from "react";
 import { APP_NAME } from "../utils/env";
 import { toast } from "sonner";
+import { SkeletonRows } from "../components/ui/Skeleton";
 import { EmptyState } from "../components/ui/EmptyState";
 import { StatusBadge } from "../components/ui/StatusBadge";
 import * as memberApi from "../features/members/memberApi";
@@ -60,7 +61,12 @@ export function MemberAccountPage({ mode }: { mode: MemberAccountMode }) {
   const membershipStatus = useMemo(() => membershipState(activeSubscription), [activeSubscription]);
 
   if (loading) {
-    return <div className="rounded-lg border border-border bg-card p-6 text-sm font-bold text-muted-foreground shadow-sm">Loading account</div>;
+    return (
+      <div className="space-y-6">
+        <SkeletonRows rows={1} />
+        <SkeletonRows rows={3} />
+      </div>
+    );
   }
 
   return (
@@ -116,7 +122,7 @@ export function MemberAccountPage({ mode }: { mode: MemberAccountMode }) {
           </div>
           {payments.length === 0 ? <div className="p-4"><EmptyState icon={CreditCard} title="No payments recorded" description="Offline payments recorded by admin will appear here." /></div> : null}
           <div className="overflow-x-auto">
-            <table className="min-w-190 w-full text-left text-sm">
+            <table className="min-w-[760px] w-full text-left text-sm">
               <thead className="bg-background text-xs uppercase text-muted-foreground">
                 <tr>
                   <th className="px-4 py-3">Payment</th>

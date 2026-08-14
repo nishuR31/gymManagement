@@ -1,4 +1,5 @@
 import Fastify, { type FastifyInstance } from "fastify";
+import { RedisMemoryServer } from "redis-memory-server";
 import { loadEnv, type Env } from "./config/env.js";
 import { registerAuthMiddleware } from "./middlewares/auth.middleware.js";
 import { registerAttendanceAutoCheckoutJob } from "./plugins/attendance-auto-checkout.js";
@@ -19,10 +20,7 @@ import { PrismaReportRepository, type ReportRepository } from "./repositories/re
 import { PrismaSettingsRepository, type SettingsRepository } from "./repositories/settings.repository.js";
 import { PrismaInquiryRepository, type InquiryRepository } from "./repositories/inquiry.repository.js";
 import { PrismaAuthRepository, type AuthRepository } from "./repositories/auth.repository.js";
-import { NullAttendanceAggregateCache, RedisAttendanceAggregateCache, type AttendanceAggregateCache } from "./services/attendance-cache.service.js";
-import { NullPaymentAnalyticsCache, RedisPaymentAnalyticsCache, type PaymentAnalyticsCache } from "./services/payment-cache.service.js";
-import { NullInventoryAggregateCache, RedisInventoryAggregateCache, type InventoryAggregateCache } from "./services/inventory-cache.service.js";
-import { NullAggregateCache, RedisAggregateCache, type AggregateCache } from "./services/aggregate-cache.service.js";
+import { NullCacheService, RedisCacheService, type CacheService } from "./services/cache.service.js";
 import { attendanceRoutes } from "./routes/attendance.routes.js";
 import { authRoutes } from "./routes/auth.routes.js";
 import { memberRoutes } from "./routes/member.routes.js";
@@ -69,10 +67,10 @@ export interface BuildAppOptions {
   reportRepository?: ReportRepository;
   settingsRepository?: SettingsRepository;
   inquiryRepository?: InquiryRepository;
-  attendanceCache?: AttendanceAggregateCache;
-  paymentAnalyticsCache?: PaymentAnalyticsCache;
-  inventoryCache?: InventoryAggregateCache;
-  aggregateCache?: AggregateCache;
+  attendanceCache?: CacheService;
+  paymentAnalyticsCache?: CacheService;
+  inventoryCache?: CacheService;
+  aggregateCache?: CacheService;
   enableRateLimit?: boolean;
   enableJobs?: boolean;
   clock?: () => Date;
@@ -85,6 +83,22 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
       level: env.NODE_ENV === "test" ? "silent" : "info"
     }
   });
+
+  if (env.NODE_ENV !== "production" && (!env.REDIS_URL || env.REDIS_URL.includes("localhost") || env.REDIS_URL.includes("127.0.0.1"))) {
+    try {
+      const redisServer = new RedisMemoryServer();
+      const host = await redisServer.getHost();
+      const port = await redisServer.getPort();
+      env.REDIS_URL = `redis://${host}:${port}`;
+      app.log.info(`Started in-memory Redis instance at ${env.REDIS_URL}`);
+      
+      app.addHook("onClose", async () => {
+        await redisServer.stop();
+      });
+    } catch (e) {
+      app.log.error(e, "Failed to start in-memory Redis instance");
+    }
+  }
 
   const authRepository = options.authRepository ?? new PrismaAuthRepository(prisma);
   const memberRepository = options.memberRepository ?? new PrismaMemberRepository(prisma);
@@ -99,13 +113,11 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   const reportRepository = options.reportRepository ?? new PrismaReportRepository(prisma);
   const settingsRepository = options.settingsRepository ?? new PrismaSettingsRepository(prisma);
   const inquiryRepository = options.inquiryRepository ?? new PrismaInquiryRepository(prisma);
-  const attendanceCache =
-    options.attendanceCache ?? (env.NODE_ENV === "test" ? new NullAttendanceAggregateCache() : new RedisAttendanceAggregateCache(env));
-  const paymentAnalyticsCache =
-    options.paymentAnalyticsCache ?? (env.NODE_ENV === "test" ? new NullPaymentAnalyticsCache() : new RedisPaymentAnalyticsCache(env));
-  const inventoryCache =
-    options.inventoryCache ?? (env.NODE_ENV === "test" ? new NullInventoryAggregateCache() : new RedisInventoryAggregateCache(env));
-  const aggregateCache = options.aggregateCache ?? (env.NODE_ENV === "test" ? new NullAggregateCache() : new RedisAggregateCache(env));
+  const redisCache = options.aggregateCache ?? (env.NODE_ENV === "test" ? new NullCacheService() : new RedisCacheService(env.REDIS_URL));
+  const attendanceCache = redisCache;
+  const paymentAnalyticsCache = redisCache;
+  const inventoryCache = redisCache;
+  const aggregateCache = redisCache;
   const tokenService = new TokenService(env.JWT_ACCESS_SECRET, env.JWT_ACCESS_EXPIRES_IN);
   const authService = new AuthService(authRepository, tokenService, env);
   const memberService = new MemberService(
@@ -194,12 +206,16 @@ export async function buildApp(options: BuildAppOptions = {}): Promise<FastifyIn
   });
 
   app.get("/", async () => ({
-    status: "ok"
+    status: "server up"
   }));
 
-  app.get("/health", async () => ({
-    status: "ok"
-  }));
+  app.get("/ping", async (request, reply) => {
+    return reply.status(200).send({ status: "pong" });
+  });
+
+  app.get("/health", async (request, reply) => {
+    return reply.status(200).send({ status: "healthy" });
+  });
 
   await app.register(publicRoutes, {
     prefix: "/public",

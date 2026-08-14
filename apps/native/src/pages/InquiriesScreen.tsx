@@ -7,25 +7,26 @@ import Toast from 'react-native-toast-message';
 import { Card, CardContent } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
+import { FloatingDock } from '../components/layout/FloatingDock';
 import { useAppSelector } from '../store/hooks';
 import { themeColors } from '../constants/colors';
-import * as publicApi from '../features/public/publicApi';
-import type { PublicInquiryDto } from '@gym/shared';
+import * as inquiryApi from '../features/inquiries/inquiryApi';
+import type { InquiryDto } from '@gym/shared';
 import { formatDateTime } from '../utils/format';
 
 export function InquiriesScreen() {
   const theme = useAppSelector((state) => state.theme.theme);
   const activeColors = themeColors[theme === 'amoled' ? 'amoled' : theme === 'dark' ? 'dark' : 'light'];
 
-  const [inquiries, setInquiries] = useState<PublicInquiryDto[]>([]);
+  const [inquiries, setInquiries] = useState<InquiryDto[]>([]);
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedInquiry, setSelectedInquiry] = useState<PublicInquiryDto | null>(null);
+  const [selectedInquiry, setSelectedInquiry] = useState<InquiryDto | null>(null);
 
   const loadData = async (): Promise<void> => {
     setIsLoading(true);
     try {
-      const response = await publicApi.listInquiries({
+      const response = await inquiryApi.listInquiries({
         page: 1,
         pageSize: 50,
       });
@@ -41,20 +42,20 @@ export function InquiriesScreen() {
     loadData();
   }, []);
 
-  const filteredInquiries = inquiries.filter(i => 
-    i.name.toLowerCase().includes(search.toLowerCase()) || 
+  const filteredInquiries = inquiries.filter(i =>
+    i.name.toLowerCase().includes(search.toLowerCase()) ||
     i.email.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
     <SafeAreaView className="flex-1 bg-background">
       <ScrollView refreshControl={<RefreshControl refreshing={isLoading} onRefresh={loadData} tintColor={activeColors.primary} />} contentContainerStyle={{ padding: 16, paddingBottom: 100 }}>
-        
+
         <View className="mb-6 bg-card border border-border p-4 rounded-lg shadow-sm">
           <Text className="text-xs font-black uppercase tracking-[0.18em] text-primary">Leads</Text>
           <Text className="mt-2 text-3xl font-black text-foreground">Inquiries</Text>
           <Text className="mt-1 text-sm font-semibold text-muted-foreground mb-4">Messages from the public website</Text>
-          
+
           <View className="relative justify-center">
             <Input
               placeholder="Search inquiries..."
@@ -72,14 +73,14 @@ export function InquiriesScreen() {
           <CardContent className="p-0">
             {filteredInquiries.length === 0 && !isLoading ? (
               <View className="items-center py-12 px-4">
-                <MessageSquare size={32} color={activeColors.mutedForeground} className="mb-2" />
-                <Text className="font-bold text-foreground">No inquiries found</Text>
+                <MessageSquare size={32} color={activeColors.mutedForeground} />
+                <Text className="font-bold text-foreground mt-2">No inquiries found</Text>
               </View>
             ) : (
               <View>
                 {filteredInquiries.map((inquiry, index) => (
-                  <TouchableOpacity 
-                    key={inquiry.id} 
+                  <TouchableOpacity
+                    key={inquiry.id}
                     onPress={() => setSelectedInquiry(inquiry)}
                     className={`flex-row justify-between items-center p-4 ${index !== filteredInquiries.length - 1 ? 'border-b border-border' : ''}`}
                   >
@@ -116,7 +117,7 @@ export function InquiriesScreen() {
                 <Text className="text-xl font-bold text-foreground">Inquiry Details</Text>
                 <Button variant="outline" onPress={() => setSelectedInquiry(null)} className="h-8 px-4">Close</Button>
               </View>
-              
+
               <ScrollView className="p-4" contentContainerStyle={{ paddingBottom: 60 }}>
                 <Card className="mb-4">
                   <CardContent className="p-4 gap-4">
@@ -143,6 +144,8 @@ export function InquiriesScreen() {
           )}
         </View>
       </Modal>
+
+      <FloatingDock />
     </SafeAreaView>
   );
 }

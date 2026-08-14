@@ -2,6 +2,7 @@ import type {
   AttendanceDto,
   DailyAttendanceDto,
   MonthlyAttendanceDto,
+  PaginatedAttendanceDto,
 } from "@gym/shared";
 import { api } from "../../services/api";
 
@@ -56,6 +57,13 @@ export async function getDailyAttendance(date: string): Promise<DailyAttendanceD
 export async function getMonthlyAttendance(month: string): Promise<MonthlyAttendanceDto> {
   const response = await api.get<MonthlyAttendanceDto>("/attendance/monthly", {
     params: { month },
+  });
+  return response.data;
+}
+
+export async function listHistory(params: { page: number; pageSize: number }): Promise<PaginatedAttendanceDto> {
+  const response = await api.get<PaginatedAttendanceDto>("/attendance/history", {
+    params,
   });
   return response.data;
 }

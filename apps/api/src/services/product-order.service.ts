@@ -39,15 +39,17 @@ export class ProductOrderService {
         },
         actor.id
       );
-      await this.auditWriter.writeAuditLog({
+      await Promise.all([
+      this.auditWriter.writeAuditLog({
         userId: actor.id,
         action: "PRODUCT_ORDER_CREATED",
         entity: "ProductOrder",
         entityId: order.id,
         metadata: { orderCode: order.orderCode, memberId: member.id, productId: input.productId, quantity: input.quantity },
         ...context
-      });
-      await invalidateDashboardAndReports(this.dashboardReportCache);
+      }),
+      invalidateDashboardAndReports(this.dashboardReportCache)
+    ]);
       return toOrderDto(order);
     } catch (error: unknown) {
       if (error instanceof InsufficientStockError) {
@@ -88,15 +90,17 @@ export class ProductOrderService {
   public async updateOrder(id: string, input: UpdateProductOrderInput, actor: RequestActor, context: RequestContext): Promise<ProductOrderDto> {
     ensureAdminOrAbove(actor.role);
     const order = await this.orderRepository.update(id, input, actor.id);
-    await this.auditWriter.writeAuditLog({
+    await Promise.all([
+      this.auditWriter.writeAuditLog({
       userId: actor.id,
       action: "PRODUCT_ORDER_UPDATED",
       entity: "ProductOrder",
       entityId: order.id,
       metadata: { orderCode: order.orderCode, status: order.status, paymentStatus: order.paymentStatus },
       ...context
-    });
-    await invalidateDashboardAndReports(this.dashboardReportCache);
+    }),
+      invalidateDashboardAndReports(this.dashboardReportCache)
+    ]);
     return toOrderDto(order);
   }
 

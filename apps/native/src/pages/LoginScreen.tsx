@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { View, Text, TouchableOpacity, ImageBackground, ScrollView, Dimensions, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Dumbbell, ShieldCheck, Users, BarChart3, LockKeyhole, ArrowRight, ArrowLeft, Fingerprint, MessageSquare, Mail } from 'lucide-react-native';
+import { Dumbbell, ShieldCheck, Users, BarChart3, LockKeyhole, ArrowRight, ArrowLeft, Fingerprint } from 'lucide-react-native';
 import Toast from 'react-native-toast-message';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -24,7 +24,7 @@ const codeSchema = z.object({ code: z.string().min(4, "Enter valid code") });
 type EmailFormValues = z.infer<typeof emailSchema>;
 type PasswordFormValues = z.infer<typeof passwordSchema>;
 type CodeFormValues = z.infer<typeof codeSchema>;
-type AuthStep = "login" | "2fa" | "otp" | "magic-link";
+type AuthStep = "login" | "2fa" | "otp";
 
 export function LoginScreen({ navigation }: any) {
   const dispatch = useAppDispatch();
@@ -39,7 +39,7 @@ export function LoginScreen({ navigation }: any) {
   const { control: controlLogin, handleSubmit: subLogin, formState: { errors: errLogin } } = useForm<EmailFormValues & PasswordFormValues>({ resolver: zodResolver(emailSchema.merge(passwordSchema)) });
   const { control: controlCode, handleSubmit: subCode, formState: { errors: errCode } } = useForm<CodeFormValues>({ resolver: zodResolver(codeSchema) });
 
-  const onFinalLogin = async (pass?: string, code?: string) => {
+  const onFinalLogin = async (pass?: string) => {
     setIsSimulating(true);
     const result = await dispatch(loginThunk({ email: email || "admin@example.com", password: pass || "adminpassword" }));
     setIsSimulating(false);
@@ -70,11 +70,9 @@ export function LoginScreen({ navigation }: any) {
     setEmail(v.email);
     onFinalLogin(v.password);
   };
-  const handleCodeSubmit = (v: CodeFormValues) => { onFinalLogin(passwordCache, v.code); };
+  const handleCodeSubmit = (v: CodeFormValues) => { onFinalLogin(passwordCache); };
 
   const handlePasskey = () => { Toast.show({ type: 'success', text1: "Prompting for Passkey..." }); setTimeout(() => onFinalLogin(), 1500); };
-  // const handleMagicLink = () => { setStep("magic-link"); Toast.show({ type: 'success', text1: "Magic link sent to " + email }); };
-  const handleSendOTP = () => { setStep("otp"); Toast.show({ type: 'success', text1: "OTP sent to " + email }); };
 
   const renderStep = () => {
     if (step === "login") {
@@ -136,20 +134,6 @@ export function LoginScreen({ navigation }: any) {
       );
     }
 
-    if (step === "magic-link") {
-      return (
-        <View className="gap-6 animate-fade-in w-full items-center py-6">
-          <View className="w-16 h-16 bg-primary/10 rounded-full items-center justify-center mb-4">
-            <Mail size={32} color={activeColors.primary} />
-          </View>
-          <Text className="text-xl font-bold text-foreground">Check your email</Text>
-          <Text className="text-sm text-muted-foreground text-center px-4">We sent a magic link to <Text className="font-bold text-foreground">{email}</Text>. Click the link inside to instantly sign in.</Text>
-          <Button variant="outline" onPress={() => setStep("login")} className="mt-4 w-full h-11">
-            <Text className="text-foreground font-bold">Back to Login</Text>
-          </Button>
-        </View>
-      );
-    }
   };
 
   return (

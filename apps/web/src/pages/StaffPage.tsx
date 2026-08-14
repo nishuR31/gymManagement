@@ -90,7 +90,7 @@ export function StaffPage() {
           {loading ? <SkeletonRows /> : null}
           {!loading && profiles.length === 0 ? <EmptyState title="No staff profiles" /> : null}
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className="min-w-[800px] w-full text-left text-sm">
               <thead className="text-xs uppercase text-muted-foreground">
                 <tr>
                   <th className="px-3 py-2">User</th>

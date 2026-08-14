@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, RefreshControl, Modal, ActivityIndicator } from 'react-native';
+import { useEffect, useState } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, RefreshControl, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Activity, Search, LogOut, UserRound, Users } from 'lucide-react-native';
+import { Search, LogOut, UserRound, Users } from 'lucide-react-native';
 import Toast from 'react-native-toast-message';
 
 import { Button } from '../components/ui/Button';
@@ -10,7 +10,7 @@ import { Input } from '../components/ui/Input';
 import { useAppSelector } from '../store/hooks';
 import { themeColors } from '../constants/colors';
 import * as attendanceApi from '../features/attendance/attendanceApi';
-import type { AttendanceDto, DailyAttendanceDto, MonthlyAttendanceDto } from '@gym/shared';
+import type { AttendanceDto, DailyAttendanceDto } from '@gym/shared';
 import { getApiErrorMessage } from '../utils/apiError';
 import { formatDateTime } from '../utils/format';
 

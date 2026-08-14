@@ -138,22 +138,25 @@ export function ReportsPage() {
         </Card>
 
         <Card title="Buckets">
-          {!loading && (report?.buckets.length ?? 0) === 0 ? <EmptyState title="No bucket data" /> : null}
-          <div className="h-72">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={report?.buckets ?? []}>
-                <CartesianGrid stroke="hsl(var(--border))" strokeOpacity={0.45} strokeDasharray="3 3" />
-                <XAxis dataKey="label" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={{ stroke: "hsl(var(--border))" }} tickLine={{ stroke: "hsl(var(--border))" }} />
-                <YAxis tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={{ stroke: "hsl(var(--border))" }} tickLine={{ stroke: "hsl(var(--border))" }} width={80} />
-                <Tooltip
-                  cursor={{ fill: "color-mix(in srgb, hsl(var(--primary)) 8%, transparent)" }}
-                  contentStyle={{ background: "hsl(var(--background))", border: "1px solid hsl(var(--border))", borderRadius: "8px", color: "hsl(var(--foreground))" }}
-                  formatter={(value) => (typeof value === "number" && value > 999 ? formatCents(value) : value)}
-                />
-                <Bar dataKey={report?.buckets.some((bucket) => bucket.amountCents !== undefined) ? "amountCents" : "count"} fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+          {loading ? <SkeletonRows rows={3} /> : null}
+          {!loading && (!report || report.buckets.length === 0) ? <EmptyState title="No bucket data" /> : null}
+          {!loading && report && report.buckets.length > 0 ? (
+            <div className="h-72">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={report.buckets}>
+                  <CartesianGrid stroke="hsl(var(--border))" strokeOpacity={0.45} strokeDasharray="3 3" />
+                  <XAxis dataKey="label" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={{ stroke: "hsl(var(--border))" }} tickLine={{ stroke: "hsl(var(--border))" }} />
+                  <YAxis tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} axisLine={{ stroke: "hsl(var(--border))" }} tickLine={{ stroke: "hsl(var(--border))" }} width={80} />
+                  <Tooltip
+                    cursor={{ fill: "color-mix(in srgb, hsl(var(--primary)) 8%, transparent)" }}
+                    contentStyle={{ background: "hsl(var(--background))", border: "1px solid hsl(var(--border))", borderRadius: "8px", color: "hsl(var(--foreground))" }}
+                    formatter={(value) => (typeof value === "number" && value > 999 ? formatCents(value) : value)}
+                  />
+                  <Bar dataKey={report.buckets.some((bucket) => bucket.amountCents !== undefined) ? "amountCents" : "count"} fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          ) : null}
         </Card>
       </div>
 
@@ -170,7 +173,7 @@ function ReportTable({ rows }: { rows: ReportDto["rows"] }) {
   const keys = [...new Set(rows.flatMap((row) => Object.keys(row)))];
   return (
     <div className="overflow-x-auto">
-      <table className="w-full text-left text-sm">
+      <table className="min-w-[800px] w-full text-left text-sm">
         <thead className="text-xs uppercase text-muted-foreground">
           <tr>
             {keys.map((key) => (

@@ -127,14 +127,16 @@ export class MemberService {
       });
     }
 
-    await this.auditWriter.writeAuditLog({
+    await Promise.all([
+      this.auditWriter.writeAuditLog({
       userId: actor.id,
       action: "MEMBER_CREATED",
       entity: "Member",
       entityId: member.id,
       ...context
-    });
-    await invalidateDashboardAndReports(this.dashboardReportCache);
+    }),
+      invalidateDashboardAndReports(this.dashboardReportCache)
+    ]);
 
     return toMemberDto(member, { includeMedicalNotes: canReadMedicalNotes(member, actor) });
   }
@@ -163,14 +165,16 @@ export class MemberService {
       }
     }
 
-    await this.auditWriter.writeAuditLog({
+    await Promise.all([
+      this.auditWriter.writeAuditLog({
       userId: actor.id,
       action: "MEMBER_UPDATED",
       entity: "Member",
       entityId: member.id,
       ...context
-    });
-    await invalidateDashboardAndReports(this.dashboardReportCache);
+    }),
+      invalidateDashboardAndReports(this.dashboardReportCache)
+    ]);
 
     return toMemberDto(member, { includeMedicalNotes: canReadMedicalNotes(member, actor) });
   }
@@ -181,14 +185,16 @@ export class MemberService {
     ensureMutable(existing);
 
     const member = await this.repository.setStatus(id, "ARCHIVED", null);
-    await this.auditWriter.writeAuditLog({
+    await Promise.all([
+      this.auditWriter.writeAuditLog({
       userId: actor.id,
       action: "MEMBER_ARCHIVED",
       entity: "Member",
       entityId: member.id,
       ...context
-    });
-    await invalidateDashboardAndReports(this.dashboardReportCache);
+    }),
+      invalidateDashboardAndReports(this.dashboardReportCache)
+    ]);
 
     return toMemberDto(member, { includeMedicalNotes: canReadMedicalNotes(member, actor) });
   }
@@ -204,15 +210,17 @@ export class MemberService {
     ensureMutable(existing);
 
     const member = await this.repository.setStatus(id, "SUSPENDED", reason);
-    await this.auditWriter.writeAuditLog({
+    await Promise.all([
+      this.auditWriter.writeAuditLog({
       userId: actor.id,
       action: "MEMBER_SUSPENDED",
       entity: "Member",
       entityId: member.id,
       metadata: { reason },
       ...context
-    });
-    await invalidateDashboardAndReports(this.dashboardReportCache);
+    }),
+      invalidateDashboardAndReports(this.dashboardReportCache)
+    ]);
 
     return toMemberDto(member, { includeMedicalNotes: canReadMedicalNotes(member, actor) });
   }
@@ -226,14 +234,16 @@ export class MemberService {
     }
 
     const member = await this.repository.setStatus(id, "ACTIVE", null);
-    await this.auditWriter.writeAuditLog({
+    await Promise.all([
+      this.auditWriter.writeAuditLog({
       userId: actor.id,
       action: "MEMBER_RESTORED",
       entity: "Member",
       entityId: member.id,
       ...context
-    });
-    await invalidateDashboardAndReports(this.dashboardReportCache);
+    }),
+      invalidateDashboardAndReports(this.dashboardReportCache)
+    ]);
 
     return toMemberDto(member, { includeMedicalNotes: canReadMedicalNotes(member, actor) });
   }
@@ -244,14 +254,16 @@ export class MemberService {
     ensureMutable(existing);
 
     const member = await this.repository.updateQrSecret(id, createQrSecret());
-    await this.auditWriter.writeAuditLog({
+    await Promise.all([
+      this.auditWriter.writeAuditLog({
       userId: actor.id,
       action: "MEMBER_QR_REGENERATED",
       entity: "Member",
       entityId: member.id,
       ...context
-    });
-    await invalidateDashboardAndReports(this.dashboardReportCache);
+    }),
+      invalidateDashboardAndReports(this.dashboardReportCache)
+    ]);
 
     return toQrDto(member);
   }
@@ -276,15 +288,17 @@ export class MemberService {
 
     try {
       const result = await this.repository.createOrRegenerateLogin(id, passwordHash);
-      await this.auditWriter.writeAuditLog({
+      await Promise.all([
+      this.auditWriter.writeAuditLog({
         userId: actor.id,
         action: result.regenerated ? "MEMBER_LOGIN_REGENERATED" : "MEMBER_LOGIN_CREATED",
         entity: "Member",
         entityId: result.member.id,
         metadata: { userId: result.user.id },
         ...context
-      });
-      await invalidateDashboardAndReports(this.dashboardReportCache);
+      }),
+      invalidateDashboardAndReports(this.dashboardReportCache)
+    ]);
 
       return {
         member: toMemberDto(result.member, { includeMedicalNotes: canReadMedicalNotes(result.member, actor) }),

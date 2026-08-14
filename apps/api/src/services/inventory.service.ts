@@ -76,8 +76,10 @@ export class InventoryService {
   public async createSupplier(input: CreateSupplierInput, actor: RequestActor, context: RequestContext): Promise<SupplierDto> {
     ensureAdminOrAbove(actor.role);
     const supplier = await this.inventoryRepository.createSupplier(input);
-    await this.auditWriter.writeAuditLog({ userId: actor.id, action: "SUPPLIER_CREATED", entity: "Supplier", entityId: supplier.id, ...context });
-    await invalidateDashboardAndReports(this.dashboardReportCache);
+    await Promise.all([
+      this.auditWriter.writeAuditLog({ userId: actor.id, action: "SUPPLIER_CREATED", entity: "Supplier", entityId: supplier.id, ...context }),
+      invalidateDashboardAndReports(this.dashboardReportCache)
+    ]);
     return toSupplierDto(supplier);
   }
 
@@ -90,8 +92,10 @@ export class InventoryService {
   public async updateSupplier(id: string, input: UpdateSupplierInput, actor: RequestActor, context: RequestContext): Promise<SupplierDto> {
     ensureAdminOrAbove(actor.role);
     const supplier = await this.inventoryRepository.updateSupplier(id, input);
-    await this.auditWriter.writeAuditLog({ userId: actor.id, action: "SUPPLIER_UPDATED", entity: "Supplier", entityId: supplier.id, ...context });
-    await invalidateDashboardAndReports(this.dashboardReportCache);
+    await Promise.all([
+      this.auditWriter.writeAuditLog({ userId: actor.id, action: "SUPPLIER_UPDATED", entity: "Supplier", entityId: supplier.id, ...context }),
+      invalidateDashboardAndReports(this.dashboardReportCache)
+    ]);
     return toSupplierDto(supplier);
   }
 

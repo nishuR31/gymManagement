@@ -590,11 +590,20 @@ export function MembersPage() {
               error={errors.dateOfBirth?.message}
               {...register("dateOfBirth")}
             />
-            <Input
-              label="Gender"
-              error={errors.gender?.message}
-              {...register("gender")}
-            />
+            <label className="grid gap-2 text-sm font-semibold text-foreground">
+              <span>Gender</span>
+              <select
+                className="h-11 rounded-md border border-border bg-surface/70 px-3 outline-none transition hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/25"
+                {...register("gender")}
+              >
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+                <option value="Prefer not to say">Prefer not to say</option>
+              </select>
+              {errors.gender?.message && <span className="text-xs text-destructive">{String(errors.gender.message)}</span>}
+            </label>
           </div>
           <Input
             label="Address"

@@ -1,4 +1,4 @@
-import type { AttendanceDto, DailyAttendanceDto, MonthlyAttendanceDto } from "@gym/shared";
+import type { AttendanceDto, DailyAttendanceDto, MonthlyAttendanceDto, PaginatedAttendanceDto } from "@gym/shared";
 import { useEffect, useState } from "react";
 import { Activity, Search, LogOut, CheckCircle2, UserRound, Users } from "lucide-react";
 import { toast } from "sonner";
@@ -22,6 +22,10 @@ export function AttendancePage() {
   const [isCheckingIn, setIsCheckingIn] = useState(false);
   const [disambiguationMatches, setDisambiguationMatches] = useState<attendanceApi.DisambiguationMatch[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+
+  const [historyPage, setHistoryPage] = useState(1);
+  const [historyData, setHistoryData] = useState<PaginatedAttendanceDto | null>(null);
+  const [isHistoryLoading, setIsHistoryLoading] = useState(false);
 
   const loadData = async (): Promise<void> => {
     setIsLoading(true);
@@ -50,6 +54,22 @@ export function AttendancePage() {
     return () => clearInterval(interval);
   }, []);
 
+  const loadHistory = async (page: number): Promise<void> => {
+    setIsHistoryLoading(true);
+    try {
+      const data = await attendanceApi.listHistory({ page, pageSize: 20 });
+      setHistoryData(data);
+    } catch (error) {
+      toast.error("Could not load attendance history");
+    } finally {
+      setIsHistoryLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    void loadHistory(historyPage);
+  }, [historyPage]);
+
   const handleCheckIn = async (queryOverride?: string): Promise<void> => {
     const query = queryOverride ?? searchQuery.trim();
     if (!query) return;
@@ -65,6 +85,7 @@ export function AttendancePage() {
         setSearchQuery("");
         setDisambiguationMatches([]);
         void loadData();
+        void loadHistory(historyPage);
       }
     } catch (error) {
       toast.error(getApiErrorMessage(error, "Check-in failed"));
@@ -78,6 +99,7 @@ export function AttendancePage() {
       await attendanceApi.checkOut({ attendanceId });
       toast.success(`Checked out ${memberName}`);
       void loadData();
+      void loadHistory(historyPage);
     } catch (error) {
       toast.error(getApiErrorMessage(error, "Check-out failed"));
     }
@@ -203,6 +225,83 @@ export function AttendancePage() {
           </Card>
         </div>
       </div>
+
+      <Card title="Attendance History" className="mt-4">
+        {isHistoryLoading && !historyData ? <SkeletonRows /> : null}
+        {!isHistoryLoading && (!historyData || historyData.data.length === 0) ? (
+          <EmptyState title="No attendance history" />
+        ) : null}
+        {historyData && historyData.data.length > 0 ? (
+          <>
+            <div className="overflow-x-auto">
+              <table className="min-w-[800px] w-full text-left text-sm">
+                <thead className="bg-background text-xs uppercase text-muted-foreground">
+                  <tr>
+                    <th className="px-4 py-3">Member</th>
+                    <th className="px-4 py-3">Check In</th>
+                    <th className="px-4 py-3">Check Out</th>
+                    <th className="px-4 py-3">Method</th>
+                    <th className="px-4 py-3">Duration</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {historyData.data.map((att) => (
+                    <tr key={att.id} className="transition hover:bg-surface/50">
+                      <td className="px-4 py-3 font-semibold text-foreground">
+                        {att.member.firstName} {att.member.lastName}
+                        <div className="text-xs font-normal text-muted-foreground">{att.member.memberCode}</div>
+                      </td>
+                      <td className="px-4 py-3">{formatDateTime(att.checkInAt)}</td>
+                      <td className="px-4 py-3">
+                        {att.checkOutAt ? (
+                          formatDateTime(att.checkOutAt)
+                        ) : (
+                          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
+                            <span className="relative flex h-1.5 w-1.5">
+                              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75"></span>
+                              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-primary"></span>
+                            </span>
+                            Active
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="inline-flex rounded-full bg-secondary px-2 py-0.5 text-xs font-bold text-secondary-foreground">
+                          {att.checkInMethod}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">{att.durationMinutes ? `${att.durationMinutes} min` : '-'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {historyData.pagination.totalPages > 1 && (
+              <div className="flex items-center justify-between border-t border-border p-4">
+                <span className="text-sm font-semibold text-muted-foreground">
+                  Page {historyData.pagination.page} of {historyData.pagination.totalPages}
+                </span>
+                <div className="flex gap-2">
+                  <Button
+                    variant="secondary"
+                    disabled={historyData.pagination.page === 1}
+                    onClick={() => setHistoryPage(p => p - 1)}
+                  >
+                    Previous
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    disabled={historyData.pagination.page === historyData.pagination.totalPages}
+                    onClick={() => setHistoryPage(p => p + 1)}
+                  >
+                    Next
+                  </Button>
+                </div>
+              </div>
+            )}
+          </>
+        ) : null}
+      </Card>
 
       <Modal title="Multiple Members Found" open={disambiguationMatches.length > 0} onClose={() => setDisambiguationMatches([])}>
         <div className="grid gap-3">

@@ -5,12 +5,13 @@ import { ShieldCheck, Search } from 'lucide-react-native';
 import Toast from 'react-native-toast-message';
 
 import { Card, CardContent } from '../components/ui/Card';
+import { FloatingDock } from '../components/layout/FloatingDock';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import { useAppSelector } from '../store/hooks';
 import { themeColors } from '../constants/colors';
 import * as staffApi from '../features/staff/staffApi';
-import type { StaffDto } from '@gym/shared';
+import { type StaffDto } from '@gym/shared';
 import { formatDateTime } from '../utils/format';
 
 export function StaffScreen() {
@@ -41,20 +42,20 @@ export function StaffScreen() {
     loadData();
   }, []);
 
-  const filteredStaff = staff.filter(s => 
-    `${s.firstName} ${s.lastName}`.toLowerCase().includes(search.toLowerCase()) || 
+  const filteredStaff = staff.filter(s =>
+    `${s.firstName} ${s.lastName}`.toLowerCase().includes(search.toLowerCase()) ||
     (s.email && s.email.toLowerCase().includes(search.toLowerCase()))
   );
 
   return (
     <SafeAreaView className="flex-1 bg-background">
       <ScrollView refreshControl={<RefreshControl refreshing={isLoading} onRefresh={loadData} tintColor={activeColors.primary} />} contentContainerStyle={{ padding: 16, paddingBottom: 100 }}>
-        
+
         <View className="mb-6 bg-card border border-border p-4 rounded-lg shadow-sm">
           <Text className="text-xs font-black uppercase tracking-[0.18em] text-primary">Management</Text>
           <Text className="mt-2 text-3xl font-black text-foreground">Staff</Text>
           <Text className="mt-1 text-sm font-semibold text-muted-foreground mb-4">Manage staff accounts and permissions</Text>
-          
+
           <View className="relative justify-center">
             <Input
               placeholder="Search staff..."
@@ -78,8 +79,8 @@ export function StaffScreen() {
             ) : (
               <View>
                 {filteredStaff.map((person, index) => (
-                  <TouchableOpacity 
-                    key={person.id} 
+                  <TouchableOpacity
+                    key={person.id}
                     onPress={() => setSelectedStaff(person)}
                     className={`flex-row justify-between items-center p-4 ${index !== filteredStaff.length - 1 ? 'border-b border-border' : ''}`}
                   >
@@ -114,7 +115,7 @@ export function StaffScreen() {
                 <Text className="text-xl font-bold text-foreground">Staff Details</Text>
                 <Button variant="outline" onPress={() => setSelectedStaff(null)} className="h-8 px-4">Close</Button>
               </View>
-              
+
               <ScrollView className="p-4" contentContainerStyle={{ paddingBottom: 60 }}>
                 <View className="items-center mb-6">
                   <View className="w-20 h-20 bg-secondary items-center justify-center rounded-full mb-3">
@@ -142,6 +143,7 @@ export function StaffScreen() {
           )}
         </View>
       </Modal>
+      <FloatingDock />
     </SafeAreaView>
   );
 }

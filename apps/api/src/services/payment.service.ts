@@ -72,15 +72,17 @@ export class PaymentService {
       amountDueCents: input.amountDueCents,
       dueDate: input.dueDate
     });
-    await this.auditWriter.writeAuditLog({
+    await Promise.all([
+      this.auditWriter.writeAuditLog({
       userId: actor.id,
       action: "INVOICE_CREATED",
       entity: "Invoice",
       entityId: invoice.id,
       metadata: { memberId, amountDueCents: input.amountDueCents },
       ...context
-    });
-    await invalidateDashboardAndReports(this.dashboardReportCache);
+    }),
+      invalidateDashboardAndReports(this.dashboardReportCache)
+    ]);
     return toInvoiceDto(invoice);
   }
 

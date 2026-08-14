@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { View, Text, ScrollView, ActivityIndicator } from 'react-native';
 import { CalendarClock, Clock3, MapPin, Phone, UserRound, WalletCards } from 'lucide-react-native';
 import { APP_NAME } from '../utils/env';
+import { SkeletonRows } from "../components/ui/Skeleton";
 import Toast from 'react-native-toast-message';
 import { EmptyState } from '../components/ui/EmptyState';
 import { StatusBadge } from '../components/ui/StatusBadge';
@@ -70,9 +71,11 @@ export function MemberAccountScreen({ route }: any) {
 
   if (loading) {
     return (
-      <View className="flex-1 bg-background items-center justify-center p-6">
-        <ActivityIndicator size="large" color={activeColors.primary} />
-        <Text className="mt-4 font-bold text-muted-foreground text-sm">Loading account</Text>
+      <View className="flex-1 bg-background p-4 mt-4">
+        <SkeletonRows rows={1} />
+        <View className="mt-6">
+          <SkeletonRows rows={3} />
+        </View>
       </View>
     );
   }

@@ -93,7 +93,7 @@ export function OrdersPage() {
         <Metric label="Booked Value" value={formatCents(totals.amount)} />
       </div>
 
-      <div className="rounded-lg border border-border bg-card shadow-sm">
+      <div className="rounded-lg border border-border bg-card shadow-sm min-w-0">
         <div className="grid gap-3 border-b border-border p-4 md:grid-cols-3">
           <label className="grid gap-2 text-sm font-semibold text-foreground">
             <span>Order status</span>

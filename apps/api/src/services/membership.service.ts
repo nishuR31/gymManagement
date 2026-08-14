@@ -41,14 +41,16 @@ export class MembershipService {
   ): Promise<MembershipPlanDto> {
     ensureAdminOrAbove(actor.role);
     const plan = await this.membershipRepository.createPlan(input);
-    await this.auditWriter.writeAuditLog({
+    await Promise.all([
+      this.auditWriter.writeAuditLog({
       userId: actor.id,
       action: "MEMBERSHIP_PLAN_CREATED",
       entity: "MembershipPlan",
       entityId: plan.id,
       ...context
-    });
-    await invalidateDashboardAndReports(this.dashboardReportCache);
+    }),
+      invalidateDashboardAndReports(this.dashboardReportCache)
+    ]);
     return toPlanDto(plan);
   }
 
@@ -67,14 +69,16 @@ export class MembershipService {
     ensureAdminOrAbove(actor.role);
     await this.findPlanOrThrow(id);
     const plan = await this.membershipRepository.updatePlan(id, input);
-    await this.auditWriter.writeAuditLog({
+    await Promise.all([
+      this.auditWriter.writeAuditLog({
       userId: actor.id,
       action: "MEMBERSHIP_PLAN_UPDATED",
       entity: "MembershipPlan",
       entityId: plan.id,
       ...context
-    });
-    await invalidateDashboardAndReports(this.dashboardReportCache);
+    }),
+      invalidateDashboardAndReports(this.dashboardReportCache)
+    ]);
     return toPlanDto(plan);
   }
 
@@ -82,14 +86,16 @@ export class MembershipService {
     ensureAdminOrAbove(actor.role);
     await this.findPlanOrThrow(id);
     const plan = await this.membershipRepository.updatePlan(id, { isActive: false });
-    await this.auditWriter.writeAuditLog({
+    await Promise.all([
+      this.auditWriter.writeAuditLog({
       userId: actor.id,
       action: "MEMBERSHIP_PLAN_DEACTIVATED",
       entity: "MembershipPlan",
       entityId: plan.id,
       ...context
-    });
-    await invalidateDashboardAndReports(this.dashboardReportCache);
+    }),
+      invalidateDashboardAndReports(this.dashboardReportCache)
+    ]);
     return toPlanDto(plan);
   }
 
@@ -218,15 +224,17 @@ export class MembershipService {
       status: "FROZEN",
       freezeStartDate: this.clock()
     });
-    await this.auditWriter.writeAuditLog({
+    await Promise.all([
+      this.auditWriter.writeAuditLog({
       userId: actor.id,
       action: "MEMBERSHIP_SUBSCRIPTION_FROZEN",
       entity: "MembershipSubscription",
       entityId: frozen.id,
       metadata: { memberId },
       ...context
-    });
-    await invalidateDashboardAndReports(this.dashboardReportCache);
+    }),
+      invalidateDashboardAndReports(this.dashboardReportCache)
+    ]);
     return toSubscriptionDto(frozen);
   }
 
@@ -251,7 +259,8 @@ export class MembershipService {
       freezeEndDate,
       endDate
     });
-    await this.auditWriter.writeAuditLog({
+    await Promise.all([
+      this.auditWriter.writeAuditLog({
       userId: actor.id,
       action: "MEMBERSHIP_SUBSCRIPTION_UNFROZEN",
       entity: "MembershipSubscription",
@@ -261,8 +270,9 @@ export class MembershipService {
         frozenMinutes: Math.round(frozenMs / 60000)
       },
       ...context
-    });
-    await invalidateDashboardAndReports(this.dashboardReportCache);
+    }),
+      invalidateDashboardAndReports(this.dashboardReportCache)
+    ]);
     return toSubscriptionDto(unfrozen);
   }
 
@@ -283,15 +293,17 @@ export class MembershipService {
       status: "CANCELLED"
     });
     await this.paymentRepository?.cancelOpenInvoicesForSubscription(subscription.id);
-    await this.auditWriter.writeAuditLog({
+    await Promise.all([
+      this.auditWriter.writeAuditLog({
       userId: actor.id,
       action: "MEMBERSHIP_SUBSCRIPTION_CANCELLED",
       entity: "MembershipSubscription",
       entityId: cancelled.id,
       metadata: { memberId, planId: cancelled.planId },
       ...context
-    });
-    await invalidateDashboardAndReports(this.dashboardReportCache);
+    }),
+      invalidateDashboardAndReports(this.dashboardReportCache)
+    ]);
     return toSubscriptionDto(cancelled);
   }
 

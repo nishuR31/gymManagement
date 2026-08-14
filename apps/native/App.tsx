@@ -61,8 +61,8 @@ function RootApp() {
 
   if (!isLoaded) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#09090b' }}>
-        <ActivityIndicator size="large" color="#6366f1" />
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#0c0a09' }}>
+        <ActivityIndicator size="large" color="#a77d35" />
       </View>
     );
   }
@@ -72,8 +72,7 @@ function RootApp() {
       <View className={`flex-1 ${theme === 'dark' || theme === 'amoled' ? 'dark' : ''} ${theme === 'amoled' ? 'amoled' : ''} theme-${styleMode}`}>
         <NavigationContainer>
           <Stack.Navigator screenOptions={{
-            headerStyle: { backgroundColor: activeColors.background },
-            headerTintColor: activeColors.foreground,
+            headerShown: false,
           }}>
             <Stack.Screen name="Home" component={PublicHomeScreen} options={{ title: 'Valor Fitness', headerShown: false }} />
             <Stack.Screen name="Login" component={LoginScreen} options={{ title: 'Staff Login' }} />

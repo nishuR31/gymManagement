@@ -37,7 +37,19 @@ const envSchema = z.object({
     .default("http://localhost:5173"),
   COOKIE_SECURE: z.coerce.boolean().default(false),
   API_PORT: z.coerce.number().int().positive().default(4000),
-  PASSKEY_EXPECTED_ORIGIN: z.string().url().default("http://localhost:5173"),
+  PASSKEY_EXPECTED_ORIGIN: z
+    .string()
+    .min(1)
+    .refine(
+      (value) =>
+        value
+          .split(",")
+          .map((origin) => origin.trim())
+          .filter(Boolean)
+          .every((origin) => z.string().url().safeParse(origin).success || origin.startsWith("android:apk-key-hash:") || origin.startsWith("apple-webcredentials:")),
+      "PASSKEY_EXPECTED_ORIGIN must be a URL or comma-separated list of URLs"
+    )
+    .default("http://localhost:5173"),
   PASSKEY_RP_ID: z.string().default("valor-fitness.vercel.app"),
   PASSKEY_RP_NAME: z.string().default("ValorFitness")
 });

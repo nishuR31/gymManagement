@@ -1,7 +1,7 @@
 import type { AuditLogDto, DashboardSummaryDto, LowStockProductDto, MembershipSubscriptionDto, NotificationDto, PaymentDto, ProductDto, ProductOrderDto } from "@gym/shared";
 import { useEffect, useRef, useState } from "react";
 import type { LucideIcon } from "lucide-react";
-import { Activity, AlertTriangle, Boxes, CalendarClock, Clock3, CreditCard, Dumbbell, Receipt, TrendingUp, Users, WalletCards } from "lucide-react";
+import { Activity, Loader2, AlertTriangle, Boxes, CalendarClock, Clock3, CreditCard, Dumbbell, Receipt, TrendingUp, Users, WalletCards } from "lucide-react";
 import { toast } from "sonner";
 import { Card } from "../components/ui/Card";
 import { EmptyState } from "../components/ui/EmptyState";
@@ -70,7 +70,16 @@ export function DashboardPage() {
             </div>
             <div className="w-fit rounded-lg border border-border bg-card/10 px-4 py-3 xl:justify-self-end">
               <p className="text-xs font-black uppercase tracking-[0.14em] text-foreground">Refresh state</p>
-              <p className="mt-1 text-sm font-bold text-foreground">{isLoading ? "Loading live metrics" : "Metrics synced"}</p>
+              <p className="mt-1 text-sm font-bold text-foreground flex items-center gap-2">
+                {isLoading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Loading live metrics
+                  </>
+                ) : (
+                  "Metrics synced"
+                )}
+              </p>
             </div>
           </div>
         </div>

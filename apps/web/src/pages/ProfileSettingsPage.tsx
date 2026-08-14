@@ -218,7 +218,7 @@ export function ProfileSettingsPage() {
               <Input label="Current Password" type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} required />
               <Input label="New Password" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required minLength={8} />
               <div className="mt-2 flex justify-end">
-                <Button type="submit" disabled={passwordLoading} className="h-9 px-4">
+                <Button type="submit" isLoading={passwordLoading} className="h-9 px-4">
                   {passwordLoading ? "Updating..." : "Update Password"}
                 </Button>
               </div>
@@ -316,8 +316,8 @@ export function ProfileSettingsPage() {
                 </div>
               ))}
               
-              <Button variant="outline" className="mt-2 w-full flex items-center justify-center gap-2" onClick={handleAddPasskey} disabled={passkeysLoading}>
-                <Smartphone className="h-4 w-4" />
+              <Button variant="outline" className="mt-2 w-full flex items-center justify-center gap-2" onClick={handleAddPasskey} isLoading={passkeysLoading}>
+                {!passkeysLoading && <Smartphone className="h-4 w-4" />}
                 {passkeysLoading ? "Registering..." : "Add Passkey"}
               </Button>
             </div>

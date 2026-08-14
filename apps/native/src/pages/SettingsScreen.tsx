@@ -1,9 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Building2, Clock3, FileText, Percent, Settings as SettingsIcon, Moon, Sun, MoonStar, Paintbrush } from 'lucide-react-native';
 import Toast from 'react-native-toast-message';
 import { Button } from '../components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
+import { FloatingDock } from '../components/layout/FloatingDock';
 import { EmptyState } from '../components/ui/EmptyState';
 import { Input } from '../components/ui/Input';
 import * as settingsApi from '../features/settings/settingsApi';
@@ -75,7 +77,8 @@ export function SettingsScreen() {
   };
 
   return (
-    <ScrollView className="flex-1 bg-background p-4">
+    <SafeAreaView className="flex-1 bg-background">
+    <ScrollView className="flex-1 p-4">
       <Card className="mb-6">
         <CardContent className="pt-6">
           <Text className="text-xs font-black uppercase tracking-[2px] text-primary">Control Room</Text>
@@ -185,6 +188,8 @@ export function SettingsScreen() {
 
       <View className="h-12" />
     </ScrollView>
+    <FloatingDock />
+    </SafeAreaView>
   );
 }
 
