@@ -61,7 +61,10 @@ export async function bootstrap(options: any = {}) {
     memberRepository,
     authRepository,
     membershipRepository,
-    options.clock, redisCache
+    attendanceRepository,
+    paymentRepository,
+    options.clock, 
+    redisCache
   );
 
   const membershipService = new MembershipService(
@@ -107,6 +110,7 @@ export async function bootstrap(options: any = {}) {
   );
 
   const dashboardService = new DashboardService(
+    memberRepository,
     attendanceRepository,
     paymentRepository,
     membershipRepository,

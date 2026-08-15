@@ -60,6 +60,9 @@ export interface MemberDto {
   joinedAt: string;
   suspendedAt: string | null;
   suspendedReason: string | null;
+  lastAttendanceDate?: string | null;
+  streakDays?: number;
+  notices?: string[];
   createdAt: string;
   updatedAt: string;
 }
@@ -519,6 +522,7 @@ export interface DashboardSummaryDto {
   recentPayments: PaymentDto[];
   lowStockAlerts: LowStockProductDto[];
   recentActivity: AuditLogDto[];
+  redListMembers: MemberDto[];
 }
 
 export interface ReportBucketDto {

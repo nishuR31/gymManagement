@@ -54,7 +54,7 @@ export function InventoryScreen() {
           <Text className="text-xs font-black uppercase tracking-[0.18em] text-primary">
             Management
           </Text>
-          <Button variant="default" size="sm" onPress={() => { setEditingProduct(null); setIsFormVisible(true); }}>
+          <Button variant="primary" size="sm" onPress={() => { setEditingProduct(null); setIsFormVisible(true); }}>
             <Text className="text-white font-bold">+ Product</Text>
           </Button>
         </View>

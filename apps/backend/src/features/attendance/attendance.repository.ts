@@ -57,6 +57,7 @@ export interface AttendanceRepository {
   listForMember(memberId: string, page: number, pageSize: number): Promise<{ attendances: AttendanceRecord[]; total: number }>;
   listHistory(page: number, pageSize: number): Promise<{ attendances: AttendanceRecord[]; total: number }>;
   countByCheckInDay(startInclusive: Date, endExclusive: Date): Promise<{ date: string; count: number }[]>;
+  getStreakAndLastAttendance(memberId: string, today: Date): Promise<{ streak: number; lastAttendance: Date | null }>;
 }
 
 export class PrismaAttendanceRepository implements AttendanceRepository {
@@ -221,6 +222,53 @@ export class PrismaAttendanceRepository implements AttendanceRepository {
       date: row.date.toISOString().slice(0, 10),
       count: Number(row.count)
     }));
+  }
+
+  public async getStreakAndLastAttendance(memberId: string, today: Date): Promise<{ streak: number; lastAttendance: Date | null }> {
+    const attendances = await this.prisma.attendance.findMany({
+      where: { memberId, checkInAt: { lte: today } },
+      orderBy: { checkInAt: "desc" },
+      select: { checkInAt: true }
+    });
+
+    if (attendances.length === 0) {
+      return { streak: 0, lastAttendance: null };
+    }
+
+    const lastAttendance = attendances[0]?.checkInAt ?? null;
+    
+    // Get distinct local dates
+    const distinctDates = Array.from(new Set(attendances.map(a => 
+      a.checkInAt.toISOString().slice(0, 10)
+    )));
+
+    const todayStr = today.toISOString().slice(0, 10);
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = yesterday.toISOString().slice(0, 10);
+
+    let streak = 0;
+    
+    // Streak breaks if no attendance today or yesterday
+    if (distinctDates[0] !== todayStr && distinctDates[0] !== yesterdayStr) {
+      return { streak: 0, lastAttendance };
+    }
+
+    let currentDate = new Date(distinctDates[0] === todayStr ? today : yesterday);
+    
+    for (const dateStr of distinctDates) {
+      const expectedStr = currentDate.toISOString().slice(0, 10);
+      if (dateStr === expectedStr) {
+        streak++;
+        currentDate.setDate(currentDate.getDate() - 1);
+      } else if (dateStr > expectedStr) {
+        continue; // Multiple check-ins on same day (already handled by Set, but just in case)
+      } else {
+        break; // Streak broken
+      }
+    }
+
+    return { streak, lastAttendance };
   }
 }
 

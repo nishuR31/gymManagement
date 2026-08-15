@@ -27,6 +27,7 @@ import type {
   MembershipSubscriptionDto,
   PaymentDto,
   LowStockProductDto,
+  MemberDto,
 } from '@gym/shared';
 import * as dashboardApi from '../features/dashboard/dashboardApi';
 import * as memberApi from '../features/members/memberApi';
@@ -257,6 +258,22 @@ export function DashboardScreen({ navigation }: any) {
           </View>
         </CardContent>
       </Card>
+
+      {/* Red List */}
+      <Card className="mb-2 mt-2">
+        <CardContent className="pt-4">
+          <Text className="text-base font-bold text-destructive mb-3">Red List (Missing &gt; 7 Days)</Text>
+          {isLoading ? <SkeletonRows showAvatar /> : null}
+          {!isLoading && (summary?.redListMembers?.length ?? 0) === 0 ? (
+            <EmptyState title="No members on the Red List!" />
+          ) : null}
+          <View className="gap-2">
+            {summary?.redListMembers?.map((member) => (
+              <RedListRow key={member.id} member={member} colors={colors} />
+            ))}
+          </View>
+        </CardContent>
+      </Card>
     </ScreenWrapper>
   );
 }
@@ -272,6 +289,7 @@ function MemberDashboard({
 }) {
   const [subscriptions, setSubscriptions] = useState<MembershipSubscriptionDto[]>([]);
   const [payments, setPayments] = useState<PaymentDto[]>([]);
+  const [currentMember, setCurrentMember] = useState<MemberDto | null>(null);
   const [loading, setLoading] = useState(true);
   const { colors } = useTheme();
 
@@ -283,6 +301,7 @@ function MemberDashboard({
         membershipApi.listMemberSubscriptions(member.id).catch(() => []),
         paymentApi.listMemberPayments(member.id).catch(() => []),
       ]);
+      setCurrentMember(member);
       setSubscriptions(subscriptionRows);
       setPayments(paymentRows);
     } catch (error: any) {
@@ -338,6 +357,14 @@ function MemberDashboard({
           value={formatCents(recentPaymentTotal)}
           copy={`${payments.length} payment records`}
           tone="brand"
+          colors={colors}
+        />
+        <PortalMetric
+          icon={TrendingUp}
+          title="Current Streak"
+          value={currentMember?.streakDays ? `${currentMember.streakDays} Days` : '0 Days'}
+          copy="Keep up the great work!"
+          tone="success"
           colors={colors}
         />
       </View>
@@ -521,6 +548,28 @@ function LowStockRow({ product, colors }: { product: LowStockProductDto; colors:
         max={Math.max(1, product.reorderThreshold)}
         tone="danger"
       />
+    </View>
+  );
+}
+
+function RedListRow({ member, colors }: { member: MemberDto; colors: any }) {
+  return (
+    <View className="rounded-lg border border-destructive bg-destructiveSoft p-3">
+      <View className="mb-1 flex-row justify-between items-center">
+        <View className="flex-row items-center gap-2 flex-1 mr-2">
+          <AlertTriangle size={16} color={colors.destructive} />
+          <Text className="font-bold text-foreground flex-1" numberOfLines={1}>
+            {member.firstName} {member.lastName}
+          </Text>
+        </View>
+        <Text className="font-semibold text-destructive text-xs">
+          {member.lastAttendanceDate ? formatRelativeTime(member.lastAttendanceDate) : 'Never'}
+        </Text>
+      </View>
+      <View className="flex-row gap-4 mt-1">
+        <Text className="text-xs text-muted-foreground">{member.phone}</Text>
+        <Text className="text-xs text-muted-foreground">{member.email}</Text>
+      </View>
     </View>
   );
 }

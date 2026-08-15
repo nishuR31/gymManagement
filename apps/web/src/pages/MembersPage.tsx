@@ -162,6 +162,20 @@ export function MembersPage() {
       columnHelper.accessor((row) => `${row.firstName} ${row.lastName}`, {
         id: "name",
         header: "Name",
+        cell: (info) => (
+          <div>
+            <span>{info.getValue()}</span>
+            {info.row.original.notices && info.row.original.notices.length > 0 && (
+              <div className="flex gap-1 mt-1">
+                {info.row.original.notices.map(n => (
+                  <span key={n} className="rounded bg-destructive/10 px-1.5 py-0.5 text-[10px] font-bold uppercase text-destructive">
+                    {n.replace('_', ' ')}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        ),
       }),
       columnHelper.accessor("status", {
         header: "Status",
@@ -449,10 +463,22 @@ export function MembersPage() {
                   <div className="min-w-0 flex-1">
                     <p className="numeric text-xs font-black text-primary">
                       {member.memberCode}
+                      {member.streakDays ? ` · 🔥 ${member.streakDays} Day Streak` : ''}
                     </p>
-                    <p className="mt-1 truncate text-base font-black text-foreground">
-                      {member.firstName} {member.lastName}
-                    </p>
+                    <div className="mt-1 flex flex-col items-start">
+                      <p className="truncate text-base font-black text-foreground">
+                        {member.firstName} {member.lastName}
+                      </p>
+                      {member.notices && member.notices.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {member.notices.map(n => (
+                            <span key={n} className="rounded bg-destructive/10 px-1.5 py-0.5 text-[10px] font-bold uppercase text-destructive">
+                              {n.replace('_', ' ')}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                     <p className="numeric mt-1 truncate text-sm font-semibold text-muted-foreground">
                       {member.phone}
                     </p>
@@ -843,9 +869,15 @@ function MemberDetailModal({
                     {member.firstName} {member.lastName}
                   </h3>
                   <StatusBadge status={member.status} />
+                  {member.notices?.map(n => (
+                    <span key={n} className="rounded bg-destructive/10 px-2 py-0.5 text-[10px] font-bold uppercase text-destructive">
+                      {n.replace('_', ' ')}
+                    </span>
+                  ))}
                 </div>
                 <p className="numeric mt-1 text-sm font-black text-primary">
                   {member.memberCode}
+                  {member.streakDays ? ` · 🔥 ${member.streakDays} Day Streak` : ''}
                 </p>
                 <p className="numeric mt-2 truncate text-sm font-semibold text-muted-foreground">
                   {member.phone}
@@ -888,6 +920,8 @@ function MemberDetailModal({
                     numeric
                   />
                   <Detail label="Joined" value={member.joinedAt.slice(0, 10)} />
+                  <Detail label="Last Attendance" value={member.lastAttendanceDate ? new Date(member.lastAttendanceDate).toISOString().slice(0, 10) : 'Never'} />
+                  <Detail label="Streak" value={member.streakDays ? `${member.streakDays} Days` : 'None'} />
                 </dl>
                 {member.medicalNotes ? (
                   <div className="rounded-md border border-border bg-background p-3 text-sm text-muted-foreground">

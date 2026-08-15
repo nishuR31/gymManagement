@@ -236,6 +236,15 @@ export function MembersScreen() {
                       <Text className="text-xs font-semibold text-muted-foreground" numberOfLines={1}>
                         {member.memberCode} · {member.email || member.phone}
                       </Text>
+                      {member.notices && member.notices.length > 0 && (
+                        <View className="flex-row mt-1 gap-1">
+                          {member.notices.map(n => (
+                            <View key={n} style={{ backgroundColor: colors.destructiveSoft }} className="px-1.5 py-0.5 rounded">
+                              <Text style={{ color: colors.destructive }} className="text-[10px] font-bold uppercase">{n.replace('_', ' ')}</Text>
+                            </View>
+                          ))}
+                        </View>
+                      )}
                     </View>
                   </View>
                   <StatusBadge status={member.status} />
@@ -296,9 +305,15 @@ export function MembersScreen() {
                   </Text>
                   <Text style={{ color: colors.primary }} className="font-bold mt-1">
                     {selectedMember.memberCode}
+                    {selectedMember.streakDays ? ` · 🔥 ${selectedMember.streakDays} Day Streak` : ''}
                   </Text>
-                  <View className="mt-2">
+                  <View className="flex-row gap-2 mt-2 items-center">
                     <StatusBadge status={selectedMember.status} />
+                    {selectedMember.notices?.map(n => (
+                      <View key={n} style={{ backgroundColor: colors.destructiveSoft }} className="px-2 py-0.5 rounded items-center justify-center">
+                        <Text style={{ color: colors.destructive }} className="text-[10px] font-bold uppercase">{n.replace('_', ' ')}</Text>
+                      </View>
+                    ))}
                   </View>
                 </View>
 
@@ -348,6 +363,10 @@ export function MembersScreen() {
                         <DetailRow label="Status" value={selectedMember.status} colors={colors} />
                         <View style={{ backgroundColor: colors.border }} className="h-px" />
                         <DetailRow label="Joined" value={formatDateTime(selectedMember.createdAt)} colors={colors} />
+                        <View style={{ backgroundColor: colors.border }} className="h-px" />
+                        <DetailRow label="Last Attendance" value={selectedMember.lastAttendanceDate ? formatDateTime(selectedMember.lastAttendanceDate) : 'Never'} colors={colors} />
+                        <View style={{ backgroundColor: colors.border }} className="h-px" />
+                        <DetailRow label="Streak" value={selectedMember.streakDays ? `${selectedMember.streakDays} Days` : 'None'} colors={colors} />
                       </CardContent>
                     </Card>
 

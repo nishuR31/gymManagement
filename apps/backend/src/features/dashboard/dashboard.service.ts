@@ -11,6 +11,8 @@ import type { ActivityLogRepository } from "../../features/activity-log/activity
 import type { AttendanceRepository } from "../../features/attendance/attendance.repository.js";
 import type { InventoryRepository, ProductRecord } from "../../features/inventory/inventory.repository.js";
 import type { MembershipRepository, MembershipSubscriptionRecord } from "../../features/membership/membership.repository.js";
+import type { MemberRepository } from "../../features/member/member.repository.js";
+import { toMemberDto } from "../../features/member/member.service.js";
 import type { PaymentRecord, PaymentRepository } from "../../features/payment/payment.repository.js";
 import type { RequestActor } from "../../core/types/auth.js";
 import type { CacheService } from "../../core/cache/cache.service.js";
@@ -19,6 +21,7 @@ import { toAuditLogDto } from "../../features/activity-log/activity-log.service.
 
 export class DashboardService {
   public constructor(
+    private readonly memberRepository: MemberRepository,
     private readonly attendanceRepository: AttendanceRepository,
     private readonly paymentRepository: PaymentRepository,
     private readonly membershipRepository: MembershipRepository,
@@ -49,7 +52,8 @@ export class DashboardService {
         expiring,
         recentPayments,
         lowStock,
-        recentActivity
+        recentActivity,
+        redList
       ] = await Promise.all([
         this.attendanceRepository.countCurrent(),
         this.attendanceRepository.countAttendanceForDate(todayStart, tomorrowStart),
@@ -59,7 +63,8 @@ export class DashboardService {
         this.membershipRepository.listExpiringSoon(now, new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)),
         this.paymentRepository.listRecentPayments(8),
         this.inventoryRepository.listLowStock(),
-        this.activityLogRepository.recent(10)
+        this.activityLogRepository.recent(10),
+        this.memberRepository.listRedList(new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000))
       ]);
 
       const result: DashboardSummaryDto = {
@@ -72,7 +77,8 @@ export class DashboardService {
         membershipsExpiringSoon: expiring.map(toSubscriptionDto),
         recentPayments: recentPayments.map(toPaymentDto),
         lowStockAlerts: lowStock.map(toProductDto),
-        recentActivity: recentActivity.map(toAuditLogDto)
+        recentActivity: recentActivity.map(toAuditLogDto),
+        redListMembers: redList.map(m => toMemberDto(m, { includeMedicalNotes: false }))
       };
 
       await this.cache.set(cacheKey, result);

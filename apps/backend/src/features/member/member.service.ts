@@ -13,6 +13,8 @@ import {
   type UpdateMemberInput
 } from "./member.repository.js";
 import type { MembershipRepository } from "../../features/membership/membership.repository.js";
+import type { AttendanceRepository } from "../../features/attendance/attendance.repository.js";
+import type { PaymentRepository } from "../../features/payment/payment.repository.js";
 import type { RequestActor, RequestContext } from "../../core/types/auth.js";
 import { createQrSecret } from "../../core/utils/qr-secret.js";
 import { hashPassword } from "../../core/utils/password.js";
@@ -67,6 +69,8 @@ export class MemberService {
     private readonly repository: MemberRepository,
     private readonly auditWriter: AuditWriter,
     private readonly membershipRepository?: MembershipRepository,
+    private readonly attendanceRepository?: AttendanceRepository,
+    private readonly paymentRepository?: PaymentRepository,
     private readonly clock: () => Date = () => new Date(),
     private readonly dashboardReportCache?: CacheService
   ) {}
@@ -75,6 +79,8 @@ export class MemberService {
     ensureOneOf(actor.role, ["SUPER_ADMIN", "GYM_OWNER", "ADMIN", "STAFF"]);
     const result = await this.repository.list(input);
 
+    // If you need streaks for all list, fetch them here. However, to keep it performant, 
+    // we will leave streakDays undefined in list unless strictly needed.
     return {
       data: result.members.map((member) => toMemberDto(member, { includeMedicalNotes: false })),
       pagination: {
@@ -89,7 +95,13 @@ export class MemberService {
   public async getMember(id: string, actor: RequestActor): Promise<MemberDto> {
     const member = await this.findMemberOrThrow(id);
     ensureCanReadMember(member, actor);
-    return toMemberDto(member, { includeMedicalNotes: canReadMedicalNotes(member, actor) });
+
+    const enriched = await this.enrichMemberData(member.id);
+
+    return toMemberDto(member, {
+      includeMedicalNotes: canReadMedicalNotes(member, actor),
+      ...enriched
+    });
   }
 
   public async getCurrentMember(actor: RequestActor): Promise<MemberDto> {
@@ -100,7 +112,13 @@ export class MemberService {
     if (!member) {
       throw errors.notFound("Member not found");
     }
-    return toMemberDto(member, { includeMedicalNotes: true });
+
+    const enriched = await this.enrichMemberData(member.id);
+
+    return toMemberDto(member, {
+      includeMedicalNotes: true,
+      ...enriched
+    });
   }
 
   public async createMember(input: CreateMemberInput, actor: RequestActor, context: RequestContext): Promise<MemberDto> {
@@ -351,6 +369,40 @@ export class MemberService {
 
     return member;
   }
+
+  private async enrichMemberData(memberId: string): Promise<{ streakDays?: number; lastAttendanceDate?: string | null; notices?: string[] }> {
+    let streakDays: number | undefined = undefined;
+    let lastAttendanceDate: string | null | undefined = undefined;
+    const notices: string[] = [];
+
+    const now = this.clock();
+
+    if (this.attendanceRepository) {
+      const stats = await this.attendanceRepository.getStreakAndLastAttendance(memberId, now);
+      streakDays = stats.streak;
+      lastAttendanceDate = stats.lastAttendance?.toISOString() ?? null;
+    }
+
+    if (this.membershipRepository) {
+      const expiring = await this.membershipRepository.listExpiringSoon(now, new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000));
+      if (expiring.some(s => s.memberId === memberId)) {
+        notices.push("EXPIRING_SOON");
+      }
+    }
+
+    if (this.paymentRepository) {
+      const invoices = await this.paymentRepository.listInvoicesForMember(memberId);
+      if (invoices.some(i => i.status === "PENDING" || i.status === "PARTIALLY_PAID")) {
+        notices.push("FEE_DUE");
+      }
+    }
+
+    const result: { streakDays?: number; lastAttendanceDate?: string | null; notices?: string[] } = {};
+    if (streakDays !== undefined) result.streakDays = streakDays;
+    if (lastAttendanceDate !== undefined) result.lastAttendanceDate = lastAttendanceDate;
+    if (notices.length > 0) result.notices = notices;
+    return result;
+  }
 }
 
 function ensureOneOf(role: RoleName, allowedRoles: readonly RoleName[]): void {
@@ -398,8 +450,18 @@ function ensureMutable(member: MemberRecord): void {
   }
 }
 
-function toMemberDto(member: MemberRecord, options: { includeMedicalNotes: boolean }): MemberDto {
-  return {
+
+
+export function toMemberDto(
+  member: MemberRecord,
+  options: {
+    includeMedicalNotes: boolean;
+    streakDays?: number;
+    lastAttendanceDate?: string | null;
+    notices?: string[];
+  }
+): MemberDto {
+  const dto: MemberDto = {
     id: member.id,
     memberCode: member.memberCode,
     userId: member.userId,
@@ -423,6 +485,18 @@ function toMemberDto(member: MemberRecord, options: { includeMedicalNotes: boole
     createdAt: member.createdAt.toISOString(),
     updatedAt: member.updatedAt.toISOString()
   };
+
+  if (options.lastAttendanceDate !== undefined) {
+    dto.lastAttendanceDate = options.lastAttendanceDate;
+  }
+  if (options.streakDays !== undefined) {
+    dto.streakDays = options.streakDays;
+  }
+  if (options.notices !== undefined) {
+    dto.notices = options.notices;
+  }
+
+  return dto;
 }
 
 function toUserDto(user: {

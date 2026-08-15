@@ -120,6 +120,7 @@ export interface CreateProgressPhotoInput {
 
 export interface MemberRepository {
   list(params: MemberListParams): Promise<MemberListResult>;
+  listRedList(cutoff: Date): Promise<MemberRecord[]>;
   findById(id: string): Promise<MemberRecord | null>;
   findByUserId(userId: string): Promise<MemberRecord | null>;
   findByQrSecret(qrSecret: string): Promise<MemberRecord | null>;
@@ -168,6 +169,22 @@ export class PrismaMemberRepository implements MemberRepository {
       members: members.map(toMemberRecord),
       total
     };
+  }
+
+  public async listRedList(cutoff: Date): Promise<MemberRecord[]> {
+    const members = await this.prisma.member.findMany({
+      where: {
+        status: "ACTIVE",
+        joinedAt: { lt: cutoff },
+        attendances: {
+          none: {
+            checkInAt: { gte: cutoff }
+          }
+        }
+      },
+      orderBy: { joinedAt: "asc" }
+    });
+    return members.map(toMemberRecord);
   }
 
   public async findById(id: string): Promise<MemberRecord | null> {
