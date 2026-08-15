@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, Platform } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { EmptyState } from '../components/ui/EmptyState';
@@ -114,7 +114,31 @@ export function DashboardScreen({ navigation }: any) {
         }
       />
 
-      {showDatePicker && (
+      {showDatePicker && Platform.OS === 'web' ? (
+        React.createElement('input', {
+          type: 'date',
+          value: date.toISOString().split('T')[0],
+          onChange: (e: any) => {
+            const newDate = new Date(e.target.value);
+            if (!isNaN(newDate.getTime())) {
+              setDate(newDate);
+            }
+            setShowDatePicker(false);
+          },
+          style: {
+            position: 'absolute',
+            right: 16,
+            top: 60,
+            zIndex: 50,
+            padding: 8,
+            borderRadius: 8,
+            border: `1px solid ${colors.border}`,
+            backgroundColor: colors.card,
+            color: colors.foreground,
+            colorScheme: colors.background === '#09090b' ? 'dark' : 'light',
+          }
+        })
+      ) : showDatePicker && (
         <DateTimePicker
           value={date}
           mode="date"
