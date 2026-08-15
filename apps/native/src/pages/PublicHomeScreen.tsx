@@ -97,12 +97,12 @@ export function PublicHomeScreen() {
           <View className="relative min-h-[600px] lg:min-h-[700px] justify-center">
             <Image
               source={{ uri: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=1600&q=80" }}
-              className="absolute inset-0 w-full h-full opacity-60"
+              className="absolute inset-0 w-full h-full opacity-90"
               resizeMode="cover"
             />
             {/* Dark masking gradient from top (for nav) and bottom (to blend into black) */}
-            <View className="absolute inset-0 bg-black/20" />
-            <View className="absolute inset-0 bg-gradient-to-b from-background/80 via-transparent to-background" />
+            <View className="absolute inset-0 bg-black/10" />
+            <View className="absolute inset-0 bg-gradient-to-b from-background/50 via-transparent to-background" />
 
             {/* Top Navigation Accents */}
             <View className="absolute top-4 left-4 z-10 flex-row items-center gap-2 bg-black/50 rounded-full px-4 py-2">
@@ -224,14 +224,14 @@ export function PublicHomeScreen() {
 
           {/* Bottom Sections with Immersive Background */}
           <View className="relative w-full bg-background overflow-hidden min-h-[800px]">
-            <View className="absolute inset-0 bg-gradient-to-b from-background via-background/40 to-background/80" style={{ pointerEvents: 'none' }} />
+            <View className="absolute inset-0 bg-gradient-to-b from-background via-background/20 to-background/60" style={{ pointerEvents: 'none' }} />
             <Image
               source={{ uri: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=1600&q=80" }}
-              className="absolute inset-0 w-full h-full opacity-40"
+              className="absolute inset-0 w-full h-full opacity-80"
               resizeMode="cover"
             />
             {/* Top gradient to blend with the black section above */}
-            <View className="absolute inset-0 bg-gradient-to-b from-background via-background/40 to-background/80 pointer-events-none" />
+            <View className="absolute inset-0 bg-gradient-to-b from-background via-background/20 to-background/80 pointer-events-none" />
 
             <View className="relative z-10 w-full max-w-7xl self-center px-6 py-16 flex-col lg:flex-row gap-12">
               
