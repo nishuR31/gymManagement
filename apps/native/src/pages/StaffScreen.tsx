@@ -44,8 +44,10 @@ export function StaffScreen() {
   useEffect(() => { void loadData(); }, [loadData]);
 
   const filteredStaff = staff.filter((s) =>
-    `${s.firstName} ${s.lastName}`.toLowerCase().includes(search.toLowerCase()) ||
-    (s.email && s.email.toLowerCase().includes(search.toLowerCase())),
+    // Assuming backend populates user (if not, fallback to userId)
+    (s as any).user ? `${(s as any).user.firstName} ${(s as any).user.lastName}`.toLowerCase().includes(search.toLowerCase()) ||
+    ((s as any).user.email && (s as any).user.email.toLowerCase().includes(search.toLowerCase())) :
+    s.userId.toLowerCase().includes(search.toLowerCase())
   );
 
   const handleAction = async (action: 'checkIn' | 'checkOut') => {
@@ -111,10 +113,10 @@ export function StaffScreen() {
                     </View>
                     <View className="flex-1">
                       <Text className="font-bold text-foreground text-base" numberOfLines={1}>
-                        {person.firstName} {person.lastName}
+                        {(person as any).user ? `${(person as any).user.firstName} ${(person as any).user.lastName}` : `User ID: ${person.userId}`}
                       </Text>
                       <Text className="text-xs font-semibold text-muted-foreground" numberOfLines={1}>
-                        {person.email}
+                        {(person as any).user?.email || ''}
                       </Text>
                     </View>
                   </View>
@@ -164,7 +166,7 @@ export function StaffScreen() {
                     <ShieldCheck size={32} color={colors.primary} />
                   </View>
                   <Text className="text-2xl font-black text-foreground">
-                    {selectedStaff.firstName} {selectedStaff.lastName}
+                    {(selectedStaff as any).user ? `${(selectedStaff as any).user.firstName} ${(selectedStaff as any).user.lastName}` : `User ID: ${selectedStaff.userId}`}
                   </Text>
                   <View className="mt-2">
                     <StatusBadge status={selectedStaff.role} />
@@ -175,7 +177,7 @@ export function StaffScreen() {
                   <CardContent className="p-4 gap-4">
                     <View>
                       <Text className="text-xs font-bold text-muted-foreground uppercase mb-1">Email</Text>
-                      <Text className="text-foreground font-semibold">{selectedStaff.email}</Text>
+                      <Text className="text-foreground font-semibold">{(selectedStaff as any).user?.email || 'N/A'}</Text>
                     </View>
                     <View className="h-px bg-border" />
                     <View>
