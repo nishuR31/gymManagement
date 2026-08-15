@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { View, Text, TouchableOpacity, Modal, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -46,8 +46,8 @@ export function StaffScreen() {
   const filteredStaff = staff.filter((s) =>
     // Assuming backend populates user (if not, fallback to userId)
     (s as any).user ? `${(s as any).user.firstName} ${(s as any).user.lastName}`.toLowerCase().includes(search.toLowerCase()) ||
-    ((s as any).user.email && (s as any).user.email.toLowerCase().includes(search.toLowerCase())) :
-    s.userId.toLowerCase().includes(search.toLowerCase())
+      ((s as any).user.email && (s as any).user.email.toLowerCase().includes(search.toLowerCase())) :
+      s.userId.toLowerCase().includes(search.toLowerCase())
   );
 
   const handleAction = async (action: 'checkIn' | 'checkOut') => {
@@ -72,7 +72,7 @@ export function StaffScreen() {
         title="Staff"
         subtitle="Manage staff accounts and permissions"
         actions={
-          <Button variant="default" size="sm" onPress={() => setIsStaffFormVisible(true)}>
+          <Button variant="primary" size="sm" onPress={() => setIsStaffFormVisible(true)}>
             <Text className="text-white font-bold">+ Staff</Text>
           </Button>
         }
@@ -99,9 +99,8 @@ export function StaffScreen() {
                 <TouchableOpacity
                   key={person.id}
                   onPress={() => setSelectedStaff(person)}
-                  className={`flex-row justify-between items-center p-4 ${
-                    index !== filteredStaff.length - 1 ? 'border-b border-border' : ''
-                  }`}
+                  className={`flex-row justify-between items-center p-4 ${index !== filteredStaff.length - 1 ? 'border-b border-border' : ''
+                    }`}
                   activeOpacity={0.7}
                 >
                   <View className="flex-row items-center flex-1 mr-2">

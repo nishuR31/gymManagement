@@ -27,12 +27,12 @@ import * as membershipApi from '../features/memberships/membershipApi';
 import * as paymentApi from '../features/payments/paymentApi';
 import * as staffApi from '../features/staff/staffApi';
 import { requestSecurityDisable } from '../features/auth/authApi';
-import type { 
-  MemberDto, 
-  MemberWorkoutPlanDto, 
-  MemberDietPlanDto, 
-  MembershipSubscriptionDto, 
-  InvoiceDto, 
+import type {
+  MemberDto,
+  MemberWorkoutPlanDto,
+  MemberDietPlanDto,
+  MembershipSubscriptionDto,
+  InvoiceDto,
   PaymentDto,
   MemberLoginSetupDto
 } from '@gym/shared';
@@ -45,7 +45,7 @@ import QRCode from 'react-native-qrcode-svg';
 export function MembersScreen() {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
-  
+
   const currentUser = useAppSelector((state) => state.auth.user);
   const isSuperAdmin = currentUser?.role === 'SUPER_ADMIN';
   const isAdmin = currentUser?.role === 'ADMIN' || currentUser?.role === 'SUPER_ADMIN';
@@ -180,7 +180,7 @@ export function MembersScreen() {
           <Text className="text-xs font-black uppercase tracking-[0.18em] text-primary">
             Management
           </Text>
-          <Button variant="default" size="sm" onPress={() => { setEditingMember(null); setIsFormVisible(true); }}>
+          <Button variant="primary" size="sm" onPress={() => { setEditingMember(null); setIsFormVisible(true); }}>
             <Text className="text-white font-bold">+ Member</Text>
           </Button>
         </View>
@@ -218,9 +218,8 @@ export function MembersScreen() {
                 <TouchableOpacity
                   key={member.id}
                   onPress={() => void selectMember(member)}
-                  className={`flex-row justify-between items-center px-4 py-3 ${
-                    index !== members.length - 1 ? 'border-b border-border' : ''
-                  }`}
+                  className={`flex-row justify-between items-center px-4 py-3 ${index !== members.length - 1 ? 'border-b border-border' : ''
+                    }`}
                   activeOpacity={0.7}
                 >
                   <View className="flex-row items-center flex-1 mr-3">
@@ -410,7 +409,7 @@ export function MembersScreen() {
                         ))
                       )}
                     </View>
-                    
+
                     <View style={{ borderColor: colors.border, backgroundColor: colors.background }} className="rounded-lg border p-3">
                       <Text style={{ color: colors.foreground }} className="mb-2 font-bold">Diet Plans</Text>
                       {memberDiets.length === 0 ? (

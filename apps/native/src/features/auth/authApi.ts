@@ -64,3 +64,7 @@ export async function logout(): Promise<void> {
   }
   await api.post("/auth/logout", {}, { headers });
 }
+
+export async function requestSecurityDisable(userId: string): Promise<void> {
+  await api.post("/auth/security-disable/request", { userId });
+}
