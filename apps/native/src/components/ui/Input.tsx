@@ -33,7 +33,7 @@ export function Input({
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   // ── Container border class by styleMode + state ──
-  let containerClass = 'flex-row items-center h-12 ';
+  let containerClass = 'flex-row items-center h-12 overflow-hidden ';
   const bgClass = isDark ? 'bg-white/10' : 'bg-black/5';
   const glassBgClass = isDark ? 'bg-white/10' : 'bg-white/40';
 
@@ -41,18 +41,18 @@ export function Input({
     containerClass += isFocused
       ? `rounded-2xl border-2 border-primary ${bgClass} shadow-md`
       : `rounded-2xl border-2 border-transparent ${bgClass} shadow-sm`;
-  } else if (styleMode === 'glass') {
+  } else if (styleMode === 'glass' || styleMode === 'liquid-glass') {
     containerClass += isFocused
-      ? `rounded-xl border border-primary ${glassBgClass} backdrop-blur-md shadow-md`
-      : `rounded-xl border border-white/20 ${glassBgClass} backdrop-blur-md shadow-sm`;
+      ? `rounded-xl border border-primary ${glassBgClass}`
+      : `rounded-xl border border-white/10 ${glassBgClass}`;
   } else if (styleMode === 'minimal') {
     containerClass += isFocused
       ? 'rounded-none border-b-2 border-primary bg-transparent'
       : 'rounded-none border-b border-border bg-transparent';
   } else {
     containerClass += isFocused
-      ? `rounded-md border border-primary ${bgClass}`
-      : `rounded-md border border-input ${bgClass}`;
+      ? `rounded-lg border border-primary ${bgClass}`
+      : `rounded-lg border border-input ${bgClass}`;
   }
 
   if (error) {
@@ -75,8 +75,8 @@ export function Input({
         ) : null}
 
         <TextInput
-          className={`flex-1 py-2 text-sm ${leftIcon ? 'pl-1' : 'pl-3'} ${secureTextEntry ? 'pr-10' : 'pr-3'} ${props.multiline ? 'min-h-[40px]' : 'h-10'}`}
-          style={{ color: colors.foreground }}
+          className={`flex-1 text-foreground py-2 text-sm ${leftIcon ? 'pl-1' : 'pl-3'} ${secureTextEntry ? 'pr-10' : 'pr-3'} ${props.multiline ? 'min-h-[40px]' : 'h-10'}`}
+          style={[{ color: colors.foreground }, props.style]}
           placeholderTextColor={colors.mutedForeground}
           secureTextEntry={isSecure}
           onFocus={(e) => {

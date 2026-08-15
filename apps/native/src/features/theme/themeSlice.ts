@@ -2,8 +2,8 @@ import { createSlice, createAsyncThunk, type PayloadAction } from "@reduxjs/tool
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Appearance } from "react-native";
 
-export type Theme = "light" | "dark" | "amoled";
-export type StyleMode = "minimal" | "glass" | "clay";
+export type Theme = "light" | "dark" | "amoled" | "system";
+export type StyleMode = "minimal" | "glass" | "clay" | "liquid-glass";
 
 export interface ThemeState {
   theme: Theme;
@@ -17,7 +17,7 @@ const STYLE_STORAGE_KEY = "gymos-style";
 const PINNED_ROUTES_KEY = "gymos-pinned-routes";
 
 const initialState: ThemeState = {
-  theme: "light",
+  theme: "system",
   styleMode: "minimal",
   isLoaded: false,
   pinnedRoutes: ["Dashboard", "Attendance"],
@@ -37,8 +37,8 @@ export const loadThemeSettings = createAsyncThunk("theme/loadSettings", async ()
   }
 
   return {
-    theme: (theme === "light" || theme === "dark" || theme === "amoled") ? theme : systemTheme,
-    styleMode: (style === "minimal" || style === "glass" || style === "clay") ? style : "minimal",
+    theme: (theme === "light" || theme === "dark" || theme === "amoled" || theme === "system") ? theme : "system",
+    styleMode: (style === "minimal" || style === "glass" || style === "clay" || style === "liquid-glass") ? style : "minimal",
     pinnedRoutes
   };
 });

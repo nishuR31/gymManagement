@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, Platform } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { EmptyState } from '../components/ui/EmptyState';
 import { LoadBar } from '../components/ui/LoadBar';
 import { SkeletonRows } from '../components/ui/Skeleton';
@@ -16,6 +17,7 @@ import {
   AlertTriangle,
   Boxes,
   CalendarClock,
+  Calendar,
   Receipt,
   TrendingUp,
   WalletCards,
@@ -42,6 +44,8 @@ export function DashboardScreen({ navigation }: any) {
   const [summary, setSummary] = useState<DashboardSummaryDto | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [date, setDate] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   const loadSummary = useCallback(async () => {
     if (user?.role === 'MEMBER') {
@@ -72,6 +76,16 @@ export function DashboardScreen({ navigation }: any) {
     navigation.replace('Home');
   }, [dispatch, navigation]);
 
+  const onDateChange = (event: any, selectedDate?: Date) => {
+    const currentDate = selectedDate || date;
+    if (Platform.OS === 'android') {
+      setShowDatePicker(false);
+    }
+    setDate(currentDate);
+    // Note: the backend does not currently support historical dashboard summary by date, 
+    // so this is primarily for UI parity as requested.
+  };
+
   if (user?.role === 'MEMBER') {
     return (
       <MemberDashboard
@@ -86,13 +100,29 @@ export function DashboardScreen({ navigation }: any) {
       <PageHeader
         label="Live Operations"
         title="Dashboard"
-        subtitle="Live operational summary for the gym floor, front desk, revenue, dues, inventory, and recent activity."
+        subtitle={`Summary for ${date.toLocaleDateString()}`}
+        onSubtitlePress={() => setShowDatePicker(true)}
         actions={
-          <Button variant="ghost" size="icon" onPress={handleLogout}>
-            <LogOut size={22} color={colors.foreground} />
-          </Button>
+          <>
+            <Button variant="ghost" size="icon" onPress={() => setShowDatePicker(true)}>
+              <Calendar size={22} color={colors.foreground} />
+            </Button>
+            <Button variant="ghost" size="icon" onPress={handleLogout}>
+              <LogOut size={22} color={colors.foreground} />
+            </Button>
+          </>
         }
       />
+
+      {showDatePicker && (
+        <DateTimePicker
+          value={date}
+          mode="date"
+          display="default"
+          onChange={onDateChange}
+          themeVariant={colors.background === '#09090b' ? 'dark' : 'light'}
+        />
+      )}
 
       {/* 2-column metric grid */}
       <View className="flex-row flex-wrap gap-3 mb-4">

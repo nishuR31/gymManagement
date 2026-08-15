@@ -18,7 +18,7 @@ interface ButtonProps extends TouchableOpacityProps {
   children: React.ReactNode;
 }
 
-export function Button({
+export const Button = React.memo(function Button({
   variant = 'primary',
   size = 'md',
   isLoading = false,
@@ -32,13 +32,15 @@ export function Button({
   const { styleMode, colors, isDark } = useTheme();
 
   // ── Border radius by styleMode ──
-  let radiusClass = 'rounded-md';
+  let radiusClass = 'rounded-lg'; // 8px default
   let clayShadowClass = '';
   if (styleMode === 'clay') {
-    radiusClass = 'rounded-2xl';
-    clayShadowClass = 'shadow-[0_4px_14px_rgba(0,0,0,0.15)]'; // Deeper clay shadow for buttons
+    radiusClass = 'rounded-2xl'; // 16px
+    clayShadowClass = 'shadow-[0_4px_14px_rgba(0,0,0,0.15)]'; 
+  } else if (styleMode === 'glass' || styleMode === 'liquid-glass') {
+    radiusClass = 'rounded-xl'; // 12px
   } else if (styleMode === 'minimal') {
-    radiusClass = 'rounded-none';
+    radiusClass = 'rounded-none'; // 0px
   }
 
   // ── Variant styles ──
@@ -125,33 +127,35 @@ export function Button({
       activeOpacity={0.75}
       {...props}
     >
-      {isLoading && (
+      {isLoading ? (
         <ActivityIndicator
           size="small"
           color={spinnerColor}
-          style={{ marginRight: 8 }}
         />
-      )}
-      {!isLoading && leftIcon && (
-        <View style={{ marginRight: 8 }}>
-          {leftIcon}
-        </View>
-      )}
-      {typeof children === 'string' ? (
-        <Text
-          className={`font-semibold text-center ${textSize} ${textClass}`}
-          numberOfLines={1}
-        >
-          {children}
-        </Text>
       ) : (
-        children
-      )}
-      {!isLoading && rightIcon && (
-        <View style={{ marginLeft: 8 }}>
-          {rightIcon}
-        </View>
+        <>
+          {leftIcon && (
+            <View style={{ marginRight: 8 }}>
+              {leftIcon}
+            </View>
+          )}
+          {typeof children === 'string' ? (
+            <Text
+              className={`font-semibold text-center ${textSize} ${textClass}`}
+              numberOfLines={1}
+            >
+              {children}
+            </Text>
+          ) : (
+            children
+          )}
+          {rightIcon && (
+            <View style={{ marginLeft: 8 }}>
+              {rightIcon}
+            </View>
+          )}
+        </>
       )}
     </TouchableOpacity>
   );
-}
+});

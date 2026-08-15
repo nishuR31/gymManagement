@@ -6,6 +6,9 @@ import { APP_NAME } from '../utils/env';
 import { ScreenWrapper } from '../components/layout/ScreenWrapper';
 import { Card, CardContent } from '../components/ui/Card';
 import { useTheme } from '../hooks/useTheme';
+import { ThemeToggle } from '../components/ui/ThemeToggle';
+import { LiquidMetalButton } from '../components/ui/LiquidMetalButton';
+import { LiquidGlassPanel } from '../components/ui/LiquidGlassPanel';
 
 function Step({ number, title, description }: { number: string; title: string; description: string }) {
   const { colors } = useTheme();
@@ -57,9 +60,19 @@ export function DownloadAppScreen() {
           <Text className="text-xs font-black uppercase tracking-widest" style={{ color: colors.primary }}>{APP_NAME} APP</Text>
         </View>
         <Text className="text-4xl md:text-6xl font-black text-foreground text-center mb-4 tracking-tight">Your gym pass in your pocket.</Text>
-        <Text className="text-base md:text-lg text-muted-foreground text-center max-w-2xl leading-relaxed">
+        <Text className="text-base md:text-lg text-muted-foreground text-center max-w-2xl leading-relaxed mb-8">
           Download our app for better services, easy access, and a more convenient gym experience. View timelines, track your classes, and manage your membership seamlessly.
         </Text>
+
+        {/* Functional Layer: Liquid Glass Floating Toolbar */}
+        <View className="absolute bottom-10 left-4 right-4 items-center z-50">
+          <LiquidGlassPanel variant="regular" containerStyle={{ width: '100%', maxWidth: 400 }}>
+            <Text className="text-foreground font-bold text-center mb-2 text-sm uppercase tracking-widest">Functional Controls</Text>
+            <ThemeToggle />
+            <View className="h-4" />
+            <LiquidMetalButton title="Get Access Link" onPress={() => {}} />
+          </LiquidGlassPanel>
+        </View>
       </View>
 
       <View className="max-w-7xl mx-auto w-full px-4 lg:px-12 pb-20">

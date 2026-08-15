@@ -11,6 +11,8 @@ import { useTheme } from '../hooks/useTheme';
 import * as inventoryApi from '../features/inventory/inventoryApi';
 import type { ProductDto } from '@gym/shared';
 import { formatCents } from '../utils/format';
+import { ProductFormModal } from '../components/forms/ProductFormModal';
+import { Button } from '../components/ui/Button';
 
 export function InventoryScreen() {
   const { colors } = useTheme();
@@ -19,6 +21,8 @@ export function InventoryScreen() {
   const [valuation, setValuation] = useState(0);
   const [search, setSearch] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isFormVisible, setIsFormVisible] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<ProductDto | null>(null);
 
   const loadData = useCallback(async (): Promise<void> => {
     setIsLoading(true);
@@ -44,14 +48,22 @@ export function InventoryScreen() {
 
   return (
     <ScreenWrapper refreshing={isLoading} onRefresh={loadData}>
-      <PageHeader
-        label="Management"
-        title="Inventory"
-        subtitle="Manage products and stock levels."
-      />
-
-      {/* Search */}
-      <View className="mb-4">
+      {/* Embedded search header */}
+      <View className="mb-6 rounded-xl border border-border bg-card px-4 py-4">
+        <View className="flex-row justify-between items-start mb-1">
+          <Text className="text-xs font-black uppercase tracking-[0.18em] text-primary">
+            Management
+          </Text>
+          <Button variant="default" size="sm" onPress={() => { setEditingProduct(null); setIsFormVisible(true); }}>
+            <Text className="text-white font-bold">+ Product</Text>
+          </Button>
+        </View>
+        <Text className="text-3xl font-black text-foreground leading-tight mb-1">
+          Inventory
+        </Text>
+        <Text className="text-sm font-semibold text-muted-foreground mb-4">
+          Manage products and stock levels.
+        </Text>
         <Input
           placeholder="Search products..."
           value={search}
@@ -94,8 +106,9 @@ export function InventoryScreen() {
                 const iconBg = isLowStock ? colors.destructiveSoft : colors.primarySoft;
                 const iconColor = isLowStock ? colors.destructive : colors.primary;
                 return (
-                  <View
+                  <TouchableOpacity
                     key={product.id}
+                    onPress={() => { setEditingProduct(product); setIsFormVisible(true); }}
                     className={`flex-row justify-between items-center p-4 ${
                       index !== filteredProducts.length - 1 ? 'border-b border-border' : ''
                     }`}
@@ -134,13 +147,23 @@ export function InventoryScreen() {
                         In Stock
                       </Text>
                     </View>
-                  </View>
+                  </TouchableOpacity>
                 );
               })}
             </View>
           )}
         </CardContent>
       </Card>
+      
+      <ProductFormModal
+        visible={isFormVisible}
+        product={editingProduct}
+        onClose={() => setIsFormVisible(false)}
+        onSuccess={() => {
+          setIsFormVisible(false);
+          void loadData();
+        }}
+      />
     </ScreenWrapper>
   );
 }

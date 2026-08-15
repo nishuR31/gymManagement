@@ -14,6 +14,8 @@ import { ScreenWrapper, PageHeader } from '../components/layout/ScreenWrapper';
 import { useTheme } from '../hooks/useTheme';
 import type { InvoiceDto } from '@gym/shared';
 import { formatCents, formatDateTime } from '../utils/format';
+import { RecordPaymentModal } from '../components/forms/RecordPaymentModal';
+import * as paymentApi from '../features/payments/paymentApi';
 
 export function PaymentsScreen() {
   const { colors } = useTheme();
@@ -23,23 +25,31 @@ export function PaymentsScreen() {
   const [search, setSearch] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<InvoiceDto | null>(null);
+  const [isPaymentFormVisible, setIsPaymentFormVisible] = useState(false);
 
   const loadData = useCallback(async (): Promise<void> => {
+    if (!search.trim()) {
+      setInvoices([]);
+      return;
+    }
+    
     setIsLoading(true);
     try {
-      setInvoices([]);
+      // If user enters an invoice ID, we try to fetch it
+      const invoice = await paymentApi.getInvoice(search.trim());
+      setInvoices([invoice]);
     } catch {
-      Toast.show({ type: 'error', text1: 'Could not load payments' });
+      Toast.show({ type: 'error', text1: 'Invoice not found or invalid ID' });
+      setInvoices([]);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [search]);
 
-  useEffect(() => { void loadData(); }, [loadData]);
-
-  const filteredInvoices = invoices.filter((inv) =>
-    inv.id.toLowerCase().includes(search.toLowerCase()),
-  );
+  // We don't automatically fetch on mount since we need a search term
+  // But we do allow them to submit the search
+  
+  const filteredInvoices = invoices;
 
   return (
     <ScreenWrapper refreshing={isLoading} onRefresh={loadData}>
@@ -52,9 +62,11 @@ export function PaymentsScreen() {
       {/* Search */}
       <View className="mb-4">
         <Input
-          placeholder="Search payments..."
+          placeholder="Search by Invoice ID (e.g. inv_...)"
           value={search}
           onChangeText={setSearch}
+          onSubmitEditing={() => loadData()}
+          returnKeyType="search"
           leftIcon={<Search size={16} color={colors.mutedForeground} />}
         />
       </View>
@@ -65,8 +77,8 @@ export function PaymentsScreen() {
             <View className="p-4">
               <EmptyState
                 icon={CreditCard}
-                title="No payments found"
-                description="Use the web dashboard to view and manage all payments."
+                title="Search for an invoice"
+                description="Enter an invoice ID above to view details and record payments."
               />
             </View>
           ) : (
@@ -165,11 +177,34 @@ export function PaymentsScreen() {
                     </View>
                   </CardContent>
                 </Card>
+                
+                {selectedInvoice.status !== 'PAID' && (
+                  <Button
+                    onPress={() => setIsPaymentFormVisible(true)}
+                    className="w-full mt-4"
+                  >
+                    <Text className="text-white font-bold text-lg">
+                      Record Payment
+                    </Text>
+                  </Button>
+                )}
               </ScrollView>
             </View>
           )}
         </SafeAreaView>
       </Modal>
+      
+      <RecordPaymentModal
+        visible={isPaymentFormVisible}
+        invoice={selectedInvoice}
+        onClose={() => setIsPaymentFormVisible(false)}
+        onSuccess={() => {
+          setIsPaymentFormVisible(false);
+          // Reload the invoice to show the updated amount/status
+          void loadData();
+          setSelectedInvoice(null);
+        }}
+      />
     </ScreenWrapper>
   );
 }

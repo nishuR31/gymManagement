@@ -14,6 +14,7 @@ import { useTheme } from '../hooks/useTheme';
 import * as inquiryApi from '../features/inquiries/inquiryApi';
 import type { InquiryDto } from '@gym/shared';
 import { formatDateTime } from '../utils/format';
+import { Button } from '../components/ui/Button';
 
 export function InquiriesScreen() {
   const { colors } = useTheme();
@@ -37,6 +38,23 @@ export function InquiriesScreen() {
   }, []);
 
   useEffect(() => { void loadData(); }, [loadData]);
+
+  const handleAction = async (action: 'markRead' | 'delete') => {
+    if (!selectedInquiry) return;
+    try {
+      if (action === 'markRead') {
+        await inquiryApi.markInquiryRead(selectedInquiry.id);
+        Toast.show({ type: 'success', text1: 'Inquiry marked as read' });
+      } else if (action === 'delete') {
+        await inquiryApi.deleteInquiry(selectedInquiry.id);
+        Toast.show({ type: 'success', text1: 'Inquiry deleted' });
+      }
+      setSelectedInquiry(null);
+      void loadData();
+    } catch (error: any) {
+      Toast.show({ type: 'error', text1: error.message || 'Action failed' });
+    }
+  };
 
   const filteredInquiries = inquiries.filter((i) =>
     i.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -156,6 +174,18 @@ export function InquiriesScreen() {
                     </View>
                   </CardContent>
                 </Card>
+
+                {/* Actions */}
+                <View className="gap-3">
+                  {selectedInquiry.status === 'NEW' && (
+                    <Button variant="outline" onPress={() => handleAction('markRead')}>
+                      <Text style={{ color: colors.foreground }} className="font-bold">Mark as Read</Text>
+                    </Button>
+                  )}
+                  <Button variant="outline" onPress={() => handleAction('delete')}>
+                    <Text style={{ color: colors.destructive }} className="font-bold">Delete Inquiry</Text>
+                  </Button>
+                </View>
               </ScrollView>
             </View>
           )}

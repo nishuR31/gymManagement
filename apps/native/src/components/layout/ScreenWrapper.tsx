@@ -109,9 +109,11 @@ interface PageHeaderProps {
   subtitle?: string;
   /** Slot for action buttons (right side) */
   actions?: React.ReactNode;
+  /** Optional callback for when the subtitle is pressed */
+  onSubtitlePress?: () => void;
 }
 
-export function PageHeader({ label, title, subtitle, actions }: PageHeaderProps) {
+export function PageHeader({ label, title, subtitle, actions, onSubtitlePress }: PageHeaderProps) {
   return (
     <View className="mb-6 rounded-xl border border-border bg-card px-4 py-4">
       <View className="flex-row items-start justify-between">
@@ -125,9 +127,20 @@ export function PageHeader({ label, title, subtitle, actions }: PageHeaderProps)
             {title}
           </Text>
           {subtitle ? (
-            <Text className="mt-1 text-sm font-semibold text-muted-foreground">
-              {subtitle}
-            </Text>
+            onSubtitlePress ? (
+              <React.Fragment>
+                <Text
+                  onPress={onSubtitlePress}
+                  className="mt-1 text-sm font-semibold text-primary underline"
+                >
+                  {subtitle}
+                </Text>
+              </React.Fragment>
+            ) : (
+              <Text className="mt-1 text-sm font-semibold text-muted-foreground">
+                {subtitle}
+              </Text>
+            )
           ) : null}
         </View>
         {actions ? (

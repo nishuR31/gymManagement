@@ -22,12 +22,16 @@ import {
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../../hooks/useTheme';
+import { usePinger } from '../../hooks/usePinger';
+import { useNetworkStatus } from '../../hooks/useNetworkStatus';
 
 export function PublicFloatingDock() {
   const navigation = useNavigation<any>();
   const route = useRoute();
   const { colors, styleMode } = useTheme();
   const insets = useSafeAreaInsets();
+  const isBackendOnline = usePinger(6 * 60 * 1000); // 6 mins
+  const isNetworkOnline = useNetworkStatus();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { width } = useWindowDimensions();
@@ -163,6 +167,18 @@ export function PublicFloatingDock() {
         className={containerClass}
         style={containerStyle}
       >
+        {/* Backend Pinger Dot (Blue/Orange) */}
+        <View
+          style={{
+            width: 10,
+            height: 10,
+            borderRadius: 5,
+            backgroundColor: isBackendOnline === null ? colors.mutedForeground : isBackendOnline ? '#3b82f6' : '#f97316',
+            marginLeft: 4,
+            marginRight: -4,
+          }}
+        />
+
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <NavItem icon={Home} targetRoute="Home" label="Home" />
           <NavItem icon={Dumbbell} targetRoute="Plans" label="Plans" />
@@ -194,6 +210,18 @@ export function PublicFloatingDock() {
             More
           </Text>
         </TouchableOpacity>
+
+        {/* Network Status Dot (Green/Red) */}
+        <View
+          style={{
+            width: 10,
+            height: 10,
+            borderRadius: 5,
+            backgroundColor: isNetworkOnline ? '#10b981' : '#ef4444',
+            marginLeft: -4,
+            marginRight: 4,
+          }}
+        />
       </View>
 
       {/* Sheet menu */}

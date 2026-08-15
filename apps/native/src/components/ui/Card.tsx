@@ -1,5 +1,7 @@
+// Trigger rebuild
 import React from 'react';
-import { View, Text, ViewProps, TextProps } from 'react-native';
+import { View, Text, ViewProps, TextProps, Platform, StyleSheet } from 'react-native';
+import { BlurView } from 'expo-blur';
 import { useAppSelector } from '../../store/hooks';
 import { useTheme } from '../../hooks/useTheme';
 
@@ -8,7 +10,7 @@ interface CardProps extends ViewProps {
 }
 
 export function Card({ children, className, style, ...props }: CardProps) {
-  const { colors, styleMode } = useTheme();
+  const { colors, styleMode, isDark } = useTheme();
 
   let baseClass = '';
   let customStyle: any = { backgroundColor: colors.card, borderColor: colors.border };
@@ -22,9 +24,9 @@ export function Card({ children, className, style, ...props }: CardProps) {
     customStyle.shadowOpacity = 0.25;
     customStyle.shadowRadius = 24;
     customStyle.elevation = 12;
-  } else if (styleMode === 'glass') {
-    baseClass += 'rounded-3xl shadow-sm border border-white/10';
-    customStyle.backgroundColor = 'rgba(255,255,255,0.03)'; // Subtle tint
+  } else if (styleMode === 'glass' || styleMode === 'liquid-glass') {
+    baseClass += 'rounded-3xl border border-white/10 overflow-hidden';
+    customStyle.backgroundColor = 'transparent'; // Let blur handle the background
   } else if (styleMode === 'minimal') {
     baseClass += 'rounded-none shadow-none';
     customStyle.borderWidth = 1;
@@ -36,7 +38,21 @@ export function Card({ children, className, style, ...props }: CardProps) {
 
   return (
     <View className={`${baseClass} ${className || ''}`} style={[customStyle, style]} {...props}>
-      {children}
+      {(styleMode === 'liquid-glass' || styleMode === 'glass') && (Platform.OS === 'ios' || Platform.OS === 'web') && (
+        <BlurView
+          intensity={Platform.OS === 'web' ? 50 : 100}
+          tint={colors.card === '#ffffff' ? 'systemThinMaterialLight' : 'systemThinMaterialDark'}
+          style={StyleSheet.absoluteFill}
+        />
+      )}
+      {/* Fallback for Android in liquid-glass mode */}
+      {(styleMode === 'liquid-glass' || styleMode === 'glass') && Platform.OS !== 'ios' && Platform.OS !== 'web' && (
+        <View style={[StyleSheet.absoluteFill, { backgroundColor: colors.card === '#ffffff' ? 'rgba(255,255,255,0.85)' : 'rgba(25,25,25,0.85)' }]} />
+      )}
+      
+      <View className="z-10">
+        {children}
+      </View>
     </View>
   );
 }

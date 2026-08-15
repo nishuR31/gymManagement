@@ -33,16 +33,9 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   private clearCacheAndReload = () => {
-    // Preserve theme preference if possible
-    const theme = localStorage.getItem("gymos-theme");
-    
-    // Clear all local and session storage
-    localStorage.clear();
+    // Only clear session storage to prevent getting stuck, but keep localStorage
+    // intact so user tokens and themes aren't wiped.
     sessionStorage.clear();
-    
-    if (theme) {
-      localStorage.setItem("gymos-theme", theme);
-    }
     
     // Hard reload
     window.location.reload();

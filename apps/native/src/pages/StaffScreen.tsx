@@ -14,6 +14,9 @@ import { useTheme } from '../hooks/useTheme';
 import * as staffApi from '../features/staff/staffApi';
 import { formatDateTime } from '../utils/format';
 import type { StaffProfileDto as StaffDto } from '@gym/shared';
+import { Button } from '../components/ui/Button';
+import { StaffFormModal } from '../components/forms/StaffFormModal';
+import { LeaveRequestModal } from '../components/forms/LeaveRequestModal';
 
 export function StaffScreen() {
   const { colors } = useTheme();
@@ -23,6 +26,8 @@ export function StaffScreen() {
   const [search, setSearch] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [selectedStaff, setSelectedStaff] = useState<StaffDto | null>(null);
+  const [isStaffFormVisible, setIsStaffFormVisible] = useState(false);
+  const [isLeaveModalVisible, setIsLeaveModalVisible] = useState(false);
 
   const loadData = useCallback(async (): Promise<void> => {
     setIsLoading(true);
@@ -43,12 +48,32 @@ export function StaffScreen() {
     (s.email && s.email.toLowerCase().includes(search.toLowerCase())),
   );
 
+  const handleAction = async (action: 'checkIn' | 'checkOut') => {
+    if (!selectedStaff) return;
+    try {
+      if (action === 'checkIn') {
+        await staffApi.checkInStaff(selectedStaff.id);
+        Toast.show({ type: 'success', text1: 'Staff checked in' });
+      } else if (action === 'checkOut') {
+        await staffApi.checkOutStaff(selectedStaff.id);
+        Toast.show({ type: 'success', text1: 'Staff checked out' });
+      }
+    } catch (error: any) {
+      Toast.show({ type: 'error', text1: error.message || 'Action failed' });
+    }
+  };
+
   return (
     <ScreenWrapper refreshing={isLoading} onRefresh={loadData}>
       <PageHeader
         label="Management"
         title="Staff"
         subtitle="Manage staff accounts and permissions"
+        actions={
+          <Button variant="default" size="sm" onPress={() => setIsStaffFormVisible(true)}>
+            <Text className="text-white font-bold">+ Staff</Text>
+          </Button>
+        }
       />
 
       <View className="mb-4">
@@ -159,11 +184,42 @@ export function StaffScreen() {
                     </View>
                   </CardContent>
                 </Card>
+
+                {/* Actions */}
+                <View className="mt-6 gap-3">
+                  <Button variant="outline" onPress={() => handleAction('checkIn')}>
+                    <Text style={{ color: colors.foreground }} className="font-bold">Check In</Text>
+                  </Button>
+                  <Button variant="outline" onPress={() => handleAction('checkOut')}>
+                    <Text style={{ color: colors.foreground }} className="font-bold">Check Out</Text>
+                  </Button>
+                  <Button variant="outline" onPress={() => setIsLeaveModalVisible(true)}>
+                    <Text style={{ color: colors.foreground }} className="font-bold">Request Leave</Text>
+                  </Button>
+                </View>
               </ScrollView>
             </View>
           )}
         </SafeAreaView>
       </Modal>
+
+      <StaffFormModal
+        visible={isStaffFormVisible}
+        onClose={() => setIsStaffFormVisible(false)}
+        onSuccess={() => {
+          setIsStaffFormVisible(false);
+          void loadData();
+        }}
+      />
+
+      <LeaveRequestModal
+        visible={isLeaveModalVisible}
+        profile={selectedStaff}
+        onClose={() => setIsLeaveModalVisible(false)}
+        onSuccess={() => {
+          setIsLeaveModalVisible(false);
+        }}
+      />
     </ScreenWrapper>
   );
 }

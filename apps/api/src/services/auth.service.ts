@@ -472,8 +472,8 @@ export class AuthService {
       verification = await verifyRegistrationResponse({
         response: body,
         expectedChallenge,
-        expectedOrigin: this.env.PASSKEY_EXPECTED_ORIGIN,
-        expectedRPID: this.env.PASSKEY_RP_ID,
+        expectedOrigin: this.env.PASSKEY_EXPECTED_ORIGIN.split(",").map(s => s.trim()),
+        expectedRPID: this.env.PASSKEY_RP_ID.split(",").map(s => s.trim()),
       });
     } catch (error: any) {
       throw errors.badRequest(error.message);
@@ -556,8 +556,8 @@ export class AuthService {
       verification = await verifyAuthenticationResponse({
         response: body,
         expectedChallenge,
-        expectedOrigin: this.env.PASSKEY_EXPECTED_ORIGIN,
-        expectedRPID: this.env.PASSKEY_RP_ID,
+        expectedOrigin: this.env.PASSKEY_EXPECTED_ORIGIN.split(",").map(s => s.trim()),
+        expectedRPID: this.env.PASSKEY_RP_ID.split(",").map(s => s.trim()),
         credential: {
           id: passkey.credentialId,
           publicKey: new Uint8Array(passkey.publicKey),
@@ -608,8 +608,8 @@ export class AuthService {
       verification = await verifyAuthenticationResponse({
         response: body,
         expectedChallenge,
-        expectedOrigin: this.env.PASSKEY_EXPECTED_ORIGIN,
-        expectedRPID: this.env.PASSKEY_RP_ID,
+        expectedOrigin: this.env.PASSKEY_EXPECTED_ORIGIN.split(",").map(s => s.trim()),
+        expectedRPID: this.env.PASSKEY_RP_ID.split(",").map(s => s.trim()),
         credential: {
           id: passkey.credentialId,
           publicKey: new Uint8Array(passkey.publicKey),

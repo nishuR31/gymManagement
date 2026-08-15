@@ -1,8 +1,10 @@
 import { useAppSelector } from '../store/hooks';
 import { themeColors, type ThemeColors } from '../constants/colors';
 
-type StyleMode = 'default' | 'glass' | 'clay' | 'minimal';
-type Theme = 'light' | 'dark' | 'amoled';
+import { useColorScheme } from 'react-native';
+
+type StyleMode = 'minimal' | 'glass' | 'clay' | 'liquid-glass';
+type Theme = 'light' | 'dark' | 'amoled' | 'system';
 
 interface UseThemeReturn {
   theme: Theme;
@@ -20,12 +22,15 @@ interface UseThemeReturn {
 export function useTheme(): UseThemeReturn {
   const theme = useAppSelector((state) => state.theme.theme) as Theme;
   const styleMode = useAppSelector((state) => state.theme.styleMode) as StyleMode;
+  const systemColorScheme = useColorScheme();
 
-  const themeKey: Theme =
-    theme === 'amoled' ? 'amoled' : theme === 'dark' ? 'dark' : 'light';
+  const effectiveTheme = theme === 'system' ? (systemColorScheme === 'dark' ? 'dark' : 'light') : theme;
+
+  const themeKey: 'light' | 'dark' | 'amoled' =
+    effectiveTheme === 'amoled' ? 'amoled' : effectiveTheme === 'dark' ? 'dark' : 'light';
 
   let activeColors = { ...themeColors[themeKey] };
-  const isDarkTheme = theme === 'dark' || theme === 'amoled';
+  const isDarkTheme = effectiveTheme === 'dark' || effectiveTheme === 'amoled';
 
   return {
     theme,

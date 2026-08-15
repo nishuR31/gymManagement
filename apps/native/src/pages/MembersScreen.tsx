@@ -24,6 +24,7 @@ import { useTheme } from '../hooks/useTheme';
 import * as memberApi from '../features/members/memberApi';
 import type { MemberDto } from '@gym/shared';
 import { formatDateTime } from '../utils/format';
+import { MemberFormModal } from '../components/forms/MemberFormModal';
 
 export function MembersScreen() {
   const { colors } = useTheme();
@@ -33,6 +34,8 @@ export function MembersScreen() {
   const [search, setSearch] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [selectedMember, setSelectedMember] = useState<MemberDto | null>(null);
+  const [isFormVisible, setIsFormVisible] = useState(false);
+  const [editingMember, setEditingMember] = useState<MemberDto | null>(null);
 
   const loadMembers = useCallback(async (): Promise<void> => {
     setIsLoading(true);
@@ -54,13 +57,38 @@ export function MembersScreen() {
     void loadMembers();
   }, [loadMembers]);
 
+  const handleAction = async (action: 'suspend' | 'restore' | 'archive') => {
+    if (!selectedMember) return;
+    try {
+      if (action === 'suspend') {
+        await memberApi.suspendMember(selectedMember.id, 'Suspended by admin via app');
+        Toast.show({ type: 'success', text1: 'Member suspended' });
+      } else if (action === 'restore') {
+        await memberApi.restoreMember(selectedMember.id);
+        Toast.show({ type: 'success', text1: 'Member restored' });
+      } else if (action === 'archive') {
+        await memberApi.archiveMember(selectedMember.id);
+        Toast.show({ type: 'success', text1: 'Member archived' });
+      }
+      setSelectedMember(null);
+      void loadMembers();
+    } catch (error: any) {
+      Toast.show({ type: 'error', text1: error.message || 'Action failed' });
+    }
+  };
+
   return (
     <ScreenWrapper refreshing={isLoading} onRefresh={loadMembers}>
       {/* Embedded search header */}
       <View className="mb-6 rounded-xl border border-border bg-card px-4 py-4">
-        <Text className="text-xs font-black uppercase tracking-[0.18em] text-primary mb-1">
-          Management
-        </Text>
+        <View className="flex-row justify-between items-start mb-1">
+          <Text className="text-xs font-black uppercase tracking-[0.18em] text-primary">
+            Management
+          </Text>
+          <Button variant="default" size="sm" onPress={() => { setEditingMember(null); setIsFormVisible(true); }}>
+            <Text className="text-white font-bold">+ Member</Text>
+          </Button>
+        </View>
         <Text className="text-3xl font-black text-foreground leading-tight mb-1">
           Members
         </Text>
@@ -192,11 +220,49 @@ export function MembersScreen() {
                     <DetailRow label="Joined" value={formatDateTime(selectedMember.createdAt)} />
                   </CardContent>
                 </Card>
+
+                {/* Actions */}
+                <View className="mt-6 gap-3">
+                  <Button
+                    variant="outline"
+                    onPress={() => {
+                      setSelectedMember(null);
+                      setEditingMember(selectedMember);
+                      setIsFormVisible(true);
+                    }}
+                  >
+                    <Text style={{ color: colors.foreground }} className="font-bold">Edit Member</Text>
+                  </Button>
+                  
+                  {selectedMember.status === 'ACTIVE' ? (
+                    <Button variant="outline" onPress={() => handleAction('suspend')}>
+                      <Text style={{ color: colors.warning }} className="font-bold">Suspend Member</Text>
+                    </Button>
+                  ) : selectedMember.status === 'SUSPENDED' ? (
+                    <Button variant="outline" onPress={() => handleAction('restore')}>
+                      <Text style={{ color: colors.success }} className="font-bold">Restore Member</Text>
+                    </Button>
+                  ) : null}
+
+                  <Button variant="outline" onPress={() => handleAction('archive')}>
+                    <Text style={{ color: colors.destructive }} className="font-bold">Archive Member</Text>
+                  </Button>
+                </View>
               </ScrollView>
             </View>
           )}
         </SafeAreaView>
       </Modal>
+
+      <MemberFormModal
+        visible={isFormVisible}
+        member={editingMember}
+        onClose={() => setIsFormVisible(false)}
+        onSuccess={() => {
+          setIsFormVisible(false);
+          void loadMembers();
+        }}
+      />
     </ScreenWrapper>
   );
 }
