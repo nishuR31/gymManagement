@@ -121,6 +121,7 @@
         "react-native-web": "^0.21.2",
         "react-native-worklets": "0.10.1",
         "react-redux": "^9.3.0",
+        "redux-persist": "^6.0.0",
         "tailwindcss": "^3.4.0",
         "zod": "^4.4.3",
       },
@@ -1779,6 +1780,8 @@
     "redis-memory-server": ["redis-memory-server@0.17.1", "", { "dependencies": { "camelcase": "^6.3.0", "cross-spawn": "^7.0.3", "debug": "^4.3.4", "find-cache-dir": "^3.3.2", "find-package-json": "^1.2.0", "get-port": "^5.1.1", "https-proxy-agent": "^7.0.0", "lockfile": "^1.0.4", "rimraf": "^5.0.1", "semver": "^7.5.3", "tar": "^7.5.4", "tmp": "^0.2.1" }, "bin": { "redis-memory-server": "bin/index.js" } }, "sha512-obdMVFkzLRM+NaCeuZObYNUY5klmAvv91Hq8UBtGsz6YbZd1s5DauaZpIbmjkDoMgxagWIP3/UJiSkuarXTlBg=="],
 
     "redux": ["redux@5.0.1", "", {}, "sha512-M9/ELqF6fy8FwmkpnF0S3YKOqMyoWJ4+CS5Efg2ct3oY9daQvd/Pc71FpGZsVsbl3Cpb+IIcjBDUnnyBdQbq4w=="],
+
+    "redux-persist": ["redux-persist@6.0.0", "", { "peerDependencies": { "redux": ">4.0.0" } }, "sha512-71LLMbUq2r02ng2We9S215LtPu3fY0KgaGE0k8WRgl6RkqxtGfl7HUozz1Dftwsb0D/5mZ8dwAaPbtnzfvbEwQ=="],
 
     "redux-thunk": ["redux-thunk@3.1.0", "", { "peerDependencies": { "redux": "^5.0.0" } }, "sha512-NW2r5T6ksUKXCabzhL9z+h206HQw/NJkcLm1GPImRQ8IzfXwRGqjVhKJGauHirT0DAuyy6hjdnMZaRoAcy0Klw=="],
 

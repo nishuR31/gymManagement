@@ -61,8 +61,8 @@ export const completeFirstPasswordThunk = createAsyncThunk("auth/completeFirstPa
 });
 
 export const bootstrapAuthThunk = createAsyncThunk("auth/bootstrap", async () => {
-  const session = await authApi.refreshSession();
-  return session;
+  const user = await authApi.getCurrentUser();
+  return { user };
 });
 
 export const logoutThunk = createAsyncThunk("auth/logout", async () => {
@@ -149,8 +149,7 @@ const authSlice = createSlice({
       .addCase(bootstrapAuthThunk.fulfilled, (state, action) => {
         state.status = action.payload.user.mustChangePassword ? "password_change_required" : "authenticated";
         state.user = action.payload.user;
-        state.accessToken = action.payload.accessToken;
-        setAccessToken(action.payload.accessToken);
+        // Do not touch accessToken, let it remain from persisted state
       })
       .addCase(bootstrapAuthThunk.rejected, (state) => {
         state.status = "unauthenticated";

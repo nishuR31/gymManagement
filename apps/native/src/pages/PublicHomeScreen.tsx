@@ -49,6 +49,8 @@ export function PublicHomeScreen() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const spinValue = useRef(new Animated.Value(0)).current;
 
+  const accessToken = useAppSelector((state) => state.auth.accessToken);
+
   const handleSettingsPress = () => {
     setIsSettingsOpen(true);
     Animated.sequence([

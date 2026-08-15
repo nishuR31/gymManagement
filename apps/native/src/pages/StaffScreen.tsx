@@ -27,8 +27,8 @@ export function StaffScreen() {
   const loadData = useCallback(async (): Promise<void> => {
     setIsLoading(true);
     try {
-      const response = await staffApi.listStaff({ page: 1, pageSize: 50 });
-      setStaff(response.data);
+      const response = await staffApi.listProfiles();
+      setStaff(response);
     } catch {
       Toast.show({ type: 'error', text1: 'Could not load staff members' });
     } finally {

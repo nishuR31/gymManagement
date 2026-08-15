@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ImageBackground, ScrollView, useWindowDimensions, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -39,6 +39,14 @@ export function LoginScreen({ navigation }: any) {
 
   const { control: controlLogin, handleSubmit: subLogin, formState: { errors: errLogin } } = useForm<EmailFormValues & PasswordFormValues>({ resolver: zodResolver(emailSchema.merge(passwordSchema)) });
   const { control: controlCode, handleSubmit: subCode, formState: { errors: errCode } } = useForm<CodeFormValues>({ resolver: zodResolver(codeSchema) });
+
+  const accessToken = useAppSelector((state) => state.auth.accessToken);
+
+  useEffect(() => {
+    if (accessToken) {
+      navigation.replace("Dashboard");
+    }
+  }, [accessToken, navigation]);
 
   const onFinalLogin = async (pass?: string, currentEmail?: string) => {
     setIsSimulating(true);
@@ -86,7 +94,7 @@ export function LoginScreen({ navigation }: any) {
             <Controller control={controlLogin} name="password" render={({ field: { onChange, value } }) => (
               <Input label="Password" secureTextEntry value={value} onChangeText={onChange} error={errLogin.password?.message} />
             )} />
-            <Button onPress={subLogin(handleLoginNext)} className="w-full h-11">
+            <Button onPress={subLogin(handleLoginNext)} className="w-full h-11" isLoading={isSimulating} disabled={isSimulating}>
               <Text className="text-primary-foreground font-bold mr-2">Sign In</Text>
               <ArrowRight size={16} color={activeColors.primaryForeground} />
             </Button>
@@ -102,7 +110,7 @@ export function LoginScreen({ navigation }: any) {
           </View>
 
           <View className="gap-3">
-            <Button variant="outline" onPress={handlePasskey} className="w-full h-11">
+            <Button variant="outline" onPress={handlePasskey} className="w-full h-11" isLoading={isSimulating} disabled={isSimulating}>
               <Fingerprint size={20} color={activeColors.foreground} />
               <Text className="text-foreground font-bold ml-2">Continue with Passkey</Text>
             </Button>
@@ -141,19 +149,18 @@ export function LoginScreen({ navigation }: any) {
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} className="flex-1 bg-background">
       <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: isTablet ? 120 : 80 }} keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets={true}>
-        <View className="flex-1 relative bg-zinc-950">
-          <ImageBackground
-            source={{ uri: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop' }}
-            className="absolute inset-0 w-full h-full opacity-50"
-            resizeMode="cover"
-          />
-          <View className="absolute inset-0 bg-black/60" />
-          
-          <View className={`flex-1 ${isTablet ? 'flex-row' : 'flex-col'} z-10`}>
+        <View className={`flex-1 ${isTablet ? 'flex-row' : 'flex-col'}`}>
           
           {/* Left Hero Section */}
-          <View className={`${isTablet ? 'w-1/2' : 'w-full h-56'} relative`}>
-            <SafeAreaView className="flex-1 p-8 lg:p-20 z-10 items-center justify-center">
+          <View className={`${isTablet ? 'w-1/2' : 'w-full h-56'} bg-zinc-950 relative overflow-hidden`}>
+            <ImageBackground
+              source={{ uri: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop' }}
+              className="absolute inset-0 w-full h-full opacity-50"
+              resizeMode="cover"
+            />
+            <View className="absolute inset-0 bg-black/40" />
+            
+            <SafeAreaView className="flex-1 p-8 lg:p-20 z-10">
               <TouchableOpacity onPress={() => navigation.navigate("Home")} className="flex-row items-center gap-3 absolute top-12 left-8 lg:top-20 lg:left-20 z-20">
                 <View className="w-9 h-9 bg-primary items-center justify-center rounded-lg shadow-lg">
                   <Dumbbell size={18} color="#ffffff" />
@@ -161,7 +168,7 @@ export function LoginScreen({ navigation }: any) {
                 <Text className="text-lg font-black text-white">{APP_NAME}</Text>
               </TouchableOpacity>
               
-              <View className="w-full max-w-2xl flex-1 justify-center items-center">
+              <View className="flex-1 justify-center items-center w-full">
                 {!isTablet && (
                   <View className="mt-12 items-center w-full px-4">
                     <Text className="text-3xl font-black text-white leading-tight text-center">Elevate your gym's performance.</Text>
@@ -169,10 +176,10 @@ export function LoginScreen({ navigation }: any) {
                 )}
 
                 {isTablet && (
-                  <View className="items-center w-full">
-                    <View className="self-center flex-row items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 mb-6">
+                  <View className="items-center w-full max-w-2xl">
+                    <View className="self-center flex-row items-center bg-white/20 px-4 py-1.5 rounded-full mb-6 border border-white/30">
                       <ShieldCheck size={14} color="#ffffff" />
-                      <Text className="text-xs font-black uppercase tracking-widest text-white">Staff Operations</Text>
+                      <Text className="text-xs font-black uppercase tracking-widest text-white ml-2">Staff Operations</Text>
                     </View>
                     <Text className="text-5xl font-black text-white leading-tight mb-8 text-center w-full">Elevate your gym's performance.</Text>
                     <View className="gap-5 items-center w-full mt-4">
@@ -187,8 +194,8 @@ export function LoginScreen({ navigation }: any) {
           </View>
 
           {/* Right Form Section */}
-          <View className={`${isTablet ? 'w-1/2' : 'flex-1'} justify-center p-6 lg:p-12`}>
-            <View className="w-full max-w-md self-center bg-background/80 backdrop-blur-2xl rounded-[32px] p-8 lg:p-10 border border-white/10 shadow-2xl">
+          <View className={`${isTablet ? 'w-1/2' : 'flex-1'} bg-background border-l border-border justify-center p-6`}>
+            <View className="w-full max-w-md self-center">
               
               <View className="flex-row items-center justify-between mb-6">
                 <TouchableOpacity onPress={() => navigation.navigate("Home")} className="flex-row items-center gap-2">
@@ -220,7 +227,6 @@ export function LoginScreen({ navigation }: any) {
               
             </View>
           </View>
-        </View>
         </View>
         <Footer />
       </ScrollView>

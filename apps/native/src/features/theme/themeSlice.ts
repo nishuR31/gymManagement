@@ -9,24 +9,37 @@ export interface ThemeState {
   theme: Theme;
   styleMode: StyleMode;
   isLoaded: boolean;
+  pinnedRoutes: string[];
 }
 
 const STORAGE_KEY = "gymos-theme";
 const STYLE_STORAGE_KEY = "gymos-style";
+const PINNED_ROUTES_KEY = "gymos-pinned-routes";
 
 const initialState: ThemeState = {
-  theme: "light", // Initialized lazily to prevent RN circular dependency
+  theme: "light",
   styleMode: "minimal",
-  isLoaded: false
+  isLoaded: false,
+  pinnedRoutes: ["Dashboard", "Attendance"],
 };
 
 export const loadThemeSettings = createAsyncThunk("theme/loadSettings", async () => {
   const theme = await AsyncStorage.getItem(STORAGE_KEY);
   const style = await AsyncStorage.getItem(STYLE_STORAGE_KEY);
+  const pinnedRoutesStr = await AsyncStorage.getItem(PINNED_ROUTES_KEY);
   const systemTheme = Appearance.getColorScheme() === "dark" ? "dark" : "light";
+  
+  let pinnedRoutes = ["Dashboard", "Attendance"];
+  if (pinnedRoutesStr) {
+    try {
+      pinnedRoutes = JSON.parse(pinnedRoutesStr);
+    } catch(e) {}
+  }
+
   return {
     theme: (theme === "light" || theme === "dark" || theme === "amoled") ? theme : systemTheme,
-    styleMode: (style === "minimal" || style === "glass" || style === "clay") ? style : "minimal"
+    styleMode: (style === "minimal" || style === "glass" || style === "clay") ? style : "minimal",
+    pinnedRoutes
   };
 });
 
@@ -45,12 +58,22 @@ export const themeSlice = createSlice({
     toggleTheme: (state) => {
       state.theme = state.theme === "dark" ? "light" : "dark";
       AsyncStorage.setItem(STORAGE_KEY, state.theme).catch(() => {});
+    },
+    togglePinnedRoute: (state, action: PayloadAction<string>) => {
+      const route = action.payload;
+      if (state.pinnedRoutes.includes(route)) {
+        state.pinnedRoutes = state.pinnedRoutes.filter(r => r !== route);
+      } else {
+        state.pinnedRoutes.push(route);
+      }
+      AsyncStorage.setItem(PINNED_ROUTES_KEY, JSON.stringify(state.pinnedRoutes)).catch(() => {});
     }
   },
   extraReducers: (builder) => {
     builder.addCase(loadThemeSettings.fulfilled, (state, action) => {
       if (action.payload.theme) state.theme = action.payload.theme as Theme;
       if (action.payload.styleMode) state.styleMode = action.payload.styleMode as StyleMode;
+      if (action.payload.pinnedRoutes) state.pinnedRoutes = action.payload.pinnedRoutes;
       state.isLoaded = true;
     });
     builder.addCase(loadThemeSettings.rejected, (state) => {
@@ -59,6 +82,6 @@ export const themeSlice = createSlice({
   }
 });
 
-export const { setTheme, setStyleMode, toggleTheme } = themeSlice.actions;
+export const { setTheme, setStyleMode, toggleTheme, togglePinnedRoute } = themeSlice.actions;
 export const themeReducer = themeSlice.reducer;
 

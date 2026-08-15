@@ -7,7 +7,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { store } from './src/store';
+import { PersistGate } from 'redux-persist/integration/react';
+import { store, persistor } from './src/store';
 import { LoginScreen } from './src/pages/LoginScreen';
 
 import { MemberLoginScreen } from './src/pages/MemberLoginScreen';
@@ -34,7 +35,7 @@ import { useAppSelector, useAppDispatch } from './src/store/hooks';
 import { loadThemeSettings } from './src/features/theme/themeSlice';
 import { bootstrapAuthThunk } from './src/features/auth/authSlice';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
-import { loadApiBaseUrl } from './src/services/api';
+import { loadApiBaseUrl, setAccessToken } from './src/services/api';
 import { registerForPushNotificationsAsync } from './src/services/notifications';
 
 import { themeColors } from './src/constants/colors';
@@ -46,6 +47,11 @@ function RootApp() {
   const theme = useAppSelector((state) => state.theme.theme);
   const styleMode = useAppSelector((state) => state.theme.styleMode);
   const isLoaded = useAppSelector((state) => state.theme.isLoaded);
+  const accessToken = useAppSelector((state) => state.auth.accessToken);
+
+  useEffect(() => {
+    setAccessToken(accessToken || null);
+  }, [accessToken]);
 
   const activeColors = themeColors[theme === 'dark' || theme === 'amoled' ? 'dark' : 'light'];
 
@@ -105,10 +111,12 @@ function RootApp() {
 
 export default function App() {
   return (
-    <ErrorBoundary>
-      <Provider store={store}>
-        <RootApp />
-      </Provider>
-    </ErrorBoundary>
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <ErrorBoundary>
+          <RootApp />
+        </ErrorBoundary>
+      </PersistGate>
+    </Provider>
   );
 }

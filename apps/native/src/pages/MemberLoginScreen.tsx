@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ImageBackground, ScrollView, useWindowDimensions, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
@@ -40,6 +40,14 @@ export function MemberLoginScreen() {
 
   const { control: controlLogin, handleSubmit: subLogin, formState: { errors: errLogin } } = useForm<EmailFormValues & PasswordFormValues>({ resolver: zodResolver(emailSchema.merge(passwordSchema)) });
   const { control: controlCode, handleSubmit: subCode, formState: { errors: errCode } } = useForm<CodeFormValues>({ resolver: zodResolver(codeSchema) });
+
+  const accessToken = useAppSelector((state) => state.auth.accessToken);
+
+  useEffect(() => {
+    if (accessToken) {
+      navigation.replace("Dashboard");
+    }
+  }, [accessToken, navigation]);
 
   const onFinalLogin = async (pass?: string, currentEmail?: string) => {
     setIsSimulating(true);
@@ -91,7 +99,7 @@ export function MemberLoginScreen() {
               <Input label="Password" onBlur={onBlur} onChangeText={onChange} value={value} error={errLogin.password?.message} secureTextEntry />
             )} />
           </View>
-          <Button onPress={subLogin(handleLoginNext)} className="mt-4">
+          <Button onPress={subLogin(handleLoginNext)} className="mt-4" isLoading={isSimulating} disabled={isSimulating}>
             <View className="flex-row items-center justify-center">
               <Text className="text-primary-foreground font-bold mr-2">Sign In</Text>
               <ArrowRight size={16} color={activeColors.primaryForeground} />
@@ -105,7 +113,7 @@ export function MemberLoginScreen() {
           </View>
 
           <View className="gap-3">
-            <Button variant="outline" onPress={handlePasskey}>
+            <Button variant="outline" onPress={handlePasskey} isLoading={isSimulating} disabled={isSimulating}>
               <View className="flex-row items-center justify-center">
                 <Fingerprint size={20} color={activeColors.foreground} style={{ marginRight: 8 }} />
                 <Text className="text-foreground font-bold">Continue with Passkey</Text>

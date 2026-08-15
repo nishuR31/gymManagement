@@ -4,6 +4,6 @@ import { FloatingDock } from './FloatingDock';
 import { PublicFloatingDock } from './PublicFloatingDock';
 
 export function AppDock() {
-  const token = useAppSelector((state) => state.auth.token);
-  return token ? <FloatingDock /> : <PublicFloatingDock />;
+  const accessToken = useAppSelector((state) => state.auth.accessToken);
+  return accessToken ? <FloatingDock /> : <PublicFloatingDock />;
 }
