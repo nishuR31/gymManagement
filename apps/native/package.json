@@ -3,15 +3,17 @@
   "version": "1.0.0",
   "main": "expo/AppEntry.js",
   "scripts": {
-    "apk": "eas build --platform android --profile preview --clear-cache",
-    "apk:prod": "eas build --platform android --profile production-apk --clear-cache",
-    "apk:local": "eas build --platform android --profile preview --local",
-    "aab": "eas build --platform android --profile production --clear-cache",
-    "apple": "eas build --platform ios --profile development",
-    "start": "EXPO_NO_DEV_TOOLS=1 EXPO_USE_DEVTOOLS=false expo start -c",
-    "android": "EXPO_NO_DEV_TOOLS=1 EXPO_USE_DEVTOOLS=false expo start --android",
-    "ios": "EXPO_NO_DEV_TOOLS=1 EXPO_USE_DEVTOOLS=false expo start --ios",
-    "eas-build-pre-install": "npm install -g bun"
+    "build:web": "bunx expo export --platform web",
+    "android": "bunx expo run:android",
+    "ios": "bunx expo run:ios",
+    "start": "EXPO_NO_DEV_TOOLS=1 EXPO_USE_DEVTOOLS=false bunx expo start -c",
+    "start:android": "EXPO_NO_DEV_TOOLS=1 EXPO_USE_DEVTOOLS=false bunx expo start --android",
+    "start:ios": "EXPO_NO_DEV_TOOLS=1 EXPO_USE_DEVTOOLS=false bunx expo start --ios",
+    "apk": "bunx eas build --platform android --profile preview --clear-cache",
+    "apk:prod": "bunx eas build --platform android --profile production-apk --clear-cache",
+    "apk:local": "bunx eas build --platform android --profile preview --local",
+    "aab": "bunx eas build --platform android --profile production --clear-cache",
+    "apple": "bunx eas build --platform ios --profile development"
   },
   "private": true,
   "dependencies": {
