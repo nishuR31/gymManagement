@@ -330,7 +330,7 @@ export function MembersScreen() {
                           </Text>
                         </View>
                         <Text style={{ color: colors.foreground }} className="font-semibold mb-1">
-                          {memberSubscriptions[0].plan.name}
+                          {memberSubscriptions[0].planName}
                         </Text>
                         <Text style={{ color: colors.mutedForeground }} className="text-sm">
                           Expires {formatDateTime(memberSubscriptions[0].endDate)}
