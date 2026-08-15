@@ -40,7 +40,7 @@ import { Card, CardContent } from '../components/ui/Card';
 export function DashboardScreen({ navigation }: any) {
   const user = useAppSelector((state) => state.auth.user);
   const dispatch = useAppDispatch();
-  const { colors } = useTheme();
+  const { colors, isDark } = useTheme();
 
   const [summary, setSummary] = useState<DashboardSummaryDto | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -116,29 +116,43 @@ export function DashboardScreen({ navigation }: any) {
       />
 
       {showDatePicker && Platform.OS === 'web' ? (
-        React.createElement('input', {
-          type: 'date',
-          value: date.toISOString().split('T')[0],
-          onChange: (e: any) => {
-            const newDate = new Date(e.target.value);
-            if (!isNaN(newDate.getTime())) {
-              setDate(newDate);
+        <View style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          zIndex: 50,
+        }}>
+          {React.createElement('input', {
+            type: 'date',
+            value: date.toISOString().split('T')[0],
+            onChange: (e: any) => {
+              const newDate = new Date(e.target.value);
+              if (!isNaN(newDate.getTime())) {
+                setDate(newDate);
+              }
+              setShowDatePicker(false);
+            },
+            style: {
+              padding: 12,
+              borderRadius: 8,
+              border: `1px solid ${colors.border}`,
+              backgroundColor: colors.card,
+              color: colors.foreground,
+              colorScheme: isDark ? 'dark' : 'light',
+              fontSize: 16,
             }
-            setShowDatePicker(false);
-          },
-          style: {
-            position: 'absolute',
-            right: 16,
-            top: 60,
-            zIndex: 50,
-            padding: 8,
-            borderRadius: 8,
-            border: `1px solid ${colors.border}`,
-            backgroundColor: colors.card,
-            color: colors.foreground,
-            colorScheme: colors.background === '#09090b' ? 'dark' : 'light',
-          }
-        })
+          })}
+          <View className="mt-4">
+            <Button variant="ghost" onPress={() => setShowDatePicker(false)}>
+              <Text style={{ color: colors.foreground }}>Cancel</Text>
+            </Button>
+          </View>
+        </View>
       ) : showDatePicker && (
         <DateTimePicker
           value={date}
