@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState, SetStateAction } from 'react';
-import { View, Text, ScrollView, Modal, TouchableOpacity, Alert, Switch } from 'react-native';
+import { View, Text, ScrollView, Modal, TouchableOpacity, Alert } from 'react-native';
 import { Beef, ClipboardList, Dumbbell, Pencil, Plus, Search, Timer, Trash2, UserRound, X } from 'lucide-react-native';
 import Toast from 'react-native-toast-message';
 import { Button } from '../components/ui/Button';
@@ -12,15 +12,15 @@ import { useAppSelector } from '../store/hooks';
 import { getApiErrorMessage } from '../utils/apiError';
 import { isAdminRole } from '../utils/roles';
 import type { DietMealDto, DietPlanTemplateDto, MemberDto, StaffProfileDto, WorkoutExerciseDto, WorkoutPlanTemplateDto } from '@gym/shared';
-import { themeColors } from '../constants/colors';
+import { useTheme } from '../hooks/useTheme';
+import { ScreenWrapper, PageHeader } from '../components/layout/ScreenWrapper';
 
 type TemplateKind = 'workout' | 'diet';
 type EditableTemplate = WorkoutPlanTemplateDto | DietPlanTemplateDto | null;
 
 export function PlansScreen() {
   const user = useAppSelector((state) => state.auth.user);
-  const theme = useAppSelector((state) => state.theme.theme);
-  const activeColors = themeColors[theme === 'amoled' ? 'amoled' : theme === 'dark' ? 'dark' : 'light'];
+  const { colors: activeColors } = useTheme();
 
   const [workouts, setWorkouts] = useState<WorkoutPlanTemplateDto[]>([]);
   const [diets, setDiets] = useState<DietPlanTemplateDto[]>([]);
@@ -44,7 +44,7 @@ export function PlansScreen() {
       setDiets(dietRows);
       setProfiles(profileRows);
     } catch (error) {
-      Toast.show({ type: 'error', text1: 'Could not load plans', text2: getApiErrorMessage(error) });
+      Toast.show({ type: 'error', text1: 'Could not load plans', text2: getApiErrorMessage(error, 'An unknown error occurred') });
     }
   };
 
@@ -77,26 +77,25 @@ export function PlansScreen() {
           Toast.show({ type: 'success', text1: 'Template deleted' });
           await load();
         } catch (error) {
-          Toast.show({ type: 'error', text1: 'Could not delete template', text2: getApiErrorMessage(error) });
+          Toast.show({ type: 'error', text1: 'Could not delete template', text2: getApiErrorMessage(error, 'An unknown error occurred') });
         }
       }}
     ]);
   };
 
   return (
-    <ScrollView className="flex-1 bg-background p-4">
-      <Card className="mb-6">
-        <CardContent className="pt-6">
-          <Text className="text-xs font-black uppercase tracking-[2px] text-primary">Training Library</Text>
-          <Text className="mt-2 text-3xl font-black text-foreground">Workout & Diet</Text>
-          <Text className="mt-1 text-sm font-semibold text-muted-foreground mb-4">Template library and member assignments</Text>
-          <View className="flex-row flex-wrap gap-2">
-            <Button variant="secondary" className="px-3" onPress={() => openNewTemplate('workout')}>New Workout</Button>
-            <Button variant="secondary" className="px-3" onPress={() => openNewTemplate('diet')}>New Diet</Button>
-            <Button className="px-3" onPress={() => setAssignOpen(kind)}>{`Assign ${kind}`}</Button>
+    <ScreenWrapper>
+      <PageHeader
+        label="Training Library"
+        title="Workout & Diet"
+        subtitle="Template library and member assignments."
+        actions={
+          <View className="flex-row gap-2">
+            <Button variant="secondary" size="sm" onPress={() => openNewTemplate('workout')}>+ Workout</Button>
+            <Button size="sm" onPress={() => setAssignOpen(kind)}>Assign</Button>
           </View>
-        </CardContent>
-      </Card>
+        }
+      />
 
       <View className="flex-row rounded-md border border-border bg-card p-1 mb-6 self-start">
         {(['workout', 'diet'] as const).map((item) => (
@@ -178,9 +177,7 @@ export function PlansScreen() {
         onClose={() => setAssignOpen(null)}
         activeColors={activeColors}
       />
-      
-      <View className="h-12" />
-    </ScrollView>
+    </ScreenWrapper>
   );
 }
 
@@ -221,7 +218,7 @@ function TemplateModal({ kind, template, onClose, onSaved, activeColors }: any) 
       onClose();
       onSaved();
     } catch (error) {
-      Toast.show({ type: 'error', text1: 'Could not save template', text2: getApiErrorMessage(error) });
+      Toast.show({ type: 'error', text1: 'Could not save template', text2: getApiErrorMessage(error, 'An unknown error occurred') });
     }
   };
 
@@ -339,7 +336,7 @@ function AssignModal({ kind, templates, trainerProfiles, canPickTrainer, ownTrai
       Toast.show({ type: 'success', text1: 'Plan assigned' });
       onClose();
     } catch (error) {
-      Toast.show({ type: 'error', text1: 'Could not assign plan', text2: getApiErrorMessage(error) });
+      Toast.show({ type: 'error', text1: 'Could not assign plan', text2: getApiErrorMessage(error, 'An unknown error occurred') });
     }
   };
 

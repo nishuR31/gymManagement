@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { AuthUserDto } from "@gym/shared";
 import { setAccessToken, clearRefreshToken } from "../../services/api";
-import { getApiErrorCode } from "../../utils/apiError";
+import { getApiErrorCode, getApiErrorMessage } from "../../utils/apiError";
 import * as authApi from "./authApi";
 
 export type AuthStatus = "idle" | "loading" | "authenticated" | "unauthenticated" | "password_change_required";
@@ -20,8 +20,16 @@ const initialState: AuthState = {
   error: null
 };
 
-export const loginThunk = createAsyncThunk("auth/login", async (payload: authApi.LoginPayload) => {
-  return authApi.login(payload);
+export const loginThunk = createAsyncThunk<
+  authApi.AuthResponse,
+  authApi.LoginPayload,
+  { rejectValue: string | null }
+>("auth/login", async (payload, { rejectWithValue }) => {
+  try {
+    return await authApi.login(payload);
+  } catch (error: any) {
+    return rejectWithValue(getApiErrorMessage(error, error.message || 'Unknown error'));
+  }
 });
 
 export const registerThunk = createAsyncThunk<

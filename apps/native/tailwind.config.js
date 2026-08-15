@@ -40,12 +40,25 @@ module.exports = {
         },
         warning: {
           DEFAULT: "hsl(var(--warning))",
+          foreground: "hsl(var(--warning-foreground))",
+          soft: "hsl(var(--warning-soft))",
         },
         success: {
           DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
+          soft: "hsl(var(--success-soft))",
         },
-      }
+        // Soft alias tokens (used by StatusBadge for badge backgrounds)
+        "success-soft": "hsl(var(--success-soft))",
+        "warning-soft": "hsl(var(--warning-soft))",
+        "accent-soft": "hsl(var(--accent-soft))",
+        "primary-soft": "hsl(var(--primary-soft))",
+      },
+      borderRadius: {
+        "4xl": "2rem",
+        "5xl": "2.5rem",
+      },
     },
   },
   plugins: [],
-}
+};

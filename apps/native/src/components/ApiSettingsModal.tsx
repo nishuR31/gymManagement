@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Modal, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { View, Text, Modal, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, Pressable } from 'react-native';
 import { X, RefreshCw, Sun, Moon, MoonStar, HardDrive } from 'lucide-react-native';
 import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -40,8 +40,8 @@ export function ApiSettingsModal({ visible, onClose }: ApiSettingsModalProps) {
   return (
     <Modal visible={visible} animationType="slide" transparent>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} className="flex-1">
-        <View className="flex-1 justify-end bg-black/60">
-          <View className="bg-card rounded-t-3xl overflow-hidden pt-4 pb-10 px-6 max-h-[80%]">
+        <Pressable className={`flex-1 justify-end bg-black/60 ${theme === 'dark' || theme === 'amoled' ? 'dark' : ''} ${theme === 'amoled' ? 'amoled' : ''} theme-${styleMode}`} onPress={onClose}>
+          <View className="bg-card rounded-t-3xl overflow-hidden pt-4 pb-10 px-6 max-h-[80%]" onStartShouldSetResponder={() => true}>
             
             <View className="flex-row items-center justify-between mb-6">
               <Text className="text-xl font-bold text-foreground">Valor Fitness Settings</Text>
@@ -64,15 +64,13 @@ export function ApiSettingsModal({ visible, onClose }: ApiSettingsModalProps) {
                 </Text>
                 <View className="flex-row gap-3">
                   <Button variant={theme === "light" ? "primary" : "secondary"} onPress={() => dispatch(setTheme("light"))} className="flex-1 h-10">
-                    <Text className={theme === "light" ? "text-primary-foreground font-bold" : "text-foreground font-medium"}>Light</Text>
+                    Light
                   </Button>
                   <Button variant={theme === "dark" ? "primary" : "secondary"} onPress={() => dispatch(setTheme("dark"))} className="flex-1 h-10">
-                    <Text className={theme === "dark" ? "text-primary-foreground font-bold" : "text-foreground font-medium"}>Dark</Text>
+                    Dark
                   </Button>
-                </View>
-                <View className="flex-row gap-3 mt-2">
                   <Button variant={theme === "amoled" ? "primary" : "secondary"} onPress={() => dispatch(setTheme("amoled"))} className="flex-1 h-10">
-                    <Text className={theme === "amoled" ? "text-primary-foreground font-bold" : "text-foreground font-medium"}>AMOLED (Beta)</Text>
+                    AMOLED
                   </Button>
                 </View>
               </View>
@@ -88,15 +86,15 @@ export function ApiSettingsModal({ visible, onClose }: ApiSettingsModalProps) {
                 <Text className="text-xs text-muted-foreground mb-4">
                   Change the overall shape and feel of UI components.
                 </Text>
-                <View className="flex-row flex-wrap gap-2">
-                  <Button variant={styleMode === "minimal" ? "primary" : "secondary"} onPress={() => dispatch(setStyleMode("minimal"))} className="h-10 px-4">
-                    <Text className={styleMode === "minimal" ? "text-primary-foreground font-bold" : "text-foreground font-medium"}>Minimalist</Text>
+                <View className="flex-row gap-3">
+                  <Button variant={styleMode === "minimal" ? "primary" : "secondary"} onPress={() => dispatch(setStyleMode("minimal"))} className="flex-1 h-10">
+                    Minimalist
                   </Button>
-                  <Button variant={styleMode === "glass" ? "primary" : "secondary"} onPress={() => dispatch(setStyleMode("glass"))} className="h-10 px-4">
-                    <Text className={styleMode === "glass" ? "text-primary-foreground font-bold" : "text-foreground font-medium"}>Glassmorphism</Text>
+                  <Button variant={styleMode === "glass" ? "primary" : "secondary"} onPress={() => dispatch(setStyleMode("glass"))} className="flex-1 h-10">
+                    Glassmorphism
                   </Button>
-                  <Button variant={styleMode === "clay" ? "primary" : "secondary"} onPress={() => dispatch(setStyleMode("clay"))} className="h-10 px-4 mt-2">
-                    <Text className={styleMode === "clay" ? "text-primary-foreground font-bold" : "text-foreground font-medium"}>Claymorphism</Text>
+                  <Button variant={styleMode === "clay" ? "primary" : "secondary"} onPress={() => dispatch(setStyleMode("clay"))} className="flex-1 h-10">
+                    Claymorphism
                   </Button>
                 </View>
               </View>
@@ -112,15 +110,14 @@ export function ApiSettingsModal({ visible, onClose }: ApiSettingsModalProps) {
                 <Text className="text-xs text-muted-foreground mb-4">
                   If the app shows stale data, clearing cache forces it to reload.
                 </Text>
-                <Button onPress={handleClearCache} className="w-full h-11">
-                  <RefreshCw size={16} color={activeColors.primaryForeground} style={{ marginRight: 8 }} />
-                  <Text className="text-primary-foreground font-bold">Clear Cache & Reload App</Text>
+                <Button onPress={handleClearCache} className="w-full h-11" leftIcon={<RefreshCw size={16} color={activeColors.primaryForeground} />}>
+                  Clear Cache & Reload App
                 </Button>
               </View>
 
             </ScrollView>
           </View>
-        </View>
+        </Pressable>
       </KeyboardAvoidingView>
     </Modal>
   );

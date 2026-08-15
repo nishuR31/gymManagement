@@ -1,151 +1,166 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, RefreshControl, Modal } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import { View, Text, TouchableOpacity, Modal, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { MessageSquare, Search } from 'lucide-react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { MessageSquare, Search, X } from 'lucide-react-native';
 import Toast from 'react-native-toast-message';
 
 import { Card, CardContent } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
-import { Button } from '../components/ui/Button';
-import { FloatingDock } from '../components/layout/FloatingDock';
-import { useAppSelector } from '../store/hooks';
-import { themeColors } from '../constants/colors';
+import { StatusBadge } from '../components/ui/StatusBadge';
+import { EmptyState } from '../components/ui/EmptyState';
+import { ScreenWrapper, PageHeader } from '../components/layout/ScreenWrapper';
+import { useTheme } from '../hooks/useTheme';
 import * as inquiryApi from '../features/inquiries/inquiryApi';
 import type { InquiryDto } from '@gym/shared';
 import { formatDateTime } from '../utils/format';
 
 export function InquiriesScreen() {
-  const theme = useAppSelector((state) => state.theme.theme);
-  const activeColors = themeColors[theme === 'amoled' ? 'amoled' : theme === 'dark' ? 'dark' : 'light'];
+  const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
 
   const [inquiries, setInquiries] = useState<InquiryDto[]>([]);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [selectedInquiry, setSelectedInquiry] = useState<InquiryDto | null>(null);
 
-  const loadData = async (): Promise<void> => {
+  const loadData = useCallback(async (): Promise<void> => {
     setIsLoading(true);
     try {
-      const response = await inquiryApi.listInquiries({
-        page: 1,
-        pageSize: 50,
-      });
+      const response = await inquiryApi.listInquiries({ page: 1, pageSize: 50 });
       setInquiries(response.data);
     } catch {
       Toast.show({ type: 'error', text1: 'Could not load inquiries' });
     } finally {
       setIsLoading(false);
     }
-  };
-
-  useEffect(() => {
-    loadData();
   }, []);
 
-  const filteredInquiries = inquiries.filter(i =>
+  useEffect(() => { void loadData(); }, [loadData]);
+
+  const filteredInquiries = inquiries.filter((i) =>
     i.name.toLowerCase().includes(search.toLowerCase()) ||
-    i.email.toLowerCase().includes(search.toLowerCase())
+    i.email.toLowerCase().includes(search.toLowerCase()),
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
-      <ScrollView refreshControl={<RefreshControl refreshing={isLoading} onRefresh={loadData} tintColor={activeColors.primary} />} contentContainerStyle={{ padding: 16, paddingBottom: 100 }}>
+    <ScreenWrapper refreshing={isLoading} onRefresh={loadData}>
+      <PageHeader
+        label="Leads"
+        title="Inquiries"
+        subtitle="Messages from the public website"
+      />
 
-        <View className="mb-6 bg-card border border-border p-4 rounded-lg shadow-sm">
-          <Text className="text-xs font-black uppercase tracking-[0.18em] text-primary">Leads</Text>
-          <Text className="mt-2 text-3xl font-black text-foreground">Inquiries</Text>
-          <Text className="mt-1 text-sm font-semibold text-muted-foreground mb-4">Messages from the public website</Text>
+      <View className="mb-4">
+        <Input
+          placeholder="Search inquiries..."
+          value={search}
+          onChangeText={setSearch}
+          leftIcon={<Search size={16} color={colors.mutedForeground} />}
+        />
+      </View>
 
-          <View className="relative justify-center">
-            <Input
-              placeholder="Search inquiries..."
-              value={search}
-              onChangeText={setSearch}
-              className="pl-10 h-10"
-            />
-            <View className="absolute left-3 top-2.5">
-              <Search size={16} color={activeColors.mutedForeground} />
+      <Card>
+        <CardContent className="p-0">
+          {filteredInquiries.length === 0 && !isLoading ? (
+            <View className="p-4">
+              <EmptyState icon={MessageSquare} title="No inquiries found" />
             </View>
-          </View>
-        </View>
-
-        <Card>
-          <CardContent className="p-0">
-            {filteredInquiries.length === 0 && !isLoading ? (
-              <View className="items-center py-12 px-4">
-                <MessageSquare size={32} color={activeColors.mutedForeground} />
-                <Text className="font-bold text-foreground mt-2">No inquiries found</Text>
-              </View>
-            ) : (
-              <View>
-                {filteredInquiries.map((inquiry, index) => (
-                  <TouchableOpacity
-                    key={inquiry.id}
-                    onPress={() => setSelectedInquiry(inquiry)}
-                    className={`flex-row justify-between items-center p-4 ${index !== filteredInquiries.length - 1 ? 'border-b border-border' : ''}`}
-                  >
-                    <View className="flex-row items-center flex-1 mr-2">
-                      <View className="w-10 h-10 bg-secondary items-center justify-center rounded-full mr-3">
-                        <MessageSquare size={20} color={activeColors.primary} />
-                      </View>
-                      <View className="flex-1">
-                        <Text className="font-bold text-foreground text-base" numberOfLines={1}>
-                          {inquiry.name}
-                        </Text>
-                        <Text className="text-xs font-semibold text-muted-foreground">{inquiry.email}</Text>
-                      </View>
+          ) : (
+            <View>
+              {filteredInquiries.map((inquiry, index) => (
+                <TouchableOpacity
+                  key={inquiry.id}
+                  onPress={() => setSelectedInquiry(inquiry)}
+                  className={`flex-row justify-between items-center p-4 ${
+                    index !== filteredInquiries.length - 1 ? 'border-b border-border' : ''
+                  }`}
+                  activeOpacity={0.7}
+                >
+                  <View className="flex-row items-center flex-1 mr-2">
+                    <View
+                      style={{ backgroundColor: colors.primarySoft }}
+                      className="w-10 h-10 items-center justify-center rounded-xl mr-3"
+                    >
+                      <MessageSquare size={20} color={colors.primary} />
                     </View>
-                    <View className="items-end">
-                      <View className={`px-2 py-0.5 rounded-full border ${inquiry.status === 'NEW' ? 'bg-primary/10 border-primary/20' : 'bg-secondary border-border'}`}>
-                        <Text className={`text-[10px] uppercase font-bold ${inquiry.status === 'NEW' ? 'text-primary' : 'text-muted-foreground'}`}>{inquiry.status}</Text>
-                      </View>
+                    <View className="flex-1">
+                      <Text className="font-bold text-foreground text-base" numberOfLines={1}>
+                        {inquiry.name}
+                      </Text>
+                      <Text className="text-xs font-semibold text-muted-foreground" numberOfLines={1}>
+                        {inquiry.email}
+                      </Text>
                     </View>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            )}
-          </CardContent>
-        </Card>
+                  </View>
+                  <StatusBadge status={inquiry.status} />
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
+        </CardContent>
+      </Card>
 
-      </ScrollView>
-
-      <Modal visible={!!selectedInquiry} animationType="slide" presentationStyle="pageSheet">
-        <View className="flex-1 bg-background pt-12">
+      {/* Inquiry detail modal — cross-platform */}
+      <Modal
+        visible={!!selectedInquiry}
+        animationType="slide"
+        transparent={false}
+        onRequestClose={() => setSelectedInquiry(null)}
+        statusBarTranslucent
+      >
+        <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} edges={['top', 'left', 'right']}>
           {selectedInquiry && (
-            <View className="flex-1">
-              <View className="flex-row justify-between items-center px-4 pb-4 border-b border-border">
-                <Text className="text-xl font-bold text-foreground">Inquiry Details</Text>
-                <Button variant="outline" onPress={() => setSelectedInquiry(null)} className="h-8 px-4">Close</Button>
+            <View style={{ flex: 1 }}>
+              <View
+                style={{ borderBottomColor: colors.border }}
+                className="flex-row justify-between items-center px-4 py-3 border-b"
+              >
+                <Text className="text-xl font-black text-foreground">Inquiry Details</Text>
+                <TouchableOpacity
+                  onPress={() => setSelectedInquiry(null)}
+                  style={{ backgroundColor: colors.secondary }}
+                  className="p-2 rounded-full"
+                  activeOpacity={0.7}
+                >
+                  <X size={18} color={colors.foreground} />
+                </TouchableOpacity>
               </View>
 
-              <ScrollView className="p-4" contentContainerStyle={{ paddingBottom: 60 }}>
+              <ScrollView
+                contentContainerStyle={{ padding: 16, paddingBottom: Math.max(insets.bottom, 24) }}
+                showsVerticalScrollIndicator={false}
+              >
                 <Card className="mb-4">
                   <CardContent className="p-4 gap-4">
                     <View>
-                      <Text className="text-xs font-bold text-muted-foreground uppercase">From</Text>
-                      <Text className="text-foreground mt-1 font-bold">{selectedInquiry.name}</Text>
-                      <Text className="text-muted-foreground">{selectedInquiry.email}</Text>
-                      <Text className="text-muted-foreground">{selectedInquiry.phone || 'No phone'}</Text>
+                      <Text className="text-xs font-bold text-muted-foreground uppercase mb-1">From</Text>
+                      <Text className="text-foreground font-bold">{selectedInquiry.name}</Text>
+                      <Text className="text-muted-foreground text-sm">{selectedInquiry.email}</Text>
+                      <Text className="text-muted-foreground text-sm">{selectedInquiry.phone || 'No phone'}</Text>
                     </View>
                     <View className="h-px bg-border" />
                     <View>
-                      <Text className="text-xs font-bold text-muted-foreground uppercase">Message</Text>
-                      <Text className="text-foreground mt-2">{selectedInquiry.message}</Text>
+                      <Text className="text-xs font-bold text-muted-foreground uppercase mb-1">Status</Text>
+                      <StatusBadge status={selectedInquiry.status} />
                     </View>
                     <View className="h-px bg-border" />
                     <View>
-                      <Text className="text-xs font-bold text-muted-foreground uppercase">Received</Text>
-                      <Text className="text-foreground mt-1">{formatDateTime(selectedInquiry.createdAt)}</Text>
+                      <Text className="text-xs font-bold text-muted-foreground uppercase mb-1">Message</Text>
+                      <Text className="text-foreground mt-1 leading-relaxed">{selectedInquiry.message}</Text>
+                    </View>
+                    <View className="h-px bg-border" />
+                    <View>
+                      <Text className="text-xs font-bold text-muted-foreground uppercase mb-1">Received</Text>
+                      <Text className="text-foreground font-semibold">{formatDateTime(selectedInquiry.createdAt)}</Text>
                     </View>
                   </CardContent>
                 </Card>
               </ScrollView>
             </View>
           )}
-        </View>
+        </SafeAreaView>
       </Modal>
-
-      <FloatingDock />
-    </SafeAreaView>
+    </ScreenWrapper>
   );
 }

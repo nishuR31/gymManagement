@@ -1,52 +1,87 @@
-import { useEffect, useRef } from 'react';
-import { Animated, View } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, Animated, ViewStyle } from 'react-native';
+import { useTheme } from '../../hooks/useTheme';
 
-function SkeletonBar({ delay = 0 }: { delay?: number }) {
-  const opacity = useRef(new Animated.Value(0.3)).current;
+interface SkeletonProps {
+  width?: number | string;
+  height?: number;
+  rounded?: boolean;
+  className?: string;
+  style?: ViewStyle;
+}
+
+/** Single animated shimmer skeleton bone */
+export function Skeleton({
+  width = '100%',
+  height = 16,
+  rounded = false,
+  className = '',
+  style,
+}: SkeletonProps) {
+  const { colors } = useTheme();
+  const shimmer = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    const animation = Animated.loop(
+    const loop = Animated.loop(
       Animated.sequence([
-        Animated.timing(opacity, {
-          toValue: 0.7,
-          duration: 700,
-          delay,
+        Animated.timing(shimmer, {
+          toValue: 1,
+          duration: 900,
           useNativeDriver: true,
         }),
-        Animated.timing(opacity, {
-          toValue: 0.3,
-          duration: 700,
+        Animated.timing(shimmer, {
+          toValue: 0,
+          duration: 900,
           useNativeDriver: true,
         }),
-      ])
+      ]),
     );
-    animation.start();
-    return () => animation.stop();
-  }, [opacity, delay]);
+    loop.start();
+    return () => loop.stop();
+  }, [shimmer]);
+
+  const opacity = shimmer.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.4, 0.85],
+  });
 
   return (
     <Animated.View
-      style={{ opacity }}
-      className="h-12 rounded-md bg-secondary"
+      style={[
+        {
+          width: width as any,
+          height,
+          backgroundColor: colors.border,
+          borderRadius: rounded ? 999 : 6,
+          opacity,
+        },
+        style,
+      ]}
     />
   );
 }
 
-export function SkeletonRows({ rows = 4 }: { rows?: number }) {
-  return (
-    <View className="gap-2">
-      {Array.from({ length: rows }, (_value, index) => (
-        <SkeletonBar key={index} delay={index * 100} />
-      ))}
-    </View>
-  );
+interface SkeletonRowsProps {
+  rows?: number;
+  /** Show a circle avatar before each row */
+  showAvatar?: boolean;
 }
 
-export function SkeletonCard() {
+/** Stacked skeleton rows for list loading states */
+export function SkeletonRows({ rows = 3, showAvatar = false }: SkeletonRowsProps) {
   return (
-    <View className="rounded-xl border border-border bg-card p-4 gap-3">
-      <SkeletonBar delay={0} />
-      <SkeletonBar delay={100} />
+    <View className="gap-3">
+      {Array.from({ length: rows }).map((_, i) => (
+        <View key={i} className="flex-row items-center gap-3">
+          {showAvatar && (
+            <Skeleton width={36} height={36} rounded className="shrink-0" />
+          )}
+          <View className="flex-1 gap-2">
+            <Skeleton height={14} width={`${70 + (i % 3) * 10}%`} />
+            <Skeleton height={10} width={`${40 + (i % 2) * 20}%`} />
+          </View>
+        </View>
+      ))}
     </View>
   );
 }

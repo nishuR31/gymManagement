@@ -1,38 +1,47 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Building2, Clock3, FileText, Percent, Settings as SettingsIcon, Moon, Sun, MoonStar, Paintbrush } from 'lucide-react-native';
+import { useEffect, useMemo, useState } from 'react';
+import { View, Text, TouchableOpacity, TextInput } from 'react-native';
+import {
+  Building2,
+  Clock3,
+  FileText,
+  Percent,
+  Settings as SettingsIcon,
+  Moon,
+  Sun,
+  MoonStar,
+  Paintbrush,
+} from 'lucide-react-native';
 import Toast from 'react-native-toast-message';
 import { Button } from '../components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
-import { FloatingDock } from '../components/layout/FloatingDock';
 import { EmptyState } from '../components/ui/EmptyState';
 import { Input } from '../components/ui/Input';
+import { ScreenWrapper, PageHeader } from '../components/layout/ScreenWrapper';
+import { useTheme } from '../hooks/useTheme';
 import * as settingsApi from '../features/settings/settingsApi';
 import { useAppSelector, useAppDispatch } from '../store/hooks';
 import { setTheme, setStyleMode } from '../features/theme/themeSlice';
-import { getApiErrorMessage } from '../utils/apiError';
 import { formatDateTime, readableStatus } from '../utils/format';
 import { isAdminRole } from '../utils/roles';
 import type { SettingDto } from '@gym/shared';
-import { themeColors } from '../constants/colors';
 
 const defaultKeys = ['gym-details', 'business-hours', 'tax-rate', 'receipt-template', 'general-config'];
 const firstDefaultKey = defaultKeys[0];
 
 export function SettingsScreen() {
   const role = useAppSelector((state) => state.auth.user?.role);
-  const theme = useAppSelector((state) => state.theme.theme);
-  const styleMode = useAppSelector((state) => state.theme.styleMode);
   const dispatch = useAppDispatch();
-  const activeColors = themeColors[theme === 'dark' || theme === 'amoled' ? 'dark' : 'light'];
+  const { theme, styleMode, colors } = useTheme();
 
   const [settings, setSettings] = useState<SettingDto[]>([]);
   const [selectedKey, setSelectedKey] = useState<string>(firstDefaultKey);
   const [draft, setDraft] = useState('');
   const [loading, setLoading] = useState(true);
 
-  const selected = useMemo(() => settings.find((setting) => setting.key === selectedKey), [selectedKey, settings]);
+  const selected = useMemo(
+    () => settings.find((s) => s.key === selectedKey),
+    [selectedKey, settings],
+  );
 
   const load = async (): Promise<void> => {
     setLoading(true);
@@ -42,24 +51,22 @@ export function SettingsScreen() {
       const firstKey = rows[0]?.key ?? firstDefaultKey;
       setSelectedKey((current) => current || firstKey);
     } catch (error) {
-      Toast.show({
-        type: 'error', text1: 'Could not load settings', text2: getApiErrorMessage(
-          (error as unknown as { message: string }).message.toString(), "Failed to load settings")
-      });
+      Toast.show({ type: 'error', text1: 'Could not load settings' });
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    void load();
-  }, []);
+  useEffect(() => { void load(); }, []);
 
   useEffect(() => {
     setDraft(JSON.stringify(selected?.value ?? defaultValueForKey(selectedKey), null, 2));
   }, [selected, selectedKey]);
 
-  const keys = useMemo(() => [...new Set([...defaultKeys, ...settings.map((setting) => setting.key)])], [settings]);
+  const keys = useMemo(
+    () => [...new Set([...defaultKeys, ...settings.map((s) => s.key)])],
+    [settings],
+  );
 
   const save = async (): Promise<void> => {
     try {
@@ -72,130 +79,208 @@ export function SettingsScreen() {
       Toast.show({ type: 'success', text1: 'Setting saved' });
     } catch (error) {
       if (error instanceof SyntaxError) {
-        Toast.show({ type: 'error', text1: 'Setting value must be valid JSON' });
+        Toast.show({ type: 'error', text1: 'Value must be valid JSON' });
         return;
       }
-      Toast.show({
-        type: 'error', text1: 'Could not save setting', text2: getApiErrorMessage(
-          (error as unknown as { message: string }).message.toString(), "Could not save setting")
-      });
+      Toast.show({ type: 'error', text1: 'Could not save setting' });
     }
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
-      <ScrollView className="flex-1 p-4">
-        <Card className="mb-6">
-          <CardContent className="pt-6">
-            <Text className="text-xs font-black uppercase tracking-[2px] text-primary">Control Room</Text>
-            <Text className="mt-2 text-3xl font-black text-foreground">Settings</Text>
-            <Text className="mt-1 text-sm font-semibold text-muted-foreground">Gym details, business rules, receipts, and runtime config.</Text>
-          </CardContent>
-        </Card>
+    <ScreenWrapper>
+      <PageHeader
+        label="Control Room"
+        title="Settings"
+        subtitle="Gym details, business rules, receipts, and runtime config."
+      />
 
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>App Appearance</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <View className="mb-4">
-              <View className="flex-row items-center gap-2 mb-3">
-                {theme === 'amoled' ? <MoonStar size={16} color={activeColors.foreground} /> : theme === 'dark' ? <Moon size={16} color={activeColors.foreground} /> : <Sun size={16} color={activeColors.foreground} />}
+      {/* App Appearance */}
+      <Card className="mb-4">
+        <CardHeader>
+          <CardTitle>App Appearance</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {/* Color scheme */}
+          <View className="mb-6">
+            <View className="mb-3">
+              <View className="flex-row items-center gap-2">
+                {theme === 'amoled' ? (
+                  <MoonStar size={16} color={colors.foreground} />
+                ) : theme === 'dark' ? (
+                  <Moon size={16} color={colors.foreground} />
+                ) : (
+                  <Sun size={16} color={colors.foreground} />
+                )}
                 <Text className="text-sm font-bold text-foreground">Color Scheme</Text>
               </View>
-              <View className="flex-row gap-2">
-                <Button variant={theme === 'light' ? 'primary' : 'secondary'} onPress={() => dispatch(setTheme('light'))} className="flex-1">Light</Button>
-                <Button variant={theme === 'dark' ? 'primary' : 'secondary'} onPress={() => dispatch(setTheme('dark'))} className="flex-1">Dark</Button>
-                <Button variant={theme === 'amoled' ? 'primary' : 'secondary'} onPress={() => dispatch(setTheme('amoled'))} className="flex-1">AMOLED</Button>
-              </View>
+              <Text className="text-xs text-muted-foreground mt-1">Adjust the color palette to match your environment.</Text>
             </View>
+            <View className="flex-row gap-2">
+              {(['light', 'dark', 'amoled'] as const).map((t) => (
+                <Button
+                  key={t}
+                  variant={theme === t ? 'primary' : 'secondary'}
+                  onPress={() => dispatch(setTheme(t))}
+                  className="flex-1"
+                  size="sm"
+                >
+                  {t.charAt(0).toUpperCase() + t.slice(1)}
+                </Button>
+              ))}
+            </View>
+          </View>
 
-            <View>
-              <View className="flex-row items-center gap-2 mb-3">
-                <Paintbrush size={16} color={activeColors.foreground} />
+          {/* Styling paradigm */}
+          <View>
+            <View className="mb-3">
+              <View className="flex-row items-center gap-2">
+                <Paintbrush size={16} color={colors.foreground} />
                 <Text className="text-sm font-bold text-foreground">Styling Paradigm</Text>
               </View>
-              <View className="flex-row gap-2 flex-wrap">
-                <Button variant={styleMode === 'minimal' ? 'primary' : 'secondary'} onPress={() => dispatch(setStyleMode('minimal'))} className="flex-1 min-w-[100px]">Minimalist</Button>
-                <Button variant={styleMode === 'glass' ? 'primary' : 'secondary'} onPress={() => dispatch(setStyleMode('glass'))} className="flex-1 min-w-[100px]">Glass</Button>
-                <Button variant={styleMode === 'clay' ? 'primary' : 'secondary'} onPress={() => dispatch(setStyleMode('clay'))} className="flex-1 min-w-[100px]">Clay</Button>
-              </View>
+              <Text className="text-xs text-muted-foreground mt-1">Change the overall shape and feel of UI components.</Text>
             </View>
-          </CardContent>
-        </Card>
-
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>Setting Groups</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {!loading && keys.length === 0 ? <EmptyState title="No settings found" /> : null}
-            <View className="gap-2">
-              {keys.map((key) => {
-                const Icon = iconForKey(key);
-                const isSelected = selectedKey === key;
-                return (
-                  <TouchableOpacity
-                    key={key}
-                    className={`flex-row items-center gap-3 rounded-md px-3 py-3 border ${isSelected ? 'border-primary bg-primary' : 'border-border bg-card'}`}
-                    onPress={() => setSelectedKey(key)}
-                  >
-                    <Icon size={20} color={isSelected ? activeColors.primaryForeground : activeColors.mutedForeground} />
-                    <View className="flex-1">
-                      <Text className={`font-bold ${isSelected ? 'text-primary-foreground' : 'text-foreground'}`}>{readableStatus(key)}</Text>
-                      <Text className={`text-xs ${isSelected ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>{descriptionForKey(key)}</Text>
-                    </View>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          </CardContent>
-        </Card>
-
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>{readableStatus(selectedKey)}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <View className="rounded-md bg-secondary p-3 mb-4">
-              <Input label="Key" value={selectedKey} onChangeText={setSelectedKey} editable={isAdminRole(role)} />
-              {isAdminRole(role) && (
-                <Button variant="secondary" className="mt-2" onPress={() => setDraft(JSON.stringify(defaultValueForKey(selectedKey), null, 2))}>
-                  Use Template
+            <View className="flex-row gap-2">
+              {(['minimal', 'glass', 'clay'] as const).map((s) => (
+                <Button
+                  key={s}
+                  variant={styleMode === s ? 'primary' : 'secondary'}
+                  onPress={() => dispatch(setStyleMode(s))}
+                  className="flex-1"
+                  size="sm"
+                >
+                  {s.charAt(0).toUpperCase() + s.slice(1)}
                 </Button>
-              )}
+              ))}
             </View>
+          </View>
+        </CardContent>
+      </Card>
 
-            <Text className="mb-2 text-sm font-medium text-foreground">Value JSON</Text>
-            <TextInput
-              className="min-h-[200px] rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground"
-              multiline
-              textAlignVertical="top"
-              value={draft}
-              onChangeText={setDraft}
+      {/* Setting group selector */}
+      <Card className="mb-4">
+        <CardHeader>
+          <CardTitle>Setting Groups</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {!loading && keys.length === 0 ? (
+            <EmptyState title="No settings found" />
+          ) : null}
+          <View className="gap-2">
+            {keys.map((key) => {
+              const Icon = iconForKey(key);
+              const isSelected = selectedKey === key;
+              return (
+                <TouchableOpacity
+                  key={key}
+                  style={{
+                    backgroundColor: isSelected ? colors.primary : colors.secondary,
+                    borderColor: isSelected ? colors.primary : colors.border,
+                  }}
+                  className="flex-row items-center gap-3 rounded-xl px-3 py-3 border"
+                  onPress={() => setSelectedKey(key)}
+                  activeOpacity={0.7}
+                >
+                  <Icon
+                    size={20}
+                    color={isSelected ? colors.primaryForeground : colors.mutedForeground}
+                  />
+                  <View className="flex-1">
+                    <Text
+                      style={{ color: isSelected ? colors.primaryForeground : colors.foreground }}
+                      className="font-bold"
+                    >
+                      {readableStatus(key)}
+                    </Text>
+                    <Text
+                      style={{
+                        color: isSelected
+                          ? `${colors.primaryForeground}99`
+                          : colors.mutedForeground,
+                      }}
+                      className="text-xs"
+                    >
+                      {descriptionForKey(key)}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </CardContent>
+      </Card>
+
+      {/* Setting editor */}
+      <Card className="mb-4">
+        <CardHeader>
+          <CardTitle>{readableStatus(selectedKey)}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <View
+            style={{ backgroundColor: colors.secondary }}
+            className="rounded-xl p-3 mb-4"
+          >
+            <Input
+              label="Key"
+              value={selectedKey}
+              onChangeText={setSelectedKey}
               editable={isAdminRole(role)}
-              autoCapitalize="none"
-              autoCorrect={false}
             />
-
-            {selected ? (
-              <Text className="mt-2 text-xs font-semibold text-muted-foreground">
-                Last updated {formatDateTime(selected.updatedAt)} by {selected.updatedBy ?? 'system'}
-              </Text>
-            ) : (
-              <Text className="mt-2 text-xs font-semibold text-muted-foreground">This key will be created when saved.</Text>
-            )}
-
             {isAdminRole(role) && (
-              <Button className="mt-4" onPress={save}>Save</Button>
+              <Button
+                variant="secondary"
+                className="mt-1"
+                onPress={() =>
+                  setDraft(JSON.stringify(defaultValueForKey(selectedKey), null, 2))
+                }
+                size="sm"
+              >
+                Use Template
+              </Button>
             )}
-          </CardContent>
-        </Card>
+          </View>
 
-        <View className="h-12" />
-      </ScrollView>
-      <FloatingDock />
-    </SafeAreaView>
+          <Text className="mb-2 text-sm font-medium text-foreground">Value (JSON)</Text>
+          <TextInput
+            // Use style object for min-height — className min-h is unreliable in RN
+            style={{
+              minHeight: 200,
+              borderRadius: 12,
+              borderWidth: 1,
+              borderColor: colors.input,
+              backgroundColor: colors.background,
+              paddingHorizontal: 12,
+              paddingVertical: 10,
+              fontSize: 13,
+              color: colors.foreground,
+              fontFamily: 'monospace',
+              textAlignVertical: 'top',
+            }}
+            multiline
+            value={draft}
+            onChangeText={setDraft}
+            editable={isAdminRole(role)}
+            autoCapitalize="none"
+            autoCorrect={false}
+          />
+
+          {selected ? (
+            <Text className="mt-2 text-xs font-semibold text-muted-foreground">
+              Last updated {formatDateTime(selected.updatedAt)} by {selected.updatedBy ?? 'system'}
+            </Text>
+          ) : (
+            <Text className="mt-2 text-xs font-semibold text-muted-foreground">
+              This key will be created when saved.
+            </Text>
+          )}
+
+          {isAdminRole(role) && (
+            <Button className="mt-4" onPress={save}>
+              Save Setting
+            </Button>
+          )}
+        </CardContent>
+      </Card>
+    </ScreenWrapper>
   );
 }
 
@@ -216,8 +301,14 @@ function descriptionForKey(key: string): string {
 }
 
 function defaultValueForKey(key: string): unknown {
-  if (key === 'gym-details') return { name: 'Single Gym', phone: '', email: '', address: '' };
-  if (key === 'business-hours') return { monday: '06:00-22:00', tuesday: '06:00-22:00', wednesday: '06:00-22:00', thursday: '06:00-22:00', friday: '06:00-22:00', saturday: '08:00-20:00', sunday: '08:00-14:00' };
+  if (key === 'gym-details')
+    return { name: 'Single Gym', phone: '', email: '', address: '' };
+  if (key === 'business-hours')
+    return {
+      monday: '06:00-22:00', tuesday: '06:00-22:00', wednesday: '06:00-22:00',
+      thursday: '06:00-22:00', friday: '06:00-22:00',
+      saturday: '08:00-20:00', sunday: '08:00-14:00',
+    };
   if (key === 'tax-rate') return { percent: 0 };
   if (key === 'receipt-template') return { footer: 'Thank you for training with us.' };
   return {};

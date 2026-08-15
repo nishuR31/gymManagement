@@ -1,68 +1,114 @@
-import React, { useState } from 'react';
-import { TextInput, TextInputProps, View, Text, TouchableOpacity } from 'react-native';
+import React, { useRef, useState } from 'react';
+import {
+  TextInput,
+  TextInputProps,
+  View,
+  Text,
+  TouchableOpacity,
+  Animated,
+} from 'react-native';
 import { Eye, EyeOff } from 'lucide-react-native';
-import { useAppSelector } from '../../store/hooks';
-import { themeColors } from '../../constants/colors';
+import { useTheme } from '../../hooks/useTheme';
 
 interface InputProps extends TextInputProps {
   label?: string;
   error?: string;
+  /** Optional icon rendered on the left side inside the input */
+  leftIcon?: React.ReactNode;
   className?: string;
 }
 
-export function Input({ label, error, className, secureTextEntry, ...props }: InputProps) {
-  const styleMode = useAppSelector((state) => state.theme.styleMode);
-  const theme = useAppSelector((state) => state.theme.theme);
-  const activeColors = themeColors[theme === 'amoled' ? 'amoled' : theme === 'dark' ? 'dark' : 'light'];
-  
+export function Input({
+  label,
+  error,
+  className,
+  secureTextEntry,
+  leftIcon,
+  onFocus,
+  onBlur,
+  ...props
+}: InputProps) {
+  const { styleMode, colors, isDark } = useTheme();
+  const [isFocused, setIsFocused] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  
-  let baseClass = 'flex-1 h-10 pl-3 py-2 text-sm text-foreground ';
+
+  // ── Container border class by styleMode + state ──
+  let containerClass = 'flex-row items-center h-12 ';
+  const bgClass = isDark ? 'bg-white/10' : 'bg-black/5';
+  const glassBgClass = isDark ? 'bg-white/10' : 'bg-white/40';
+
   if (styleMode === 'clay') {
-    baseClass += 'rounded-2xl border-transparent bg-card shadow-sm';
+    containerClass += isFocused
+      ? `rounded-2xl border-2 border-primary ${bgClass} shadow-md`
+      : `rounded-2xl border-2 border-transparent ${bgClass} shadow-sm`;
   } else if (styleMode === 'glass') {
-    baseClass += 'rounded-md bg-card/60 border border-border shadow-sm';
+    containerClass += isFocused
+      ? `rounded-xl border border-primary ${glassBgClass} backdrop-blur-md shadow-md`
+      : `rounded-xl border border-white/20 ${glassBgClass} backdrop-blur-md shadow-sm`;
+  } else if (styleMode === 'minimal') {
+    containerClass += isFocused
+      ? 'rounded-none border-b-2 border-primary bg-transparent'
+      : 'rounded-none border-b border-border bg-transparent';
   } else {
-    baseClass += 'rounded-md border border-input bg-background shadow-none';
+    containerClass += isFocused
+      ? `rounded-md border border-primary ${bgClass}`
+      : `rounded-md border border-input ${bgClass}`;
   }
 
   if (error) {
-    baseClass += ' border border-destructive';
-  }
-
-  // Add padding right if it has an eye icon so text doesn't overlap
-  if (secureTextEntry) {
-    baseClass += ' pr-10';
-  } else {
-    baseClass += ' pr-3';
+    containerClass += ' border-destructive border';
   }
 
   const isSecure = secureTextEntry && !isPasswordVisible;
 
   return (
     <View className="mb-4">
-      {label ? <Text className="mb-2 text-sm font-medium text-foreground">{label}</Text> : null}
-      <View className="flex-row items-center relative">
+      {label ? (
+        <Text className="mb-1.5 text-sm font-medium text-muted-foreground">
+          {label}
+        </Text>
+      ) : null}
+
+      <View className={`${containerClass} ${className || ''}`}>
+        {leftIcon ? (
+          <View className="pl-3 pr-1">{leftIcon}</View>
+        ) : null}
+
         <TextInput
-          className={`${baseClass} ${className || ''}`}
-          placeholderTextColor="#9ca3af"
+          className={`flex-1 py-2 text-sm ${leftIcon ? 'pl-1' : 'pl-3'} ${secureTextEntry ? 'pr-10' : 'pr-3'} ${props.multiline ? 'min-h-[40px]' : 'h-10'}`}
+          style={{ color: colors.foreground }}
+          placeholderTextColor={colors.mutedForeground}
           secureTextEntry={isSecure}
+          onFocus={(e) => {
+            setIsFocused(true);
+            onFocus?.(e);
+          }}
+          onBlur={(e) => {
+            setIsFocused(false);
+            onBlur?.(e);
+          }}
           {...props}
+          value={props.value !== undefined ? props.value : ''}
         />
+
         {secureTextEntry && (
-          <TouchableOpacity 
+          <TouchableOpacity
             className="absolute right-0 w-10 items-center justify-center h-full z-10"
-            onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+            onPress={() => setIsPasswordVisible((v) => !v)}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
             {isPasswordVisible ? (
-              <EyeOff size={18} color={activeColors.mutedForeground} />
+              <EyeOff size={18} color={colors.mutedForeground} />
             ) : (
-              <Eye size={18} color={activeColors.mutedForeground} />
+              <Eye size={18} color={colors.mutedForeground} />
             )}
           </TouchableOpacity>
         )}
       </View>
-      {error ? <Text className="mt-1 text-xs text-destructive">{error}</Text> : null}
+
+      {error ? (
+        <Text className="mt-1 text-xs text-destructive">{error}</Text>
+      ) : null}
     </View>
   );
 }

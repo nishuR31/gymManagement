@@ -1,36 +1,50 @@
 import React from 'react';
 import { View, Text } from 'react-native';
-import { AlertTriangle, Check, Circle, Clock3, Snowflake, X } from 'lucide-react-native';
+import {
+  AlertTriangle,
+  Check,
+  Circle,
+  Clock3,
+  Snowflake,
+  X,
+} from 'lucide-react-native';
 import { readableStatus } from '../../utils/format';
+import { useTheme } from '../../hooks/useTheme';
 
-const toneByStatus: Record<string, string> = {
-  ACTIVE: 'bg-success-soft text-success',
-  PAID: 'bg-success-soft text-success',
-  PARTIALLY_PAID: 'bg-warning-soft text-warning',
-  PENDING: 'bg-secondary text-muted-foreground',
-  REFUNDED: 'bg-secondary text-muted-foreground',
-  CANCELLED: 'bg-accent-soft text-destructive',
-  EXPIRED: 'bg-secondary text-muted-foreground',
-  EXPIRING_SOON: 'bg-warning-soft text-warning',
-  FROZEN: 'bg-secondary text-muted-foreground',
-  LOW: 'bg-secondary text-muted-foreground',
-  NORMAL: 'bg-success-soft text-success',
-  HIGH: 'bg-warning-soft text-warning',
-  NEW: 'bg-warning-soft text-warning',
-  READ: 'bg-secondary text-muted-foreground',
-  SUPER_ADMIN: 'bg-accent-soft text-destructive',
-  GYM_OWNER: 'bg-warning-soft text-warning',
-  ADMIN: 'bg-secondary text-primary',
-  STAFF: 'bg-secondary text-muted-foreground',
-  TRAINER: 'bg-success-soft text-success',
+type ToneKey = 'success' | 'warning' | 'danger' | 'muted' | 'primary';
+
+const toneByStatus: Record<string, ToneKey> = {
+  ACTIVE: 'success',
+  APPROVED: 'success',
+  PAID: 'success',
+  NORMAL: 'success',
+  TRAINER: 'success',
+  PARTIALLY_PAID: 'warning',
+  EXPIRING_SOON: 'warning',
+  HIGH: 'warning',
+  NEW: 'warning',
+  GYM_OWNER: 'warning',
+  CANCELLED: 'danger',
+  REJECTED: 'danger',
+  SUSPENDED: 'danger',
+  SUPER_ADMIN: 'danger',
+  PENDING: 'muted',
+  REFUNDED: 'muted',
+  EXPIRED: 'muted',
+  FROZEN: 'muted',
+  LOW: 'muted',
+  READ: 'muted',
+  STAFF: 'muted',
+  ADMIN: 'primary',
 };
 
-const iconByStatus = {
+const iconByStatus: Record<string, typeof Check> = {
   ACTIVE: Check,
   APPROVED: Check,
   PAID: Check,
   PARTIALLY_PAID: Clock3,
   PENDING: Clock3,
+  NEW: Clock3,
   REFUNDED: Circle,
   CANCELLED: X,
   REJECTED: X,
@@ -41,7 +55,6 @@ const iconByStatus = {
   LOW: AlertTriangle,
   NORMAL: Check,
   HIGH: AlertTriangle,
-  NEW: Clock3,
   READ: Check,
   SUPER_ADMIN: Check,
   GYM_OWNER: Check,
@@ -50,32 +63,42 @@ const iconByStatus = {
   TRAINER: Check,
 };
 
-const getTextColorClass = (className: string) => {
-  if (className.includes('text-success')) return 'text-success';
-  if (className.includes('text-warning')) return 'text-warning';
-  if (className.includes('text-destructive')) return 'text-destructive';
-  if (className.includes('text-primary')) return 'text-primary';
-  return 'text-muted-foreground';
-};
-
-const getBgColorClass = (className: string) => {
-  if (className.includes('bg-success-soft')) return 'bg-success-soft';
-  if (className.includes('bg-warning-soft')) return 'bg-warning-soft';
-  if (className.includes('bg-accent-soft')) return 'bg-accent-soft';
-  return 'bg-secondary';
-};
-
 export function StatusBadge({ status }: { status: string }) {
-  const Icon = iconByStatus[status as keyof typeof iconByStatus] ?? Circle;
-  const toneClass = toneByStatus[status] ?? 'bg-secondary text-muted-foreground';
-  
-  const textColorClass = getTextColorClass(toneClass);
-  const bgColorClass = getBgColorClass(toneClass);
+  const { colors } = useTheme();
+  const Icon = iconByStatus[status] ?? Circle;
+  const tone: ToneKey = toneByStatus[status] ?? 'muted';
+
+  // Derive colors from theme — fully type-safe and cross-platform
+  const bgColor: Record<ToneKey, string> = {
+    success: colors.successSoft,
+    warning: colors.warningSoft,
+    danger: colors.destructiveSoft,
+    muted: colors.secondary,
+    primary: colors.primarySoft,
+  };
+
+  const textColor: Record<ToneKey, string> = {
+    success: colors.success,
+    warning: colors.warning,
+    danger: colors.destructive,
+    muted: colors.mutedForeground,
+    primary: colors.primary,
+  };
+
+  const bg = bgColor[tone];
+  const fg = textColor[tone];
 
   return (
-    <View className={`flex-row items-center gap-1.5 rounded px-2 py-1 ${bgColorClass}`}>
-      <Icon size={12} className={textColorClass} />
-      <Text className={`text-xs font-bold ${textColorClass}`} numberOfLines={1}>
+    <View
+      style={{ backgroundColor: bg }}
+      className="flex-row items-center gap-1.5 rounded px-2 py-1"
+    >
+      <Icon size={12} color={fg} />
+      <Text
+        style={{ color: fg }}
+        className="text-xs font-bold"
+        numberOfLines={1}
+      >
         {readableStatus(status)}
       </Text>
     </View>

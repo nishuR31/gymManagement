@@ -4,6 +4,7 @@
 
 @layer base {
   :root {
+    /* ── Core palette ── */
     --background: 42 43% 94%;
     --foreground: 20 14.3% 4.1%;
     --card: 0 0% 100%;
@@ -23,8 +24,16 @@
     --border: 20 5.9% 90%;
     --input: 20 5.9% 90%;
     --ring: 38 52% 43%;
+    /* ── Semantic colors ── */
     --warning: 38 92% 50%;
+    --warning-foreground: 20 14.3% 4.1%;
     --success: 142 72% 29%;
+    --success-foreground: 60 9.1% 97.8%;
+    /* ── Soft badge backgrounds ── */
+    --success-soft: 142 60% 92%;
+    --warning-soft: 38 92% 92%;
+    --accent-soft: 0 84.2% 93%;
+    --primary-soft: 38 52% 92%;
   }
 
   .dark {
@@ -48,7 +57,14 @@
     --input: 12 6.5% 15.1%;
     --ring: 38 52% 43%;
     --warning: 38 92% 50%;
+    --warning-foreground: 20 14.3% 4.1%;
     --success: 142 72% 29%;
+    --success-foreground: 60 9.1% 97.8%;
+    /* Dark soft badge backgrounds */
+    --success-soft: 142 40% 14%;
+    --warning-soft: 38 60% 14%;
+    --accent-soft: 0 40% 14%;
+    --primary-soft: 38 40% 14%;
   }
 
   .amoled {
@@ -72,24 +88,43 @@
     --input: 0 0% 10%;
     --ring: 38 52% 43%;
     --warning: 38 92% 50%;
+    --warning-foreground: 20 14.3% 4.1%;
     --success: 142 72% 29%;
+    --success-foreground: 60 9.1% 97.8%;
+    /* AMOLED soft badge backgrounds */
+    --success-soft: 142 30% 8%;
+    --warning-soft: 38 40% 8%;
+    --accent-soft: 0 30% 8%;
+    --primary-soft: 38 30% 8%;
   }
 
-  /* Basic Themes approximation for native since gradients aren't fully supported via css */
-  .theme-clay {
-    --background: 210 20% 98%;
-    --primary: 38 52% 43%;
-  }
-  .dark.theme-clay {
-    --background: 20 14.3% 4.1%;
-  }
+  /* Style paradigm overrides */
+  /* We no longer override colors here, just shapes/shadows (handled elsewhere) */
+  .theme-clay {}
+  .theme-minimal {}
+  .dark.theme-minimal {}
+}
 
-  .theme-minimal {
-    --background: 0 0% 100%;
-    --primary: 0 0% 0%;
-  }
-  .dark.theme-minimal {
-    --background: 0 0% 0%;
-    --primary: 60 9.1% 97.8%;
-  }
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--background));
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted));
+  border-radius: 9999px;
+  border: 2px solid hsl(var(--background)); /* Adds padding effect around thumb */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground));
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
 }

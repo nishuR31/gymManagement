@@ -1,45 +1,50 @@
-import { View, Text, ScrollView, TouchableOpacity, RefreshControl } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Card } from '../components/ui/Card';
+import { useEffect, useState, useCallback } from 'react';
+import { View, Text } from 'react-native';
 import { EmptyState } from '../components/ui/EmptyState';
 import { LoadBar } from '../components/ui/LoadBar';
 import { SkeletonRows } from '../components/ui/Skeleton';
-import { StatusBadge } from '../components/ui/StatusBadge';
-import { APP_NAME } from '../utils/env';
+import { ScreenWrapper, PageHeader } from '../components/layout/ScreenWrapper';
 import { useAppSelector, useAppDispatch } from '../store/hooks';
 import { logoutThunk } from '../features/auth/authSlice';
 import { Button } from '../components/ui/Button';
-import { 
-  User, LogOut, Activity, CreditCard, Dumbbell, Settings,
-  AlertTriangle, Boxes, CalendarClock, Clock3, Receipt, TrendingUp, Users, WalletCards
+import { useTheme } from '../hooks/useTheme';
+import {
+  Users,
+  LogOut,
+  Activity,
+  CreditCard,
+  AlertTriangle,
+  Boxes,
+  CalendarClock,
+  Receipt,
+  TrendingUp,
+  WalletCards,
 } from 'lucide-react-native';
-import { isAdminRole } from '../utils/roles';
-import { FloatingDock } from '../components/layout/FloatingDock';
-import { themeColors } from '../constants/colors';
-import { useEffect, useState, useCallback } from 'react';
-import type { DashboardSummaryDto, MembershipSubscriptionDto, PaymentDto, ProductOrderDto, ProductDto, NotificationDto, AuditLogDto, LowStockProductDto } from '@gym/shared';
+import type {
+  DashboardSummaryDto,
+  MembershipSubscriptionDto,
+  PaymentDto,
+  LowStockProductDto,
+} from '@gym/shared';
 import * as dashboardApi from '../features/dashboard/dashboardApi';
-import * as inventoryApi from '../features/inventory/inventoryApi';
 import * as memberApi from '../features/members/memberApi';
 import * as membershipApi from '../features/memberships/membershipApi';
-import * as notificationApi from '../features/notifications/notificationApi';
-import * as orderApi from '../features/orders/orderApi';
 import * as paymentApi from '../features/payments/paymentApi';
 import Toast from 'react-native-toast-message';
 import { formatCents, formatDateTime, formatRelativeTime } from '../utils/format';
+import { Card, CardContent } from '../components/ui/Card';
 
 export function DashboardScreen({ navigation }: any) {
   const user = useAppSelector((state) => state.auth.user);
-  const theme = useAppSelector((state) => state.theme.theme);
   const dispatch = useAppDispatch();
-  const activeColors = themeColors[theme === 'amoled' ? 'amoled' : theme === 'dark' ? 'dark' : 'light'];
-  
+  const { colors } = useTheme();
+
   const [summary, setSummary] = useState<DashboardSummaryDto | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
   const loadSummary = useCallback(async () => {
-    if (user?.role === "MEMBER") {
+    if (user?.role === 'MEMBER') {
       setIsLoading(false);
       return;
     }
@@ -62,140 +67,170 @@ export function DashboardScreen({ navigation }: any) {
     void loadSummary();
   }, [loadSummary]);
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     dispatch(logoutThunk());
-    navigation.replace("Home");
-  };
+    navigation.replace('Home');
+  }, [dispatch, navigation]);
 
-  if (user?.role === "MEMBER") {
-    return <MemberDashboard userName={`${user.firstName} ${user.lastName}`} navigation={navigation} />;
+  if (user?.role === 'MEMBER') {
+    return (
+      <MemberDashboard
+        userName={`${user.firstName} ${user.lastName}`}
+        navigation={navigation}
+      />
+    );
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-background relative">
-      <ScrollView 
-        className="flex-1 p-4" 
-        contentContainerStyle={{ paddingBottom: 100 }}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={activeColors.primary} />}
-      >
-        <View className="flex-row items-center justify-between mb-6">
-          <View className="flex-row items-center gap-2 rounded-md border border-primary/35 bg-card/10 px-3 py-2">
-            <Dumbbell size={14} color={activeColors.foreground} />
-            <Text className="text-xs font-black uppercase tracking-widest text-foreground">Live Operations</Text>
-          </View>
+    <ScreenWrapper refreshing={refreshing} onRefresh={onRefresh}>
+      <PageHeader
+        label="Live Operations"
+        title="Dashboard"
+        subtitle="Live operational summary for the gym floor, front desk, revenue, dues, inventory, and recent activity."
+        actions={
           <Button variant="ghost" size="icon" onPress={handleLogout}>
-            <LogOut size={24} color={activeColors.foreground} />
+            <LogOut size={22} color={colors.foreground} />
           </Button>
-        </View>
+        }
+      />
 
-        <View className="mb-6">
-          <Text className="text-3xl font-black leading-tight text-foreground">Dashboard</Text>
-          <Text className="mt-2 text-sm font-semibold text-muted-foreground">
-            Live operational summary for the gym floor, front desk, revenue, dues, inventory, and recent activity.
-          </Text>
-        </View>
+      {/* 2-column metric grid */}
+      <View className="flex-row flex-wrap gap-3 mb-4">
+        <MetricCard
+          icon={Users}
+          title="In Gym"
+          value={summary?.membersCurrentlyInGym ?? 0}
+          loading={isLoading}
+          tone="brand"
+          colors={colors}
+        />
+        <MetricCard
+          icon={CreditCard}
+          title="Today's Rev"
+          value={summary?.todaysRevenueCents ?? 0}
+          formatter={formatCents}
+          loading={isLoading}
+          tone="warning"
+          colors={colors}
+        />
+        <MetricCard
+          icon={Activity}
+          title="Attendance"
+          value={summary?.todaysAttendance ?? 0}
+          loading={isLoading}
+          tone="success"
+          colors={colors}
+        />
+        <MetricCard
+          icon={TrendingUp}
+          title="Monthly Rev"
+          value={summary?.monthlyRevenueCents ?? 0}
+          formatter={formatCents}
+          loading={isLoading}
+          tone="brand"
+          colors={colors}
+        />
+      </View>
 
-        <View className="gap-4 mb-4 flex-row flex-wrap">
-          <MetricCard icon={Users} title="In Gym" value={summary?.membersCurrentlyInGym ?? 0} loading={isLoading} tone="brand" activeColors={activeColors} />
-          <MetricCard icon={CreditCard} title="Today's Rev" value={summary?.todaysRevenueCents ?? 0} formatter={formatCents} loading={isLoading} tone="warning" activeColors={activeColors} />
-          <MetricCard icon={Activity} title="Attendance" value={summary?.todaysAttendance ?? 0} loading={isLoading} tone="success" activeColors={activeColors} />
-          <MetricCard icon={TrendingUp} title="Monthly Rev" value={summary?.monthlyRevenueCents ?? 0} formatter={formatCents} loading={isLoading} tone="brand" activeColors={activeColors} />
-        </View>
+      {/* Alert cards row */}
+      <View className="flex-row gap-3 mb-4">
+        <AlertCard
+          icon={Receipt}
+          iconColor={colors.destructive}
+          iconBg={colors.destructiveSoft}
+          title="Pending Dues"
+          value={formatCents(summary?.pendingDuesCents ?? 0)}
+          subtitle={`${summary?.pendingDuesCount ?? 0} open invoices`}
+          loading={isLoading}
+        />
+        <AlertCard
+          icon={CalendarClock}
+          iconColor={colors.warning}
+          iconBg={colors.warningSoft}
+          title="Expiring Soon"
+          value={String(summary?.membershipsExpiringSoon.length ?? 0)}
+          subtitle="Memberships in 30 days"
+          loading={isLoading}
+        />
+      </View>
 
-        <View className="gap-4 mb-4">
-          <View className="rounded-xl border border-border bg-card p-4">
-            <Text className="text-lg font-bold text-foreground mb-4">Pending Dues</Text>
-            {isLoading ? <SkeletonRows rows={2} /> : (
-              <View>
-                <View className="mb-4 h-11 w-11 items-center justify-center rounded-md bg-accent text-destructive">
-                  <Receipt size={20} color={activeColors.destructive} />
-                </View>
-                <Text className="text-3xl font-black text-foreground">{formatCents(summary?.pendingDuesCents ?? 0)}</Text>
-                <Text className="mt-1 text-sm font-semibold text-muted-foreground">{summary?.pendingDuesCount ?? 0} open invoices</Text>
-              </View>
-            )}
-          </View>
-
-          <View className="rounded-xl border border-border bg-card p-4">
-            <Text className="text-lg font-bold text-foreground mb-4">Expiring Soon</Text>
-            {isLoading ? <SkeletonRows rows={2} /> : (
-              <View>
-                <View className="mb-4 h-11 w-11 items-center justify-center rounded-md bg-yellow-500/20">
-                  <CalendarClock size={20} color={activeColors.warning || "#eab308"} />
-                </View>
-                <Text className="text-3xl font-black text-foreground">{summary?.membershipsExpiringSoon.length ?? 0}</Text>
-                <Text className="mt-1 text-sm font-semibold text-muted-foreground">Memberships inside 30 days</Text>
-              </View>
-            )}
-          </View>
-
-          <View className="rounded-xl border border-border bg-card p-4">
-            <Text className="text-lg font-bold text-foreground mb-4">Low Stock Alerts</Text>
-            {isLoading ? <SkeletonRows rows={2} /> : (
-              <View>
-                <View className="mb-4 h-11 w-11 items-center justify-center rounded-md bg-destructive/20">
-                  <AlertTriangle size={20} color={activeColors.destructive} />
-                </View>
-                <Text className="text-3xl font-black text-foreground">{summary?.lowStockAlerts.length ?? 0}</Text>
-                <Text className="mt-1 text-sm font-semibold text-muted-foreground">Products at or below reorder point</Text>
-              </View>
-            )}
-          </View>
-        </View>
-
-        <View className="gap-4 mb-4">
-          <View className="rounded-xl border border-border bg-card p-4">
-            <Text className="text-lg font-bold text-foreground mb-4">Recent Payments</Text>
-            {isLoading ? <SkeletonRows /> : null}
-            {!isLoading && (summary?.recentPayments.length ?? 0) === 0 ? <EmptyState title="No recent payments" /> : null}
-            <View className="gap-3">
-              {summary?.recentPayments.map((payment) => <PaymentRow key={payment.id} payment={payment} />)}
+      {/* Low stock alert */}
+      <Card className="mb-4">
+        <CardContent className="pt-4">
+          <View className="flex-row items-center gap-2 mb-2">
+            <View style={{ backgroundColor: colors.destructiveSoft }} className="h-9 w-9 items-center justify-center rounded-lg">
+              <AlertTriangle size={18} color={colors.destructive} />
             </View>
-          </View>
-
-          <View className="rounded-xl border border-border bg-card p-4">
-            <Text className="text-lg font-bold text-foreground mb-4">Low Stock</Text>
-            {isLoading ? <SkeletonRows /> : null}
-            {!isLoading && (summary?.lowStockAlerts.length ?? 0) === 0 ? <EmptyState title="No low-stock products" /> : null}
-            <View className="gap-3">
-              {summary?.lowStockAlerts.map((product) => <LowStockRow key={product.id} product={product} />)}
+            <View className="flex-1">
+              <Text className="text-sm font-black text-foreground">Low Stock Alerts</Text>
+              <Text className="text-xs text-muted-foreground">Products at or below reorder point</Text>
             </View>
+            <Text className="text-2xl font-black text-foreground">
+              {summary?.lowStockAlerts.length ?? 0}
+            </Text>
           </View>
-        </View>
+        </CardContent>
+      </Card>
 
-      </ScrollView>
-      <FloatingDock />
-    </SafeAreaView>
+      {/* Recent payments */}
+      <Card className="mb-4">
+        <CardContent className="pt-4">
+          <Text className="text-base font-bold text-foreground mb-3">Recent Payments</Text>
+          {isLoading ? <SkeletonRows showAvatar /> : null}
+          {!isLoading && (summary?.recentPayments.length ?? 0) === 0 ? (
+            <EmptyState title="No recent payments" />
+          ) : null}
+          <View className="gap-2">
+            {summary?.recentPayments.map((payment) => (
+              <PaymentRow key={payment.id} payment={payment} colors={colors} />
+            ))}
+          </View>
+        </CardContent>
+      </Card>
+
+      {/* Low stock list */}
+      <Card className="mb-2">
+        <CardContent className="pt-4">
+          <Text className="text-base font-bold text-foreground mb-3">Low Stock</Text>
+          {isLoading ? <SkeletonRows showAvatar /> : null}
+          {!isLoading && (summary?.lowStockAlerts.length ?? 0) === 0 ? (
+            <EmptyState title="No low-stock products" />
+          ) : null}
+          <View className="gap-2">
+            {summary?.lowStockAlerts.map((product) => (
+              <LowStockRow key={product.id} product={product} colors={colors} />
+            ))}
+          </View>
+        </CardContent>
+      </Card>
+    </ScreenWrapper>
   );
 }
 
-function MemberDashboard({ userName, navigation }: { userName: string; navigation: any }) {
+// ─── Member Dashboard ───────────────────────────────────────────────────────
+
+function MemberDashboard({
+  userName,
+  navigation,
+}: {
+  userName: string;
+  navigation: any;
+}) {
   const [subscriptions, setSubscriptions] = useState<MembershipSubscriptionDto[]>([]);
   const [payments, setPayments] = useState<PaymentDto[]>([]);
-  const [orders, setOrders] = useState<ProductOrderDto[]>([]);
-  const [products, setProducts] = useState<ProductDto[]>([]);
-  const [notifications, setNotifications] = useState<NotificationDto[]>([]);
   const [loading, setLoading] = useState(true);
-  
-  const theme = useAppSelector((state) => state.theme.theme);
-  const activeColors = themeColors[theme === 'amoled' ? 'amoled' : theme === 'dark' ? 'dark' : 'light'];
+  const { colors } = useTheme();
 
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
       const member = await memberApi.getCurrentMember();
-      const [subscriptionRows, paymentRows, orderRows, productRows, notificationRows] = await Promise.all([
+      const [subscriptionRows, paymentRows] = await Promise.all([
         membershipApi.listMemberSubscriptions(member.id).catch(() => []),
         paymentApi.listMemberPayments(member.id).catch(() => []),
-        orderApi.listOrders({ pageSize: 5 }).then((response) => response.data).catch(() => []),
-        inventoryApi.listProducts().catch(() => []),
-        notificationApi.listNotifications({ pageSize: 5 }).then((response) => response.data).catch(() => [])
       ]);
       setSubscriptions(subscriptionRows);
       setPayments(paymentRows);
-      setOrders(orderRows);
-      setProducts(productRows);
-      setNotifications(notificationRows);
     } catch (error: any) {
       Toast.show({ type: 'error', text1: 'Could not load member dashboard', text2: error?.message });
     } finally {
@@ -207,133 +242,231 @@ function MemberDashboard({ userName, navigation }: { userName: string; navigatio
     void loadData();
   }, [loadData]);
 
-  const activeSubscription = subscriptions.find((subscription) => subscription.status === "ACTIVE") ?? subscriptions[0] ?? null;
+  const activeSubscription =
+    subscriptions.find((s) => s.status === 'ACTIVE') ?? subscriptions[0] ?? null;
   const membership = memberMembershipState(activeSubscription);
-  const recentPaymentTotal = payments.slice(0, 3).reduce((total, payment) => total + payment.amountCents, 0);
+  const recentPaymentTotal = payments
+    .slice(0, 3)
+    .reduce((total, payment) => total + payment.amountCents, 0);
 
   return (
-    <SafeAreaView className="flex-1 bg-background relative">
-      <ScrollView className="flex-1 p-4" contentContainerStyle={{ paddingBottom: 100 }}>
-        <View className="mb-6">
-          <View className="w-fit flex-row items-center gap-2 rounded-md border border-primary/35 bg-card/10 px-3 py-2 mb-4 self-start">
-            <Dumbbell size={14} color={activeColors.foreground} />
-            <Text className="text-xs font-black uppercase tracking-widest text-foreground">Member Portal</Text>
-          </View>
-          <Text className="text-3xl font-black text-foreground">Welcome, {userName}</Text>
-          <Text className="mt-2 text-sm font-semibold text-muted-foreground">Membership, payments, bookings, and alerts.</Text>
+    <ScreenWrapper refreshing={loading} onRefresh={loadData}>
+      <PageHeader
+        label="Member Portal"
+        title={`Welcome, ${userName}`}
+        subtitle="Membership, payments, bookings, and alerts."
+      />
+
+      <View className="gap-3 mb-4">
+        <PortalMetric
+          icon={WalletCards}
+          title="Membership"
+          value={membership.label}
+          copy={activeSubscription?.planName ?? 'No active plan'}
+          tone={membership.tone}
+          colors={colors}
+        />
+        <PortalMetric
+          icon={CalendarClock}
+          title="Days Remaining"
+          value={membership.daysRemaining.toString()}
+          copy={
+            activeSubscription
+              ? `Ends ${formatDateTime(activeSubscription.endDate)}`
+              : 'Contact front desk'
+          }
+          tone="warning"
+          colors={colors}
+        />
+        <PortalMetric
+          icon={CreditCard}
+          title="Recent Payments"
+          value={formatCents(recentPaymentTotal)}
+          copy={`${payments.length} payment records`}
+          tone="brand"
+          colors={colors}
+        />
+      </View>
+
+      {membership.label === 'Expiring Soon' && (
+        <View
+          style={{ borderColor: colors.warning, backgroundColor: colors.warningSoft }}
+          className="rounded-xl border p-4 mb-4"
+        >
+          <Text style={{ color: colors.warning }} className="text-sm font-bold">
+            Your membership is expiring soon. Please renew at the front desk to avoid
+            check-in interruption.
+          </Text>
         </View>
-
-        <View className="gap-4 mb-4">
-          <PortalMetric icon={WalletCards} title="Membership" value={membership.label} copy={activeSubscription?.planName ?? "No active plan"} tone={membership.tone} activeColors={activeColors} />
-          <PortalMetric icon={CalendarClock} title="Days Remaining" value={membership.daysRemaining.toString()} copy={activeSubscription ? `Ends ${formatDateTime(activeSubscription.endDate)}` : "Contact front desk"} tone="warning" activeColors={activeColors} />
-          <PortalMetric icon={CreditCard} title="Recent Payments" value={formatCents(recentPaymentTotal)} copy={`${payments.length} payment records`} tone="brand" activeColors={activeColors} />
-        </View>
-
-        {membership.label === "Expiring Soon" && (
-          <View className="rounded-lg border border-yellow-500 bg-yellow-500/20 p-4 mb-4">
-            <Text className="text-sm font-bold text-yellow-500">
-              Your membership is expiring soon. Please renew at the front desk to avoid check-in interruption.
-            </Text>
-          </View>
-        )}
-
-      </ScrollView>
-      <FloatingDock />
-    </SafeAreaView>
+      )}
+    </ScreenWrapper>
   );
 }
 
-function MetricCard({ icon: Icon, title, value, formatter, loading, tone, activeColors }: any) {
+// ─── Sub-components ──────────────────────────────────────────────────────────
+
+function MetricCard({
+  icon: Icon,
+  title,
+  value,
+  formatter,
+  loading,
+  tone,
+  colors,
+}: any) {
   const displayValue = formatter ? formatter(value) : value.toString();
-  const tones: any = {
-    brand: "bg-primary/20",
-    success: "bg-green-500/20",
-    warning: "bg-yellow-500/20"
-  };
-  const iconColors: any = {
-    brand: activeColors.primary,
-    success: "#22c55e",
-    warning: "#eab308"
-  };
+
+  const toneColors = {
+    brand: { bg: colors.primarySoft, icon: colors.primary },
+    success: { bg: colors.successSoft, icon: colors.success },
+    warning: { bg: colors.warningSoft, icon: colors.warning },
+  } as Record<string, { bg: string; icon: string }>;
+
+  const tc = toneColors[tone] ?? toneColors.brand;
 
   return (
-    <View className="w-[47%] rounded-xl border border-border bg-card p-4 mr-2 mb-2">
+    <View className="flex-1 min-w-[45%] rounded-xl border border-border bg-card p-4">
       <View className="flex-row items-start justify-between">
         <View className="flex-1">
-          <Text className="text-xs font-black uppercase tracking-widest text-muted-foreground">{title}</Text>
+          <Text className="text-xs font-black uppercase tracking-widest text-muted-foreground">
+            {title}
+          </Text>
           {loading ? (
-            <View className="mt-4"><SkeletonRows rows={1} /></View>
+            <View className="mt-3">
+              <SkeletonRows rows={1} />
+            </View>
           ) : (
-            <Text className="mt-4 text-2xl font-black text-foreground">{displayValue}</Text>
+            <Text className="mt-3 text-2xl font-black text-foreground">{displayValue}</Text>
           )}
         </View>
-        <View className={`h-11 w-11 items-center justify-center rounded-md ${tones[tone]}`}>
-          <Icon size={20} color={iconColors[tone]} />
+        <View
+          style={{ backgroundColor: tc.bg }}
+          className="h-11 w-11 items-center justify-center rounded-lg ml-2"
+        >
+          <Icon size={20} color={tc.icon} />
         </View>
       </View>
     </View>
   );
 }
 
-function PortalMetric({ icon: Icon, title, value, copy, tone, activeColors }: any) {
-  const tones: any = {
-    brand: "bg-primary/20",
-    success: "bg-green-500/20",
-    warning: "bg-yellow-500/20",
-    danger: "bg-destructive/20"
-  };
-  const iconColors: any = {
-    brand: activeColors.primary,
-    success: "#22c55e",
-    warning: "#eab308",
-    danger: activeColors.destructive
-  };
+function AlertCard({
+  icon: Icon,
+  iconColor,
+  iconBg,
+  title,
+  value,
+  subtitle,
+  loading,
+}: any) {
+  return (
+    <View className="flex-1 rounded-xl border border-border bg-card p-4">
+      {loading ? (
+        <SkeletonRows rows={2} />
+      ) : (
+        <>
+          <View
+            style={{ backgroundColor: iconBg }}
+            className="mb-3 h-10 w-10 items-center justify-center rounded-lg"
+          >
+            <Icon size={18} color={iconColor} />
+          </View>
+          <Text className="text-xs font-black uppercase tracking-widest text-muted-foreground">
+            {title}
+          </Text>
+          <Text className="mt-1 text-2xl font-black text-foreground">{value}</Text>
+          <Text className="mt-0.5 text-xs font-semibold text-muted-foreground">
+            {subtitle}
+          </Text>
+        </>
+      )}
+    </View>
+  );
+}
+
+function PortalMetric({
+  icon: Icon,
+  title,
+  value,
+  copy,
+  tone,
+  colors,
+}: any) {
+  const toneColors = {
+    brand: { bg: colors.primarySoft, icon: colors.primary },
+    success: { bg: colors.successSoft, icon: colors.success },
+    warning: { bg: colors.warningSoft, icon: colors.warning },
+    danger: { bg: colors.destructiveSoft, icon: colors.destructive },
+  } as Record<string, { bg: string; icon: string }>;
+
+  const tc = toneColors[tone] ?? toneColors.brand;
 
   return (
     <View className="rounded-xl border border-border bg-card p-4">
-      <View className={`mb-4 h-11 w-11 items-center justify-center rounded-md ${tones[tone]}`}>
-        <Icon size={20} color={iconColors[tone]} />
+      <View
+        style={{ backgroundColor: tc.bg }}
+        className="mb-3 h-10 w-10 items-center justify-center rounded-lg"
+      >
+        <Icon size={20} color={tc.icon} />
       </View>
-      <Text className="text-xs font-black uppercase tracking-widest text-muted-foreground">{title}</Text>
-      <Text className="mt-2 text-2xl font-black text-foreground">{value}</Text>
-      <Text className="mt-2 text-sm font-semibold text-muted-foreground">{copy}</Text>
+      <Text className="text-xs font-black uppercase tracking-widest text-muted-foreground">
+        {title}
+      </Text>
+      <Text className="mt-1.5 text-2xl font-black text-foreground">{value}</Text>
+      <Text className="mt-1 text-sm font-semibold text-muted-foreground">{copy}</Text>
     </View>
   );
 }
 
 function memberMembershipState(subscription: MembershipSubscriptionDto | null) {
-  if (!subscription) return { label: "No Plan", daysRemaining: 0, tone: "danger" as const };
-  const daysRemaining = Math.ceil((new Date(subscription.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
-  if (daysRemaining < 0 || subscription.status === "EXPIRED") return { label: "Expired", daysRemaining, tone: "danger" as const };
-  if (daysRemaining <= 7) return { label: "Expiring Soon", daysRemaining, tone: "warning" as const };
-  return { label: "Active", daysRemaining, tone: "success" as const };
+  if (!subscription) return { label: 'No Plan', daysRemaining: 0, tone: 'danger' as const };
+  const daysRemaining = Math.ceil(
+    (new Date(subscription.endDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24),
+  );
+  if (daysRemaining < 0 || subscription.status === 'EXPIRED')
+    return { label: 'Expired', daysRemaining, tone: 'danger' as const };
+  if (daysRemaining <= 7) return { label: 'Expiring Soon', daysRemaining, tone: 'warning' as const };
+  return { label: 'Active', daysRemaining, tone: 'success' as const };
 }
 
-function PaymentRow({ payment }: { payment: PaymentDto }) {
+function PaymentRow({ payment, colors }: { payment: PaymentDto; colors: any }) {
   return (
-    <View className="rounded-md border border-border bg-card/80 p-3 flex-row justify-between items-center">
+    <View
+      style={{ backgroundColor: colors.secondary }}
+      className="rounded-lg p-3 flex-row justify-between items-center"
+    >
       <View>
         <Text className="font-bold text-foreground">{formatCents(payment.amountCents)}</Text>
-        <Text className="text-xs font-semibold text-muted-foreground">{payment.method} · {formatRelativeTime(payment.paidAt)}</Text>
+        <Text className="text-xs font-semibold text-muted-foreground">
+          {payment.method} · {formatRelativeTime(payment.paidAt)}
+        </Text>
       </View>
-      <View className="rounded-md bg-secondary px-2 py-1">
+      <View className="rounded-md bg-background px-2 py-1">
         <Text className="text-xs text-muted-foreground">{payment.invoiceId.slice(0, 8)}</Text>
       </View>
     </View>
   );
 }
 
-function LowStockRow({ product }: { product: LowStockProductDto }) {
+function LowStockRow({ product, colors }: { product: LowStockProductDto; colors: any }) {
   return (
-    <View className="rounded-md border border-border bg-card/80 p-3">
+    <View className="rounded-lg border border-border bg-card p-3">
       <View className="mb-2 flex-row justify-between items-center">
-        <View className="flex-row items-center gap-2">
-          <Boxes size={16} color="#eab308" />
-          <Text className="font-bold text-foreground">{product.name}</Text>
+        <View className="flex-row items-center gap-2 flex-1 mr-2">
+          <Boxes size={16} color={colors.warning} />
+          <Text className="font-bold text-foreground flex-1" numberOfLines={1}>
+            {product.name}
+          </Text>
         </View>
-        <Text className="font-semibold text-muted-foreground text-sm">{product.currentStock} left</Text>
+        <Text className="font-semibold text-muted-foreground text-sm">
+          {product.currentStock} left
+        </Text>
       </View>
-      <LoadBar value={product.currentStock} max={Math.max(1, product.reorderThreshold)} tone="danger" />
+      <LoadBar
+        value={product.currentStock}
+        max={Math.max(1, product.reorderThreshold)}
+        tone="danger"
+      />
     </View>
   );
 }

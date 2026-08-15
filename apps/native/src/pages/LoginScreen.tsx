@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, TouchableOpacity, ImageBackground, ScrollView, Dimensions, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, ImageBackground, ScrollView, useWindowDimensions, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -9,13 +9,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
+import { Footer } from '../components/layout/Footer';
 import { loginThunk, logoutThunk } from '../features/auth/authSlice';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { APP_NAME } from '../utils/env';
 import { themeColors } from '../constants/colors';
 
-const { width } = Dimensions.get('window');
-const isTablet = width >= 768;
 
 const emailSchema = z.object({ email: z.string().email("Enter a valid email") });
 const passwordSchema = z.object({ password: z.string().min(8, "Password must be at least 8 characters") });
@@ -28,6 +27,8 @@ type AuthStep = "login" | "2fa" | "otp";
 
 export function LoginScreen({ navigation }: any) {
   const dispatch = useAppDispatch();
+  const { width } = useWindowDimensions();
+  const isTablet = width >= 768;
   const theme = useAppSelector((state) => state.theme.theme);
   const activeColors = themeColors[theme === 'amoled' ? 'amoled' : theme === 'dark' ? 'dark' : 'light'];
 
@@ -39,9 +40,9 @@ export function LoginScreen({ navigation }: any) {
   const { control: controlLogin, handleSubmit: subLogin, formState: { errors: errLogin } } = useForm<EmailFormValues & PasswordFormValues>({ resolver: zodResolver(emailSchema.merge(passwordSchema)) });
   const { control: controlCode, handleSubmit: subCode, formState: { errors: errCode } } = useForm<CodeFormValues>({ resolver: zodResolver(codeSchema) });
 
-  const onFinalLogin = async (pass?: string) => {
+  const onFinalLogin = async (pass?: string, currentEmail?: string) => {
     setIsSimulating(true);
-    const result = await dispatch(loginThunk({ email: email || "admin@example.com", password: pass || "adminpassword" }));
+    const result = await dispatch(loginThunk({ email: currentEmail || email || "admin@example.com", password: pass || "adminpassword" }));
     setIsSimulating(false);
 
     if (loginThunk.fulfilled.match(result)) {
@@ -63,14 +64,14 @@ export function LoginScreen({ navigation }: any) {
       return;
     }
 
-    Toast.show({ type: 'error', text1: "Authentication failed" });
+    Toast.show({ type: 'error', text1: "Authentication failed", text2: typeof result.payload === 'string' ? result.payload : "Network or server error" });
   };
 
   const handleLoginNext = (v: EmailFormValues & PasswordFormValues) => {
     setEmail(v.email);
-    onFinalLogin(v.password);
+    onFinalLogin(v.password, v.email);
   };
-  const handleCodeSubmit = (v: CodeFormValues) => { onFinalLogin(passwordCache); };
+  const handleCodeSubmit = (v: CodeFormValues) => { onFinalLogin(passwordCache, email); };
 
   const handlePasskey = () => { Toast.show({ type: 'success', text1: "Prompting for Passkey..." }); setTimeout(() => onFinalLogin(), 1500); };
 
@@ -134,74 +135,95 @@ export function LoginScreen({ navigation }: any) {
       );
     }
 
+    return null;
   };
 
   return (
-    <View className="flex-1 flex-row bg-background">
-      {isTablet && (
-        <View className="flex-1 bg-zinc-950 relative overflow-hidden">
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} className="flex-1 bg-background">
+      <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: isTablet ? 120 : 80 }} keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets={true}>
+        <View className="flex-1 relative bg-zinc-950">
           <ImageBackground
-            source={{ uri: 'https://images.unsplash.com/photo-1599058917212-d750089bc07e?q=80&w=1169&auto=format&fit=crop' }}
-            className="absolute inset-0 w-full h-full opacity-40"
+            source={{ uri: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop' }}
+            className="absolute inset-0 w-full h-full opacity-50"
             resizeMode="cover"
           />
-          <SafeAreaView className="flex-1 justify-between p-10 z-10">
-            <View className="flex-row items-center gap-3">
-              <View className="h-10 w-10 items-center justify-center rounded-lg bg-primary">
-                <Dumbbell size={20} color="#ffffff" />
-              </View>
-              <Text className="text-xl font-black text-white">{APP_NAME}</Text>
-            </View>
-            <View>
-              <View className="self-start flex-row items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 mb-6">
-                <ShieldCheck size={14} color="#ffffff" />
-                <Text className="text-xs font-black uppercase tracking-widest text-white">Staff Operations</Text>
-              </View>
-              <Text className="text-5xl font-black text-white leading-tight">Elevate{'\n'}your gym's{'\n'}performance.</Text>
-              <View className="mt-8 gap-4">
-                <View className="flex-row items-center gap-3"><Users size={20} color={activeColors.primary} /><Text className="font-semibold text-white">Member lifecycle controls</Text></View>
-                <View className="flex-row items-center gap-3"><BarChart3 size={20} color={activeColors.primary} /><Text className="font-semibold text-white">Reports and revenue snapshots</Text></View>
-                <View className="flex-row items-center gap-3"><LockKeyhole size={20} color={activeColors.primary} /><Text className="font-semibold text-white">Enterprise-grade security</Text></View>
-              </View>
-            </View>
-          </SafeAreaView>
-        </View>
-      )}
-
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} className={`flex-1 items-center justify-center bg-card ${isTablet ? 'border-l border-border max-w-[500px]' : ''}`}>
-        <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }} className="w-full" keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets={true}>
-          <SafeAreaView className="w-full px-8 py-12 max-w-[450px] self-center">
-
-            <View className="mb-8">
-              <TouchableOpacity onPress={() => navigation.navigate("Home")} className="flex-row items-center gap-2 mb-6">
-                <ArrowLeft size={16} color={activeColors.mutedForeground} />
-                <Text className="text-sm font-medium text-muted-foreground">Back to website</Text>
-              </TouchableOpacity>
-              <Text className="text-3xl md:text-4xl font-black text-foreground">Sign in</Text>
-              <Text className="mt-2 text-sm text-muted-foreground">Access the staff operations dashboard securely.</Text>
-            </View>
-
-            <View className="min-h-[300px] justify-start w-full">
-              {renderStep()}
-            </View>
-
-            <View className="mt-8 pt-6 border-t border-border">
-              <View className="flex-row items-center justify-between">
-                <View>
-                  <Text className="text-sm font-medium text-foreground">Member account?</Text>
-                  <TouchableOpacity onPress={() => navigation.navigate("MemberLogin")} className="mt-2 flex-row items-center gap-2">
-                    <Text className="text-sm font-bold text-primary">Use member portal</Text>
-                    <ArrowRight size={16} color={activeColors.primary} />
-                  </TouchableOpacity>
+          <View className="absolute inset-0 bg-black/60" />
+          
+          <View className={`flex-1 ${isTablet ? 'flex-row' : 'flex-col'} z-10`}>
+          
+          {/* Left Hero Section */}
+          <View className={`${isTablet ? 'w-1/2' : 'w-full h-56'} relative`}>
+            <SafeAreaView className="flex-1 p-8 lg:p-20 z-10 items-center justify-center">
+              <TouchableOpacity onPress={() => navigation.navigate("Home")} className="flex-row items-center gap-3 absolute top-12 left-8 lg:top-20 lg:left-20 z-20">
+                <View className="w-9 h-9 bg-primary items-center justify-center rounded-lg shadow-lg">
+                  <Dumbbell size={18} color="#ffffff" />
                 </View>
+                <Text className="text-lg font-black text-white">{APP_NAME}</Text>
+              </TouchableOpacity>
+              
+              <View className="w-full max-w-2xl flex-1 justify-center items-center">
+                {!isTablet && (
+                  <View className="mt-12 items-center w-full px-4">
+                    <Text className="text-3xl font-black text-white leading-tight text-center">Elevate your gym's performance.</Text>
+                  </View>
+                )}
 
-
+                {isTablet && (
+                  <View className="items-center w-full">
+                    <View className="self-center flex-row items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 mb-6">
+                      <ShieldCheck size={14} color="#ffffff" />
+                      <Text className="text-xs font-black uppercase tracking-widest text-white">Staff Operations</Text>
+                    </View>
+                    <Text className="text-5xl font-black text-white leading-tight mb-8 text-center w-full">Elevate your gym's performance.</Text>
+                    <View className="gap-5 items-center w-full mt-4">
+                      <View className="flex-row items-center gap-4 w-full justify-center"><Users size={24} color={activeColors.primary} /><Text className="font-semibold text-white text-xl">Member lifecycle controls</Text></View>
+                      <View className="flex-row items-center gap-4 w-full justify-center"><BarChart3 size={24} color={activeColors.primary} /><Text className="font-semibold text-white text-xl">Reports and revenue snapshots</Text></View>
+                      <View className="flex-row items-center gap-4 w-full justify-center"><LockKeyhole size={24} color={activeColors.primary} /><Text className="font-semibold text-white text-xl">Enterprise-grade security</Text></View>
+                    </View>
+                  </View>
+                )}
               </View>
-            </View>
+            </SafeAreaView>
+          </View>
 
-          </SafeAreaView>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </View>
+          {/* Right Form Section */}
+          <View className={`${isTablet ? 'w-1/2' : 'flex-1'} justify-center p-6 lg:p-12`}>
+            <View className="w-full max-w-md self-center bg-background/80 backdrop-blur-2xl rounded-[32px] p-8 lg:p-10 border border-white/10 shadow-2xl">
+              
+              <View className="flex-row items-center justify-between mb-6">
+                <TouchableOpacity onPress={() => navigation.navigate("Home")} className="flex-row items-center gap-2">
+                  <ArrowLeft size={16} color={activeColors.mutedForeground} />
+                  <Text className="text-sm font-medium text-muted-foreground">Back to website</Text>
+                </TouchableOpacity>
+                {!isTablet && (
+                  <View className="flex-row items-center gap-2">
+                    <Dumbbell size={18} color={activeColors.primary} />
+                    <Text className="font-black text-foreground">{APP_NAME}</Text>
+                  </View>
+                )}
+              </View>
+              
+              <Text className="text-3xl font-black text-foreground mb-2">Sign in</Text>
+              <Text className="text-sm text-muted-foreground mb-6">Access the staff operations dashboard securely.</Text>
+
+              <View className="min-h-[280px]">
+                {renderStep()}
+              </View>
+
+              <View className="mt-8 pt-6 border-t border-border">
+                <Text className="text-sm font-medium text-foreground">Member account?</Text>
+                <TouchableOpacity onPress={() => navigation.navigate("MemberLogin")} className="flex-row items-center mt-2">
+                  <Text className="text-sm font-bold text-primary mr-2">Use member portal</Text>
+                  <ArrowRight size={14} color={activeColors.primary} />
+                </TouchableOpacity>
+              </View>
+              
+            </View>
+          </View>
+        </View>
+        </View>
+        <Footer />
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }

@@ -1,28 +1,40 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, RefreshControl, Modal, ActivityIndicator } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Modal,
+  ScrollView,
+  Platform,
+  Dimensions,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { UserRound, Search, Eye, Archive, QrCode } from 'lucide-react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { UserRound, Search, X } from 'lucide-react-native';
 import Toast from 'react-native-toast-message';
 
 import { Button } from '../components/ui/Button';
 import { Card, CardContent } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
-import { useAppSelector } from '../store/hooks';
-import { themeColors } from '../constants/colors';
+import { EmptyState } from '../components/ui/EmptyState';
+import { StatusBadge } from '../components/ui/StatusBadge';
+import { SkeletonRows } from '../components/ui/Skeleton';
+import { ScreenWrapper, PageHeader } from '../components/layout/ScreenWrapper';
+import { useTheme } from '../hooks/useTheme';
 import * as memberApi from '../features/members/memberApi';
 import type { MemberDto } from '@gym/shared';
 import { formatDateTime } from '../utils/format';
 
 export function MembersScreen() {
-  const theme = useAppSelector((state) => state.theme.theme);
-  const activeColors = themeColors[theme === 'amoled' ? 'amoled' : theme === 'dark' ? 'dark' : 'light'];
+  const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
 
   const [members, setMembers] = useState<MemberDto[]>([]);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [selectedMember, setSelectedMember] = useState<MemberDto | null>(null);
 
-  const loadMembers = async (): Promise<void> => {
+  const loadMembers = useCallback(async (): Promise<void> => {
     setIsLoading(true);
     try {
       const response = await memberApi.listMembers({
@@ -36,119 +48,164 @@ export function MembersScreen() {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  useEffect(() => {
-    loadMembers();
   }, [search]);
 
+  useEffect(() => {
+    void loadMembers();
+  }, [loadMembers]);
+
   return (
-    <SafeAreaView className="flex-1 bg-background">
-      <ScrollView refreshControl={<RefreshControl refreshing={isLoading} onRefresh={loadMembers} tintColor={activeColors.primary} />} contentContainerStyle={{ padding: 16, paddingBottom: 100 }}>
-        
-        <View className="mb-6 bg-card border border-border p-4 rounded-lg shadow-sm">
-          <Text className="text-xs font-black uppercase tracking-[0.18em] text-primary">Management</Text>
-          <Text className="mt-2 text-3xl font-black text-foreground">Members</Text>
-          <Text className="mt-1 text-sm font-semibold text-muted-foreground mb-4">View and manage gym members.</Text>
-          
-          <View className="relative justify-center">
-            <Input
-              placeholder="Search members..."
-              value={search}
-              onChangeText={setSearch}
-              className="pl-10 h-10"
-            />
-            <View className="absolute left-3 top-2.5">
-              <Search size={16} color={activeColors.mutedForeground} />
+    <ScreenWrapper refreshing={isLoading} onRefresh={loadMembers}>
+      {/* Embedded search header */}
+      <View className="mb-6 rounded-xl border border-border bg-card px-4 py-4">
+        <Text className="text-xs font-black uppercase tracking-[0.18em] text-primary mb-1">
+          Management
+        </Text>
+        <Text className="text-3xl font-black text-foreground leading-tight mb-1">
+          Members
+        </Text>
+        <Text className="text-sm font-semibold text-muted-foreground mb-4">
+          View and manage gym members.
+        </Text>
+        <Input
+          placeholder="Search members..."
+          value={search}
+          onChangeText={setSearch}
+          leftIcon={<Search size={16} color={colors.mutedForeground} />}
+        />
+      </View>
+
+      <Card>
+        <CardContent className="p-0">
+          {isLoading ? (
+            <View className="p-4">
+              <SkeletonRows rows={5} showAvatar />
             </View>
-          </View>
-        </View>
-
-        <Card>
-          <CardContent className="p-0">
-            {members.length === 0 && !isLoading ? (
-              <View className="items-center py-12 px-4">
-                <UserRound size={32} color={activeColors.mutedForeground} className="mb-2" />
-                <Text className="font-bold text-foreground">No members found</Text>
-                <Text className="text-sm text-muted-foreground text-center">Try a different search query or add a new member.</Text>
-              </View>
-            ) : (
-              <View>
-                {members.map((member, index) => (
-                  <TouchableOpacity 
-                    key={member.id} 
-                    onPress={() => setSelectedMember(member)}
-                    className={`flex-row justify-between items-center p-4 ${index !== members.length - 1 ? 'border-b border-border' : ''}`}
-                  >
-                    <View className="flex-row items-center flex-1">
-                      <View className="w-10 h-10 bg-secondary items-center justify-center rounded-full mr-3">
-                        <UserRound size={20} color={activeColors.primary} />
-                      </View>
-                      <View className="flex-1">
-                        <Text className="font-bold text-foreground text-base">
-                          {member.firstName} {member.lastName}
-                        </Text>
-                        <Text className="text-xs font-semibold text-muted-foreground">
-                          {member.memberCode} · {member.email || member.phone}
-                        </Text>
-                      </View>
+          ) : members.length === 0 ? (
+            <View className="p-4">
+              <EmptyState
+                icon={UserRound}
+                title="No members found"
+                description="Try a different search query or add a new member."
+              />
+            </View>
+          ) : (
+            <View>
+              {members.map((member, index) => (
+                <TouchableOpacity
+                  key={member.id}
+                  onPress={() => setSelectedMember(member)}
+                  className={`flex-row justify-between items-center px-4 py-3 ${
+                    index !== members.length - 1 ? 'border-b border-border' : ''
+                  }`}
+                  activeOpacity={0.7}
+                >
+                  <View className="flex-row items-center flex-1 mr-3">
+                    <View
+                      style={{ backgroundColor: colors.primarySoft }}
+                      className="w-10 h-10 items-center justify-center rounded-full mr-3"
+                    >
+                      <UserRound size={20} color={colors.primary} />
                     </View>
-                    <View className={`px-2 py-1 rounded-full border ${member.status === 'ACTIVE' ? 'bg-green-500/10 border-green-500/20' : 'bg-secondary border-border'}`}>
-                      <Text className={`text-xs font-bold ${member.status === 'ACTIVE' ? 'text-green-500' : 'text-muted-foreground'}`}>{member.status}</Text>
+                    <View className="flex-1">
+                      <Text className="font-bold text-foreground text-base" numberOfLines={1}>
+                        {member.firstName} {member.lastName}
+                      </Text>
+                      <Text className="text-xs font-semibold text-muted-foreground" numberOfLines={1}>
+                        {member.memberCode} · {member.email || member.phone}
+                      </Text>
                     </View>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            )}
-          </CardContent>
-        </Card>
-
-      </ScrollView>
-
-      {/* Member Details Modal */}
-      <Modal visible={!!selectedMember} animationType="slide" presentationStyle="pageSheet">
-        <View className="flex-1 bg-background pt-12">
-          {selectedMember && (
-            <View className="flex-1">
-              <View className="flex-row justify-between items-center px-4 pb-4 border-b border-border">
-                <Text className="text-xl font-bold text-foreground">Member Details</Text>
-                <Button variant="outline" onPress={() => setSelectedMember(null)} className="h-8 px-4">Close</Button>
-              </View>
-              
-              <ScrollView className="p-4" contentContainerStyle={{ paddingBottom: 60 }}>
-                <View className="items-center mb-6">
-                  <View className="w-20 h-20 bg-secondary items-center justify-center rounded-full mb-3">
-                    <UserRound size={32} color={activeColors.primary} />
                   </View>
-                  <Text className="text-2xl font-black text-foreground">{selectedMember.firstName} {selectedMember.lastName}</Text>
-                  <Text className="text-primary font-bold">{selectedMember.memberCode}</Text>
+                  <StatusBadge status={member.status} />
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Member Detail Modal — cross-platform (no pageSheet) */}
+      <Modal
+        visible={!!selectedMember}
+        animationType="slide"
+        transparent={false}
+        onRequestClose={() => setSelectedMember(null)}
+        statusBarTranslucent
+      >
+        <SafeAreaView
+          style={{ flex: 1, backgroundColor: colors.background }}
+          edges={['top', 'left', 'right']}
+        >
+          {selectedMember && (
+            <View style={{ flex: 1 }}>
+              {/* Modal header */}
+              <View
+                style={{ borderBottomColor: colors.border }}
+                className="flex-row justify-between items-center px-4 py-3 border-b"
+              >
+                <Text className="text-xl font-black text-foreground">Member Details</Text>
+                <TouchableOpacity
+                  onPress={() => setSelectedMember(null)}
+                  style={{ backgroundColor: colors.secondary }}
+                  className="p-2 rounded-full"
+                  activeOpacity={0.7}
+                >
+                  <X size={18} color={colors.foreground} />
+                </TouchableOpacity>
+              </View>
+
+              <ScrollView
+                contentContainerStyle={{
+                  padding: 16,
+                  paddingBottom: Math.max(insets.bottom, 24),
+                }}
+                showsVerticalScrollIndicator={false}
+              >
+                {/* Avatar + name */}
+                <View className="items-center mb-6 pt-4">
+                  <View
+                    style={{ backgroundColor: colors.primarySoft }}
+                    className="w-20 h-20 items-center justify-center rounded-full mb-3"
+                  >
+                    <UserRound size={32} color={colors.primary} />
+                  </View>
+                  <Text className="text-2xl font-black text-foreground">
+                    {selectedMember.firstName} {selectedMember.lastName}
+                  </Text>
+                  <Text style={{ color: colors.primary }} className="font-bold mt-1">
+                    {selectedMember.memberCode}
+                  </Text>
+                  <View className="mt-2">
+                    <StatusBadge status={selectedMember.status} />
+                  </View>
                 </View>
 
-                <Card className="mb-4">
+                {/* Info card */}
+                <Card>
                   <CardContent className="p-4 gap-4">
-                    <View>
-                      <Text className="text-xs font-bold text-muted-foreground uppercase">Contact Information</Text>
-                      <Text className="text-foreground mt-1">{selectedMember.email || 'No email provided'}</Text>
-                      <Text className="text-foreground">{selectedMember.phone}</Text>
-                    </View>
+                    <DetailRow label="Email" value={selectedMember.email || 'No email provided'} />
                     <View className="h-px bg-border" />
-                    <View>
-                      <Text className="text-xs font-bold text-muted-foreground uppercase">Status</Text>
-                      <Text className="text-foreground mt-1 font-semibold">{selectedMember.status}</Text>
-                    </View>
+                    <DetailRow label="Phone" value={selectedMember.phone} />
                     <View className="h-px bg-border" />
-                    <View>
-                      <Text className="text-xs font-bold text-muted-foreground uppercase">Joined</Text>
-                      <Text className="text-foreground mt-1">{formatDateTime(selectedMember.createdAt)}</Text>
-                    </View>
+                    <DetailRow label="Status" value={selectedMember.status} />
+                    <View className="h-px bg-border" />
+                    <DetailRow label="Joined" value={formatDateTime(selectedMember.createdAt)} />
                   </CardContent>
                 </Card>
               </ScrollView>
             </View>
           )}
-        </View>
+        </SafeAreaView>
       </Modal>
+    </ScreenWrapper>
+  );
+}
 
-    </SafeAreaView>
+function DetailRow({ label, value }: { label: string; value: string }) {
+  return (
+    <View>
+      <Text className="text-xs font-bold text-muted-foreground uppercase mb-1">{label}</Text>
+      <Text className="text-foreground font-semibold">{value}</Text>
+    </View>
   );
 }

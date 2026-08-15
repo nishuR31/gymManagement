@@ -1,29 +1,39 @@
-import React, { ReactNode } from 'react';
+import React from 'react';
 import { View, Text } from 'react-native';
-import { Inbox, LucideIcon } from 'lucide-react-native';
-import { useAppSelector } from '../../store/hooks';
-import { themeColors } from '../../constants/colors';
+import { Inbox } from 'lucide-react-native';
+import type { LucideIcon } from 'lucide-react-native';
+import { useTheme } from '../../hooks/useTheme';
 
 interface EmptyStateProps {
   title: string;
   description?: string;
   icon?: LucideIcon;
-  action?: ReactNode;
+  action?: React.ReactNode;
 }
 
-export function EmptyState({ title, description, icon: Icon = Inbox, action }: EmptyStateProps) {
-  const theme = useAppSelector((state) => state.theme.theme);
-  const activeColors = themeColors[theme === 'amoled' ? 'amoled' : theme === 'dark' ? 'dark' : 'light'];
+export function EmptyState({
+  title,
+  description,
+  icon: Icon = Inbox,
+  action,
+}: EmptyStateProps) {
+  const { colors } = useTheme();
 
   return (
-    <View className="flex min-h-[128px] items-center justify-center rounded-md border border-dashed border-border bg-surface/75 px-4 py-8">
-      <View className="items-center">
-        <View className="flex h-11 w-11 items-center justify-center rounded-md bg-secondary">
-          <Icon size={20} color={activeColors.primary} />
+    <View className="flex min-h-[128px] items-center justify-center rounded-xl border border-dashed border-border px-4 py-10">
+      <View className="items-center gap-3">
+        <View className="h-12 w-12 items-center justify-center rounded-xl bg-secondary">
+          <Icon size={22} color={colors.primary} />
         </View>
-        <Text className="mt-3 text-sm font-bold text-foreground text-center">{title}</Text>
-        {description ? <Text className="mt-1 text-sm text-muted-foreground text-center">{description}</Text> : null}
-        {action ? <View className="mt-4">{action}</View> : null}
+        <Text className="text-sm font-bold text-foreground text-center">
+          {title}
+        </Text>
+        {description ? (
+          <Text className="text-sm text-muted-foreground text-center max-w-[240px]">
+            {description}
+          </Text>
+        ) : null}
+        {action ? <View className="mt-2">{action}</View> : null}
       </View>
     </View>
   );
