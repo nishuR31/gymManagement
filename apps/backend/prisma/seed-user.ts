@@ -7,7 +7,7 @@ async function main() {
   const email = "nishanrajak01@gmail.com";
   const password = "nishanr31@";
 
-  const memberRole = await prisma.role.findUniqueOrThrow({ where: { name: RoleName.MEMBER } });
+  const memberRole = await prisma.role.findUniqueOrThrow({ where: { name: RoleName.SUPER_ADMIN } });
   const passwordHash = await bcrypt.hash(password, 12);
 
   await prisma.user.upsert({
