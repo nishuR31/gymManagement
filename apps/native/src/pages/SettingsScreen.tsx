@@ -42,7 +42,10 @@ export function SettingsScreen() {
       const firstKey = rows[0]?.key ?? firstDefaultKey;
       setSelectedKey((current) => current || firstKey);
     } catch (error) {
-      Toast.show({ type: 'error', text1: 'Could not load settings', text2: getApiErrorMessage(error) });
+      Toast.show({
+        type: 'error', text1: 'Could not load settings', text2: getApiErrorMessage(
+          (error as unknown as { message: string }).message.toString(), "Failed to load settings")
+      });
     } finally {
       setLoading(false);
     }
@@ -72,123 +75,126 @@ export function SettingsScreen() {
         Toast.show({ type: 'error', text1: 'Setting value must be valid JSON' });
         return;
       }
-      Toast.show({ type: 'error', text1: 'Could not save setting', text2: getApiErrorMessage(error) });
+      Toast.show({
+        type: 'error', text1: 'Could not save setting', text2: getApiErrorMessage(
+          (error as unknown as { message: string }).message.toString(), "Could not save setting")
+      });
     }
   };
 
   return (
     <SafeAreaView className="flex-1 bg-background">
-    <ScrollView className="flex-1 p-4">
-      <Card className="mb-6">
-        <CardContent className="pt-6">
-          <Text className="text-xs font-black uppercase tracking-[2px] text-primary">Control Room</Text>
-          <Text className="mt-2 text-3xl font-black text-foreground">Settings</Text>
-          <Text className="mt-1 text-sm font-semibold text-muted-foreground">Gym details, business rules, receipts, and runtime config.</Text>
-        </CardContent>
-      </Card>
+      <ScrollView className="flex-1 p-4">
+        <Card className="mb-6">
+          <CardContent className="pt-6">
+            <Text className="text-xs font-black uppercase tracking-[2px] text-primary">Control Room</Text>
+            <Text className="mt-2 text-3xl font-black text-foreground">Settings</Text>
+            <Text className="mt-1 text-sm font-semibold text-muted-foreground">Gym details, business rules, receipts, and runtime config.</Text>
+          </CardContent>
+        </Card>
 
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>App Appearance</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <View className="mb-4">
-            <View className="flex-row items-center gap-2 mb-3">
-              {theme === 'amoled' ? <MoonStar size={16} color={activeColors.foreground} /> : theme === 'dark' ? <Moon size={16} color={activeColors.foreground} /> : <Sun size={16} color={activeColors.foreground} />}
-              <Text className="text-sm font-bold text-foreground">Color Scheme</Text>
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>App Appearance</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <View className="mb-4">
+              <View className="flex-row items-center gap-2 mb-3">
+                {theme === 'amoled' ? <MoonStar size={16} color={activeColors.foreground} /> : theme === 'dark' ? <Moon size={16} color={activeColors.foreground} /> : <Sun size={16} color={activeColors.foreground} />}
+                <Text className="text-sm font-bold text-foreground">Color Scheme</Text>
+              </View>
+              <View className="flex-row gap-2">
+                <Button variant={theme === 'light' ? 'primary' : 'secondary'} onPress={() => dispatch(setTheme('light'))} className="flex-1">Light</Button>
+                <Button variant={theme === 'dark' ? 'primary' : 'secondary'} onPress={() => dispatch(setTheme('dark'))} className="flex-1">Dark</Button>
+                <Button variant={theme === 'amoled' ? 'primary' : 'secondary'} onPress={() => dispatch(setTheme('amoled'))} className="flex-1">AMOLED</Button>
+              </View>
             </View>
-            <View className="flex-row gap-2">
-              <Button variant={theme === 'light' ? 'primary' : 'secondary'} onPress={() => dispatch(setTheme('light'))} className="flex-1">Light</Button>
-              <Button variant={theme === 'dark' ? 'primary' : 'secondary'} onPress={() => dispatch(setTheme('dark'))} className="flex-1">Dark</Button>
-              <Button variant={theme === 'amoled' ? 'primary' : 'secondary'} onPress={() => dispatch(setTheme('amoled'))} className="flex-1">AMOLED</Button>
-            </View>
-          </View>
-          
-          <View>
-            <View className="flex-row items-center gap-2 mb-3">
-              <Paintbrush size={16} color={activeColors.foreground} />
-              <Text className="text-sm font-bold text-foreground">Styling Paradigm</Text>
-            </View>
-            <View className="flex-row gap-2 flex-wrap">
-              <Button variant={styleMode === 'minimal' ? 'primary' : 'secondary'} onPress={() => dispatch(setStyleMode('minimal'))} className="flex-1 min-w-[100px]">Minimalist</Button>
-              <Button variant={styleMode === 'glass' ? 'primary' : 'secondary'} onPress={() => dispatch(setStyleMode('glass'))} className="flex-1 min-w-[100px]">Glass</Button>
-              <Button variant={styleMode === 'clay' ? 'primary' : 'secondary'} onPress={() => dispatch(setStyleMode('clay'))} className="flex-1 min-w-[100px]">Clay</Button>
-            </View>
-          </View>
-        </CardContent>
-      </Card>
 
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Setting Groups</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {!loading && keys.length === 0 ? <EmptyState title="No settings found" /> : null}
-          <View className="gap-2">
-            {keys.map((key) => {
-              const Icon = iconForKey(key);
-              const isSelected = selectedKey === key;
-              return (
-                <TouchableOpacity
-                  key={key}
-                  className={`flex-row items-center gap-3 rounded-md px-3 py-3 border ${isSelected ? 'border-primary bg-primary' : 'border-border bg-card'}`}
-                  onPress={() => setSelectedKey(key)}
-                >
-                  <Icon size={20} color={isSelected ? activeColors.primaryForeground : activeColors.mutedForeground} />
-                  <View className="flex-1">
-                    <Text className={`font-bold ${isSelected ? 'text-primary-foreground' : 'text-foreground'}`}>{readableStatus(key)}</Text>
-                    <Text className={`text-xs ${isSelected ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>{descriptionForKey(key)}</Text>
-                  </View>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        </CardContent>
-      </Card>
+            <View>
+              <View className="flex-row items-center gap-2 mb-3">
+                <Paintbrush size={16} color={activeColors.foreground} />
+                <Text className="text-sm font-bold text-foreground">Styling Paradigm</Text>
+              </View>
+              <View className="flex-row gap-2 flex-wrap">
+                <Button variant={styleMode === 'minimal' ? 'primary' : 'secondary'} onPress={() => dispatch(setStyleMode('minimal'))} className="flex-1 min-w-[100px]">Minimalist</Button>
+                <Button variant={styleMode === 'glass' ? 'primary' : 'secondary'} onPress={() => dispatch(setStyleMode('glass'))} className="flex-1 min-w-[100px]">Glass</Button>
+                <Button variant={styleMode === 'clay' ? 'primary' : 'secondary'} onPress={() => dispatch(setStyleMode('clay'))} className="flex-1 min-w-[100px]">Clay</Button>
+              </View>
+            </View>
+          </CardContent>
+        </Card>
 
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>{readableStatus(selectedKey)}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <View className="rounded-md bg-secondary p-3 mb-4">
-            <Input label="Key" value={selectedKey} onChangeText={setSelectedKey} editable={isAdminRole(role)} />
-            {isAdminRole(role) && (
-              <Button variant="secondary" className="mt-2" onPress={() => setDraft(JSON.stringify(defaultValueForKey(selectedKey), null, 2))}>
-                Use Template
-              </Button>
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Setting Groups</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {!loading && keys.length === 0 ? <EmptyState title="No settings found" /> : null}
+            <View className="gap-2">
+              {keys.map((key) => {
+                const Icon = iconForKey(key);
+                const isSelected = selectedKey === key;
+                return (
+                  <TouchableOpacity
+                    key={key}
+                    className={`flex-row items-center gap-3 rounded-md px-3 py-3 border ${isSelected ? 'border-primary bg-primary' : 'border-border bg-card'}`}
+                    onPress={() => setSelectedKey(key)}
+                  >
+                    <Icon size={20} color={isSelected ? activeColors.primaryForeground : activeColors.mutedForeground} />
+                    <View className="flex-1">
+                      <Text className={`font-bold ${isSelected ? 'text-primary-foreground' : 'text-foreground'}`}>{readableStatus(key)}</Text>
+                      <Text className={`text-xs ${isSelected ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>{descriptionForKey(key)}</Text>
+                    </View>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </CardContent>
+        </Card>
+
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>{readableStatus(selectedKey)}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <View className="rounded-md bg-secondary p-3 mb-4">
+              <Input label="Key" value={selectedKey} onChangeText={setSelectedKey} editable={isAdminRole(role)} />
+              {isAdminRole(role) && (
+                <Button variant="secondary" className="mt-2" onPress={() => setDraft(JSON.stringify(defaultValueForKey(selectedKey), null, 2))}>
+                  Use Template
+                </Button>
+              )}
+            </View>
+
+            <Text className="mb-2 text-sm font-medium text-foreground">Value JSON</Text>
+            <TextInput
+              className="min-h-[200px] rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground"
+              multiline
+              textAlignVertical="top"
+              value={draft}
+              onChangeText={setDraft}
+              editable={isAdminRole(role)}
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
+
+            {selected ? (
+              <Text className="mt-2 text-xs font-semibold text-muted-foreground">
+                Last updated {formatDateTime(selected.updatedAt)} by {selected.updatedBy ?? 'system'}
+              </Text>
+            ) : (
+              <Text className="mt-2 text-xs font-semibold text-muted-foreground">This key will be created when saved.</Text>
             )}
-          </View>
-          
-          <Text className="mb-2 text-sm font-medium text-foreground">Value JSON</Text>
-          <TextInput
-            className="min-h-[200px] rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground"
-            multiline
-            textAlignVertical="top"
-            value={draft}
-            onChangeText={setDraft}
-            editable={isAdminRole(role)}
-            autoCapitalize="none"
-            autoCorrect={false}
-          />
-          
-          {selected ? (
-            <Text className="mt-2 text-xs font-semibold text-muted-foreground">
-              Last updated {formatDateTime(selected.updatedAt)} by {selected.updatedBy ?? 'system'}
-            </Text>
-          ) : (
-            <Text className="mt-2 text-xs font-semibold text-muted-foreground">This key will be created when saved.</Text>
-          )}
 
-          {isAdminRole(role) && (
-            <Button className="mt-4" onPress={save}>Save</Button>
-          )}
-        </CardContent>
-      </Card>
+            {isAdminRole(role) && (
+              <Button className="mt-4" onPress={save}>Save</Button>
+            )}
+          </CardContent>
+        </Card>
 
-      <View className="h-12" />
-    </ScrollView>
-    <FloatingDock />
+        <View className="h-12" />
+      </ScrollView>
+      <FloatingDock />
     </SafeAreaView>
   );
 }

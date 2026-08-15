@@ -11,8 +11,8 @@ import { Button } from '../components/ui/Button';
 import { useAppSelector } from '../store/hooks';
 import { themeColors } from '../constants/colors';
 import * as staffApi from '../features/staff/staffApi';
-import { type StaffDto } from '@gym/shared';
 import { formatDateTime } from '../utils/format';
+import type { StaffProfileDto as StaffDto } from '@gym/shared';
 
 export function StaffScreen() {
   const theme = useAppSelector((state) => state.theme.theme);

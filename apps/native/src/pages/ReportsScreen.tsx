@@ -23,13 +23,13 @@ export function ReportsScreen() {
   const loadData = async (): Promise<void> => {
     setIsLoading(true);
     try {
-      const year = new Date().getFullYear();
+      // const year = new Date().getFullYear();
       const month = new Date().toLocaleString("en-US", { month: "long" })
       // const month = new Date().getMonth() + 1;
 
       const [fin, mem] = await Promise.all([
-        reportApi.getReport('payments', { year, month }).catch(() => null),
-        reportApi.getReport('memberships', { year, month }).catch(() => null),
+        reportApi.getReport('payments', { month }).catch(() => null),
+        reportApi.getReport('memberships', { month }).catch(() => null),
       ]);
       setFinancialReport(fin);
       setMembershipReport(mem);
