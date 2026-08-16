@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, Modal, ScrollView } from 'react-native';
 import { X, ShieldAlert, KeyRound } from 'lucide-react-native';
-import { useForm, Controller } from 'react-form-hook';
+import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Toast from 'react-native-toast-message';
