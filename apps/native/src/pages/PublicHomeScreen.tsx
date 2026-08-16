@@ -343,7 +343,7 @@ export function PublicHomeScreen() {
                     )} />
 
                     <Controller control={control} name="message" render={({ field: { onChange, onBlur, value } }) => (
-                      <Input label="Message" onBlur={onBlur} onChangeText={onChange} value={value} error={errors.message?.message} multiline numberOfLines={4} className="h-24 bg-[#111111] border-transparent" />
+                      <Input label="Message" onBlur={onBlur} onChangeText={onChange} value={value} error={errors.message?.message} multiline numberOfLines={4} className="min-h-[100px] bg-[#111111] border-transparent mb-2" />
                     )} />
 
                     <Button onPress={handleSubmit(onSubmit)} className="mt-8 w-full bg-[#c59a58]" isLoading={isSubmitting} rightIcon={<ArrowRight size={16} color="#ffffff" />}>

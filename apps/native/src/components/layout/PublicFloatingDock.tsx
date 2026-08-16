@@ -16,14 +16,15 @@ import {
   X,
   ArrowRight,
   ShieldCheck,
-  Smartphone,
   Users,
+  Scan
 } from 'lucide-react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../../hooks/useTheme';
 import { usePinger } from '../../hooks/usePinger';
 import { useNetworkStatus } from '../../hooks/useNetworkStatus';
+import { PulsingDot } from './PulsingDot';
 
 export function PublicFloatingDock() {
   const navigation = useNavigation<any>();
@@ -168,15 +169,10 @@ export function PublicFloatingDock() {
         style={containerStyle}
       >
         {/* Backend Pinger Dot (Blue/Orange) */}
-        <View
-          style={{
-            width: 10,
-            height: 10,
-            borderRadius: 5,
-            backgroundColor: isBackendOnline === null ? colors.mutedForeground : isBackendOnline ? '#3b82f6' : '#f97316',
-            marginLeft: 4,
-            marginRight: -4,
-          }}
+        <PulsingDot
+          color={isBackendOnline === null ? colors.mutedForeground : isBackendOnline ? '#3b82f6' : '#f97316'}
+          style={{ marginLeft: 4, marginRight: -4 }}
+          accessibilityLabel={isBackendOnline ? 'Server Online' : 'Server Offline'}
         />
 
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -212,15 +208,10 @@ export function PublicFloatingDock() {
         </TouchableOpacity>
 
         {/* Network Status Dot (Green/Red) */}
-        <View
-          style={{
-            width: 10,
-            height: 10,
-            borderRadius: 5,
-            backgroundColor: isNetworkOnline ? '#10b981' : '#ef4444',
-            marginLeft: -4,
-            marginRight: 4,
-          }}
+        <PulsingDot
+          color={isNetworkOnline ? '#10b981' : '#ef4444'}
+          style={{ marginLeft: -4, marginRight: 4 }}
+          accessibilityLabel={isNetworkOnline ? 'Network Online' : 'Network Offline'}
         />
       </View>
 
@@ -294,6 +285,7 @@ export function PublicFloatingDock() {
               </View>
 
               <ScrollView showsVerticalScrollIndicator={false}>
+                <MenuItem name="Scanner" icon={Scan} targetRoute="Scanner" />
                 <MenuItem name="Features" icon={Dumbbell} targetRoute="Features" />
                 <MenuItem name="Get the App" icon={Smartphone} targetRoute="DownloadApp" />
                 <MenuItem name="Privacy Policy" icon={ArrowRight} targetRoute="Privacy" />

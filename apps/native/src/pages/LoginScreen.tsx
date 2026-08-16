@@ -171,7 +171,7 @@ export function LoginScreen({ navigation }: any) {
               <View className="flex-1 justify-center items-center w-full">
                 {!isTablet && (
                   <View className="mt-12 items-center w-full px-4">
-                    <Text className="text-3xl font-black text-white leading-tight text-center">Elevate your gym's performance.</Text>
+                    <Text style={{ textAlign: 'center' }} className="text-3xl font-black text-white leading-tight">Elevate your gym's performance.</Text>
                   </View>
                 )}
 

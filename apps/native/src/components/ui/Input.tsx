@@ -75,10 +75,11 @@ export function Input({
         ) : null}
 
         <TextInput
-          className={`flex-1 text-foreground py-2 text-sm ${leftIcon ? 'pl-1' : 'pl-3'} ${secureTextEntry ? 'pr-10' : 'pr-3'} ${props.multiline ? 'min-h-[40px]' : 'h-10'}`}
-          style={[{ color: colors.foreground }, props.style]}
+          className={`flex-1 py-2 text-sm ${leftIcon ? 'pl-1' : 'pl-3'} ${secureTextEntry ? 'pr-10' : 'pr-3'} ${props.multiline ? 'min-h-[40px]' : 'h-10'}`}
+          style={[{ color: colors.foreground, backgroundColor: 'transparent', textAlignVertical: props.multiline ? 'top' : 'center' }, props.style]}
           placeholderTextColor={colors.mutedForeground}
           secureTextEntry={isSecure}
+          underlineColorAndroid="transparent"
           onFocus={(e) => {
             setIsFocused(true);
             onFocus?.(e);

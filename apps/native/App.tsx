@@ -30,6 +30,9 @@ import { PrivacyScreen } from './src/pages/PrivacyScreen';
 import { TermsScreen } from './src/pages/TermsScreen';
 import { DownloadAppScreen } from './src/pages/DownloadAppScreen';
 import { FeaturesScreen } from './src/pages/FeaturesScreen';
+import { RedlistScreen } from './src/pages/RedlistScreen';
+import { ProfileScreen } from './src/pages/ProfileScreen';
+import { ScannerScreen } from './src/pages/ScannerScreen';
 import { Toaster } from './src/components/ui/Toaster';
 import { useAppSelector, useAppDispatch } from './src/store/hooks';
 import { loadThemeSettings } from './src/features/theme/themeSlice';
@@ -97,6 +100,9 @@ function RootApp() {
             <Stack.Screen name="Reports" component={ReportsScreen} options={{ title: 'Reports' }} />
             <Stack.Screen name="Payments" component={PaymentsScreen} options={{ title: 'Payments' }} />
             <Stack.Screen name="Inquiries" component={InquiriesScreen} options={{ title: 'Inquiries' }} />
+            <Stack.Screen name="Redlist" component={RedlistScreen} options={{ title: 'Redlist' }} />
+            <Stack.Screen name="Scanner" component={ScannerScreen} options={{ title: 'QR Scanner' }} />
+            <Stack.Screen name="Profile" component={ProfileScreen} options={{ title: 'Profile' }} />
             <Stack.Screen name="Privacy" component={PrivacyScreen} options={{ headerShown: false }} />
             <Stack.Screen name="Terms" component={TermsScreen} options={{ headerShown: false }} />
             <Stack.Screen name="Features" component={FeaturesScreen} options={{ headerShown: false }} />

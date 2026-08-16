@@ -24,7 +24,10 @@ import {
   X,
   LayoutDashboard,
   Pin,
-  PinOff
+  PinOff,
+  AlertTriangle,
+  UserRound,
+  Scan
 } from 'lucide-react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -33,6 +36,7 @@ import { useTheme } from '../../hooks/useTheme';
 import { togglePinnedRoute } from '../../features/theme/themeSlice';
 import { usePinger } from '../../hooks/usePinger';
 import { useNetworkStatus } from '../../hooks/useNetworkStatus';
+import { PulsingDot } from './PulsingDot';
 
 const ROUTE_CONFIG: Record<string, { label: string, icon: any }> = {
   "Dashboard": { label: "Dashboard", icon: LayoutDashboard },
@@ -42,14 +46,15 @@ const ROUTE_CONFIG: Record<string, { label: string, icon: any }> = {
   "Plans": { label: "Plans", icon: NotebookText },
   "Inventory": { label: "Inventory", icon: Box },
   "Orders": { label: "Orders", icon: ClipboardList },
+  "Scanner": { label: "Scanner", icon: Scan },
   "Payments": { label: "Payments", icon: CreditCard },
   "Reports": { label: "Reports", icon: PieChart },
+  "Redlist": { label: "Redlist", icon: AlertTriangle },
   "Staff": { label: "Staff", icon: ShieldCheck },
   "Inquiries": { label: "Inquiries", icon: MessageSquare },
   "Settings": { label: "Settings", icon: Settings },
+  "Profile": { label: "Profile", icon: UserRound },
 };
-
-export const FLOATING_DOCK_HEIGHT = 64;
 
 export function FloatingDock() {
   const navigation = useNavigation<any>();
@@ -68,6 +73,8 @@ export function FloatingDock() {
 
   const currentRoute = route.name;
   const isAdmin = user?.role === 'SUPER_ADMIN' || user?.role === 'ADMIN';
+  
+  const FLOATING_DOCK_HEIGHT = isMobile ? 56 : 64;
 
   const dockBottom = Math.max(insets.bottom, 8) + 8;
 
@@ -195,15 +202,10 @@ export function FloatingDock() {
         style={containerStyle}
       >
         {/* Backend Pinger Dot (Blue/Orange) */}
-        <View
-          style={{
-            width: 10,
-            height: 10,
-            borderRadius: 5,
-            backgroundColor: isBackendOnline === null ? colors.mutedForeground : isBackendOnline ? '#3b82f6' : '#f97316',
-            marginLeft: 4,
-            marginRight: -4,
-          }}
+        <PulsingDot
+          color={isBackendOnline === null ? colors.mutedForeground : isBackendOnline ? '#3b82f6' : '#f97316'}
+          style={{ marginLeft: 4, marginRight: -4 }}
+          accessibilityLabel={isBackendOnline ? 'Server Online' : 'Server Offline'}
         />
 
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -244,15 +246,10 @@ export function FloatingDock() {
         </TouchableOpacity>
 
         {/* Network Status Dot (Green/Red) */}
-        <View
-          style={{
-            width: 10,
-            height: 10,
-            borderRadius: 5,
-            backgroundColor: isNetworkOnline ? '#10b981' : '#ef4444',
-            marginLeft: -4,
-            marginRight: 4,
-          }}
+        <PulsingDot
+          color={isNetworkOnline ? '#10b981' : '#ef4444'}
+          style={{ marginLeft: -4, marginRight: 4 }}
+          accessibilityLabel={isNetworkOnline ? 'Network Online' : 'Network Offline'}
         />
       </View>
 
@@ -296,13 +293,16 @@ export function FloatingDock() {
                 {isAdmin && <MenuItem name="Plans" icon={NotebookText} targetRoute="Plans" />}
                 <MenuItem name="Inventory" icon={Box} targetRoute="Inventory" />
                 <MenuItem name="Orders" icon={ClipboardList} targetRoute="Orders" />
+                <MenuItem name="Scanner" icon={Scan} targetRoute="Scanner" />
                 <MenuItem name="Payments" icon={CreditCard} targetRoute="Payments" />
                 
                 <Text style={{ fontSize: 12, fontWeight: '800', textTransform: 'uppercase', color: colors.mutedForeground, letterSpacing: 1, marginTop: 16, marginBottom: 8, paddingHorizontal: 4 }}>Management</Text>
                 <MenuItem name="Reports" icon={PieChart} targetRoute="Reports" />
+                <MenuItem name="Redlist" icon={AlertTriangle} targetRoute="Redlist" />
                 {isAdmin && <MenuItem name="Staff" icon={ShieldCheck} targetRoute="Staff" />}
                 <MenuItem name="Inquiries" icon={MessageSquare} targetRoute="Inquiries" />
                 <MenuItem name="Settings" icon={Settings} targetRoute="Settings" />
+                <MenuItem name="Profile" icon={UserRound} targetRoute="Profile" />
               </View>
             </ScrollView>
           </View>

@@ -337,7 +337,11 @@ function MemberDashboard({
     .reduce((total, payment) => total + payment.amountCents, 0);
 
   return (
-    <ScreenWrapper refreshing={loading} onRefresh={loadData}>
+    <ScreenWrapper 
+      refreshing={loading} 
+      onRefresh={loadData}
+      contentPaddingBottom={80}
+    >
       <PageHeader
         label="Member Portal"
         title={`Welcome, ${userName}`}
