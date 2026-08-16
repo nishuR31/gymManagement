@@ -84,6 +84,7 @@ export function MemberLoginModal({ login, onClose }: MemberLoginModalProps) {
               </Button>
             </View>
           )}
+          <Toast />
         </SafeAreaView>
       </View>
     </Modal>

@@ -509,6 +509,10 @@ function toAuthUserRecord(user: {
     mustChangePassword: user.mustChangePassword,
     memberId: user.memberProfile?.id ?? null,
     twoFactorEnabled: user.twoFactorEnabled,
+    // twoFactorSecret and passkeyRows are not loaded by member queries;
+    // default to safe empty values to satisfy the AuthUserRecord interface.
+    twoFactorSecret: null,
+    passkeyRows: [],
     hasPasskeys: (user.passkeys?.length ?? 0) > 0,
     securityDisableRequested: user.securityDisableRequested
   };

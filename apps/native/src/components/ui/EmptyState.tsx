@@ -20,16 +20,16 @@ export function EmptyState({
   const { colors } = useTheme();
 
   return (
-    <View className="flex min-h-[128px] items-center justify-center rounded-xl border border-dashed border-border px-4 py-10">
+    <View className="flex min-h-[128px] items-center justify-center rounded-xl border border-dashed px-4 py-10" style={{ borderColor: colors.border }}>
       <View className="items-center gap-3">
-        <View className="h-12 w-12 items-center justify-center rounded-xl bg-secondary">
+        <View className="h-12 w-12 items-center justify-center rounded-xl" style={{ backgroundColor: colors.secondary }}>
           <Icon size={22} color={colors.primary} />
         </View>
-        <Text className="text-sm font-bold text-foreground text-center">
+        <Text className="text-sm font-bold text-center" style={{ color: colors.foreground }}>
           {title}
         </Text>
         {description ? (
-          <Text className="text-sm text-muted-foreground text-center max-w-[240px]">
+          <Text className="text-sm text-center max-w-[240px]" style={{ color: colors.mutedForeground }}>
             {description}
           </Text>
         ) : null}

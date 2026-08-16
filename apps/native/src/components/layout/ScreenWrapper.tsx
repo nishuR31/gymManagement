@@ -114,16 +114,17 @@ interface PageHeaderProps {
 }
 
 export function PageHeader({ label, title, subtitle, actions, onSubtitlePress }: PageHeaderProps) {
+  const { colors } = useTheme();
   return (
-    <View className="mb-6 rounded-xl border border-border bg-card px-4 py-4">
+    <View className="mb-6 rounded-xl border px-4 py-4" style={{ backgroundColor: colors.card, borderColor: colors.border }}>
       <View className="flex-row items-start justify-between">
         <View className="flex-1 mr-2">
           {label ? (
-            <Text className="text-xs font-black uppercase tracking-[0.18em] text-primary mb-1">
+            <Text className="text-xs font-black uppercase tracking-[0.18em] mb-1" style={{ color: colors.primary }}>
               {label}
             </Text>
           ) : null}
-          <Text className="text-3xl font-black text-foreground leading-tight">
+          <Text className="text-3xl font-black leading-tight" style={{ color: colors.foreground }}>
             {title}
           </Text>
           {subtitle ? (
@@ -131,13 +132,14 @@ export function PageHeader({ label, title, subtitle, actions, onSubtitlePress }:
               <React.Fragment>
                 <Text
                   onPress={onSubtitlePress}
-                  className="mt-1 text-sm font-semibold text-primary underline"
+                  className="mt-1 text-sm font-semibold underline"
+                  style={{ color: colors.primary }}
                 >
                   {subtitle}
                 </Text>
               </React.Fragment>
             ) : (
-              <Text className="mt-1 text-sm font-semibold text-muted-foreground">
+              <Text className="mt-1 text-sm font-semibold" style={{ color: colors.mutedForeground }}>
                 {subtitle}
               </Text>
             )
@@ -156,8 +158,9 @@ export function PageHeader({ label, title, subtitle, actions, onSubtitlePress }:
 // ─────────────────────────────────────────────
 
 export function SectionTitle({ children }: { children: string }) {
+  const { colors } = useTheme();
   return (
-    <Text className="text-base font-black text-foreground mb-3 mt-1">
+    <Text className="text-base font-black mb-3 mt-1" style={{ color: colors.foreground }}>
       {children}
     </Text>
   );
@@ -168,5 +171,6 @@ export function SectionTitle({ children }: { children: string }) {
 // ─────────────────────────────────────────────
 
 export function Divider({ className = '' }: { className?: string }) {
-  return <View className={`h-px bg-border ${className}`} />;
+  const { colors } = useTheme();
+  return <View className={`h-px ${className}`} style={{ backgroundColor: colors.border }} />;
 }

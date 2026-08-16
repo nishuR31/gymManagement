@@ -26,15 +26,15 @@ export function MiniCalendar() {
   const timeStr = `${hours}:${minutes} ${ampm}`;
 
   return (
-    <View className="flex-row items-center justify-center self-start gap-4 rounded-full border border-border/50 bg-background/50 px-4 py-2 shadow-sm">
+    <View className="flex-row items-center justify-center self-start gap-4 rounded-full border px-4 py-2 shadow-sm" style={{ backgroundColor: `${activeColors.background}80`, borderColor: `${activeColors.border}80` }}>
       <View className="flex-row items-center gap-2">
         <CalendarIcon size={16} color={activeColors.primary} />
-        <Text className="font-semibold text-foreground text-sm">{day}, {date}</Text>
+        <Text className="font-semibold text-sm" style={{ color: activeColors.foreground }}>{day}, {date}</Text>
       </View>
-      <View className="w-[1px] h-4 bg-border/50" />
+      <View className="w-[1px] h-4" style={{ backgroundColor: `${activeColors.border}80` }} />
       <View className="flex-row items-center gap-2">
         <Clock size={16} color={activeColors.primary} />
-        <Text className="font-medium text-muted-foreground text-sm">{timeStr}</Text>
+        <Text className="font-medium text-sm" style={{ color: activeColors.mutedForeground }}>{timeStr}</Text>
       </View>
     </View>
   );

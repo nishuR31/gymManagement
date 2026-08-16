@@ -215,8 +215,20 @@ function createOrderCode(): string {
 }
 
 const productOrderInclude = {
-  member: true,
-  product: true
+  member: {
+    select: {
+      memberCode: true,
+      firstName: true,
+      lastName: true,
+      phone: true
+    }
+  },
+  product: {
+    select: {
+      name: true,
+      imageUrl: true
+    }
+  }
 };
 
 async function lockProduct(tx: TransactionClient, productId: string): Promise<void> {

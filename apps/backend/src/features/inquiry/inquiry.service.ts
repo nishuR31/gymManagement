@@ -4,17 +4,25 @@ import type { AuditWriter } from "../../features/member/member.service.js";
 import type { InquiryRecord, InquiryRepository } from "./inquiry.repository.js";
 import type { MembershipRepository } from "../../features/membership/membership.repository.js";
 import type { RequestActor, RequestContext } from "../../core/types/auth.js";
+import type { CacheService } from "../../core/cache/cache.service.js";
 
 export class InquiryService {
   public constructor(
     private readonly inquiryRepository: InquiryRepository,
     private readonly membershipRepository: MembershipRepository,
-    private readonly auditWriter: AuditWriter
+    private readonly auditWriter: AuditWriter,
+    private readonly cache?: CacheService
   ) {}
 
   public async publicPlans(): Promise<{ data: PublicMembershipPlanDto[] }> {
+    const cacheKey = "public:membership-plans";
+    if (this.cache) {
+      const cached = await this.cache.get<{ data: PublicMembershipPlanDto[] }>(cacheKey);
+      if (cached) return cached;
+    }
+
     const plans = await this.membershipRepository.listPlans(false);
-    return {
+    const result = {
       data: plans.map((plan) => ({
         name: plan.name,
         description: null,
@@ -22,6 +30,12 @@ export class InquiryService {
         durationDays: plan.durationDays
       }))
     };
+
+    if (this.cache) {
+      void this.cache.set(cacheKey, result, 300);
+    }
+
+    return result;
   }
 
   public async createPublicInquiry(input: { name: string; email: string; phone: string; message: string }): Promise<InquiryDto> {

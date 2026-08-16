@@ -1,0 +1,128 @@
+# Native App — Context
+
+## Status
+Active development. UI/UX fixes in progress.
+
+## Stack
+- React Native + Expo (bare managed)
+- NativeWind (TailwindCSS for RN) — theme classes (dark/light) applied via root `View className`
+- Redux Toolkit + redux-persist
+- React Hook Form + Zod
+- react-native-toast-message (global `<Toaster />` in App.tsx; modals include own `<Toast />`)
+- `@gym/shared` for DTO types
+
+## Theme System
+- 3 themes: `light`, `dark`, `amoled` — Redux `state.theme.theme`
+- 4 style modes: `minimal`, `glass`, `clay`, `liquid-glass` — Redux `state.theme.styleMode`
+- NativeWind color vars: `text-foreground`, `bg-background`, `bg-card`, `text-muted-foreground`, etc.
+- Direct style: `colors.foreground`, `colors.background`, `colors.card`, etc. from `useTheme()` hook
+- `themeColors` constant in `src/constants/colors.ts` — light/dark/amoled palettes
+- **High-Level UI/UX Professionalization Rule (Theme Inversion Fix)**: NativeWind v4 CSS variables (e.g., `bg-card`, `text-foreground`) can fail to cascade reliably on React Native when toggling themes, resulting in dark components in light mode or eye-straining white components. **Always use explicit inline styles for colors** (e.g., `style={{ backgroundColor: colors.card, color: colors.foreground }}`) derived from `useTheme().colors` on core primitive components (`Card`, `Button`, `Input`, `PageHeader`, `ScreenWrapper`) instead of relying solely on Tailwind CSS classes for dynamic coloring.
+
+## Key Files
+- `App.tsx` — root navigator, `<Toaster />` outside navigator
+- `src/constants/colors.ts` — `themeColors` object (light/dark/amoled palettes)
+- `src/components/ui/Input.tsx` — theme-aware input: `isDark ? bg-white/10 : bg-black/5`. Uses `useTheme()`. Text color via inline style.
+- `src/components/ui/Card.tsx` — glass/clay/minimal/default variants; uses `colors.card`; Android glass fallback at `rgba(*,*,0.92)` light / `rgba(*,*,0.90)` dark
+- `src/components/ui/Toaster.tsx` — global toast config; positioned `topOffset` from safe area insets
+- `src/components/layout/Footer.tsx` — brand + quick links + legal section. Email link: `Linking.openURL('mailto:contact@valorfitness.com')`.
+- `src/components/layout/AppDock.tsx` — renders `FloatingDock` or `PublicFloatingDock`
+- `src/features/public/publicApi.ts` — `listPublicPlans()`, `submitPublicInquiry()`
+- `src/features/members/memberApi.ts` — CRUD + QR + login; phone sent combined (prefix+number)
+- `src/features/memberships/membershipApi.ts` — `cancelSubscription(memberId, subscriptionId)`
+
+## Error Parsing Pattern (standard)
+All forms use this helper to extract API error messages:
+```ts
+function parseApiError(error: any): string {
+  const data = error?.response?.data;
+  if (data?.message && typeof data.message === 'string') return data.message;
+  if (Array.isArray(data?.message)) return data.message.join(', ');
+  if (data?.error && typeof data.error === 'string') return data.error;
+  if (error?.message && typeof error.message === 'string') return error.message;
+  return 'An unexpected error occurred. Please try again.';
+}
+```
+Toast pattern: `{ text1: 'Short title', text2: parseApiError(error), visibilityTime: 5000 }`
+
+## Strong Password Regex (active in ChangePasswordModal)
+```
+/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+```
+Requires: min 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 special char.
+
+## Phone Prefix Pattern (MemberFormModal)
+- Dropdown: `PHONE_PREFIXES = ['+91', '+1', '+44', '+971', ...]`
+- Default: `+91`
+- Combined value sent: `${phonePrefix}${phone}` (e.g., `+919876543210`)
+- `extractPhoneNumber(fullPhone)` splits on edit mode
+
+## Completed Fixes (this session)
+
+### 1. DownloadAppScreen
+- Removed `LiquidGlassPanel` floating toolbar (ThemeToggle + LiquidMetalButton)
+- Removed unused imports; page is clean scroll content only
+- Improved Android security disclaimer copy
+
+### 2. SettingsScreen — confirmed correct ✓
+- Theme toggle is in PageHeader actions at top
+- `liquid-glass` is one of the 4 style buttons
+- No changes needed
+
+### 3. MemberFormModal
+- Added `+91` phone prefix dropdown (with common international codes)
+- Combined prefix+number sent to API
+- Precise error extraction via `parseApiError()`; shown as `text2` with 5s visibility
+- All text/bg explicitly `style={{ color: colors.X }}`
+- `<Toast />` inside modal (Android-safe)
+
+### 4. StaffFormModal
+- Role input → dropdown picker for STAFF/TRAINER/MANAGER/ADMIN
+- `parseApiError()` for precise error messages
+- Added helper tip about needing the user UUID
+- `<Toast />` inside modal
+
+### 5. MemberLoginScreen
+- Full theme-aware: all containers use `style={{ backgroundColor: activeColors.background }}`
+- Input labels, text, border all use `activeColors.*` directly
+- Better error messages for: `2FA_REQUIRED`, `NOT_A_MEMBER`, `INVALID_CREDENTIALS`, generic
+- `<Toast />` inside screen for on-top rendering
+- Email/password placeholders added
+
+### 6. PublicHomeScreen
+- Added membership plans section fetching from `publicApi.listPublicPlans()`
+  - Price displayed via `formatCents()`; plan features listed with Star icons
+  - "Most Popular" badge on first plan
+- Live clock: `setInterval(1000)` updating `now` state; time refreshes every second
+- Calendar: press-toggle instead of hover (mobile-compatible)
+- Calendar correctly computes first-day offset and correct number of days per month
+- Better inquiry form error messages and placeholder text
+
+### 7. Footer
+- Email contact: `Linking.openURL('mailto:contact@valorfitness.com')` with Mail icon
+- Gaps tightened (mb-8→mb-6, mb-4→mb-3)
+- Dock spacer: `h-14` → `h-10`
+
+### 8. Card (glass mode contrast)
+- Android glass fallback: light `rgba(255,255,255,0.92)` (was 0.85), dark `rgba(25,25,25,0.90)` (was 0.85)
+
+### 9. ChangePasswordModal — strong password already enforced ✓
+- Schema already has strong regex — no change needed
+
+### 10. MembersScreen — cancel subscription ✓
+- `handleCancelSubscription()` + "Cancel Membership" button already implemented for admins — no change needed
+
+### 11. High-Level PR UI/UX Professionalize (Theme Inversion Fix)
+- **Problem**: NativeWind v4 variables failed to cascade correctly during theme toggling, causing "eye-straining white text on white backgrounds" and inverted light/dark components.
+- **Solution**: Refactored core primitives to use explicit `style={{ color: colors.X, backgroundColor: colors.Y }}` from `useTheme()`.
+- **Affected Components**:
+  - `Button.tsx` (fully refactored all variants to use `bgStyle` and `textStyle` objects)
+  - `Card.tsx` (`CardTitle` text color explicitly set to `colors.foreground`)
+  - `Input.tsx` (Label and error text explicitly set to `mutedForeground` and `destructive`)
+  - `ScreenWrapper.tsx` (`PageHeader` and `SectionTitle` text colors explicitly mapped)
+
+## Identified Known Issues (future work)
+- Staff creation requires user UUID — poor UX; consider email-lookup endpoint
+- `ChangePasswordModal` uses `presentationStyle="pageSheet"` which may clip Toast on iOS in some cases
+- Passkey flow in MemberLoginScreen is simulated (no real WebAuthn on mobile RN)
+- PublicHomeScreen plans: no client-side cache, re-fetches on every mount

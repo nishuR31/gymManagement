@@ -1,7 +1,7 @@
-import React from 'react';
+
 import { View, Text, TouchableOpacity, Linking } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { Dumbbell } from 'lucide-react-native';
+import { Dumbbell, Mail } from 'lucide-react-native';
 import { useTheme } from '../../hooks/useTheme';
 import { APP_NAME } from '../../utils/env';
 
@@ -9,11 +9,11 @@ export function Footer() {
   const { colors, styleMode } = useTheme();
   const navigation = useNavigation<any>();
 
-  let containerClass = "pt-8 pb-4 px-6 mt-4 border-t border-border";
+  let containerClass = "pt-6 pb-4 px-6 mt-4 border-t border-border";
   let containerStyle: any = { borderTopLeftRadius: 32, borderTopRightRadius: 32, backgroundColor: colors.card };
 
   if (styleMode === 'clay') {
-    containerStyle.borderRadius = 48; // Fully rounded
+    containerStyle.borderRadius = 48;
     containerStyle.borderTopWidth = 0;
     containerClass += " shadow-[0_-10px_50px_rgba(0,0,0,0.2)] m-4";
   } else if (styleMode === 'glass') {
@@ -26,12 +26,9 @@ export function Footer() {
   }
 
   return (
-    <View 
-      className={containerClass} 
-      style={containerStyle}
-    >
-      <View className="flex-row flex-wrap justify-around gap-8 mb-8">
-        
+    <View className={containerClass} style={containerStyle}>
+      <View className="flex-row flex-wrap justify-around gap-6 mb-6">
+
         {/* Brand Section */}
         <View className="flex-1 min-w-[200px]">
           <View className="flex-row items-center gap-2 mb-3">
@@ -47,7 +44,7 @@ export function Footer() {
 
         {/* Quick Links */}
         <View className="flex-1 min-w-[120px]">
-          <Text className="text-xs font-black uppercase tracking-wider mb-4" style={{ color: colors.foreground }}>Quick Links</Text>
+          <Text className="text-xs font-black uppercase tracking-wider mb-3" style={{ color: colors.foreground }}>Quick Links</Text>
           <View className="gap-3">
             <TouchableOpacity onPress={() => navigation.navigate('Home')}>
               <Text className="text-sm font-medium" style={{ color: colors.mutedForeground }}>Home</Text>
@@ -66,10 +63,15 @@ export function Footer() {
 
         {/* Contact & Legal */}
         <View className="flex-1 min-w-[120px]">
-          <Text className="text-xs font-black uppercase tracking-wider mb-4" style={{ color: colors.foreground }}>Legal & Contact</Text>
+          <Text className="text-xs font-black uppercase tracking-wider mb-3" style={{ color: colors.foreground }}>Legal & Contact</Text>
           <View className="gap-3">
-            <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-              <Text className="text-sm font-medium" style={{ color: colors.mutedForeground }}>Contact Support</Text>
+            {/* Email contact */}
+            <TouchableOpacity
+              onPress={() => Linking.openURL('mailto:contact@valorfitness.com')}
+              className="flex-row items-center gap-1.5"
+            >
+              <Mail size={13} color={colors.primary} />
+              <Text className="text-sm font-medium" style={{ color: colors.primary }}>contact@valorfitness.com</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => navigation.navigate('Privacy')}>
               <Text className="text-sm font-medium" style={{ color: colors.mutedForeground }}>Privacy Policy</Text>
@@ -82,14 +84,14 @@ export function Footer() {
 
       </View>
 
-      <View className="pt-4 border-t border-border/50 items-center">
+      <View className="pt-3 border-t border-border/50 items-center">
         <Text className="text-xs font-medium" style={{ color: colors.mutedForeground }}>
           © {new Date().getFullYear()} {APP_NAME}. All rights reserved.
         </Text>
       </View>
-      
-      {/* Spacer for dock */}
-      <View className="h-14 w-full" />
+
+      {/* Dock spacer — just enough room for the floating dock */}
+      <View className="h-10 w-full" />
     </View>
   );
 }

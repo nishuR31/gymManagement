@@ -98,7 +98,7 @@ export async function bootstrap(options: any = {}) {
   const activityLogService = new ActivityLogService(activityLogRepository);
   const notificationService = new NotificationService(notificationRepository, authRepository, options.clock, redisCache);
   const settingsService = new SettingsService(settingsRepository, authRepository, redisCache);
-  const inquiryService = new InquiryService(inquiryRepository, membershipRepository, authRepository);
+  const inquiryService = new InquiryService(inquiryRepository, membershipRepository, authRepository, redisCache);
 
   const reportService = new ReportService(
     reportRepository,

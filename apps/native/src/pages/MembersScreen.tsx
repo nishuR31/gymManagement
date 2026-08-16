@@ -109,6 +109,18 @@ export function MembersScreen() {
     }
   };
 
+  const handleCancelSubscription = async () => {
+    if (!selectedMember || memberSubscriptions.length === 0) return;
+    try {
+      await membershipApi.cancelSubscription(selectedMember.id, memberSubscriptions[0].id);
+      Toast.show({ type: 'success', text1: 'Subscription cancelled' });
+      // Refresh details
+      void selectMember(selectedMember);
+    } catch (error: any) {
+      Toast.show({ type: 'error', text1: error.message || 'Action failed' });
+    }
+  };
+
   const selectMember = async (member: MemberDto) => {
     setSelectedMember(member);
     setDetailTab('profile');
@@ -350,6 +362,17 @@ export function MembersScreen() {
                         <Text style={{ color: colors.mutedForeground }} className="text-sm">
                           Expires {formatDateTime(memberSubscriptions[0].endDate)}
                         </Text>
+                        
+                        {isAdmin && memberSubscriptions[0].status === 'ACTIVE' && (
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            className="mt-3"
+                            onPress={handleCancelSubscription}
+                          >
+                            Cancel Membership
+                          </Button>
+                        )}
                       </View>
                     )}
 

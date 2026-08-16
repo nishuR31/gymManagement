@@ -22,17 +22,17 @@ export class RedisCacheService implements CacheService {
         lazyConnect: true,
         maxRetriesPerRequest: 3,
         connectTimeout: 5000,
-        commandTimeout: 5000,
+        commandTimeout: 500, // Fail fast: 500ms instead of 5000ms
         retryStrategy: (times) => {
           return Math.min(times * 50, 2000);
         }
       });
       this.l2Redis.on("connection", () => console.log("L2 Redis Cache connected."));
 
-      this.l2Redis.on("error", () => {
-        // Ignore connection errors to prevent unhandled rejections
-        console.log("Redis connection error, falling back to L1 Memory Cache only.");
-        this.l2Redis = null;
+      this.l2Redis.on("error", (err) => {
+        // ioredis automatically attempts to reconnect using retryStrategy.
+        // We log the error but keep the l2Redis reference intact.
+        console.error("L2 Redis Cache connection error:", err.message);
       });
     }
   }
@@ -77,8 +77,18 @@ export class RedisCacheService implements CacheService {
       this.l1Cache.set(key, stringValue);
       this.l1Ttls.set(key, Date.now() + ttlSeconds * 1000);
 
+      if (this.l1Cache.size > 1000) {
+        const firstKey = this.l1Cache.keys().next().value;
+        if (firstKey !== undefined) {
+          this.l1Cache.delete(firstKey);
+          this.l1Ttls.delete(firstKey);
+        }
+      }
+
       if (this.l2Redis) {
-        await this.l2Redis.set(key, stringValue, "EX", ttlSeconds);
+        void this.l2Redis.set(key, stringValue, "EX", ttlSeconds).catch(err => {
+          console.error("L2 Redis cache set error:", err);
+        });
       }
     } catch {
       return;

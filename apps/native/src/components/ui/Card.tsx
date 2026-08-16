@@ -47,7 +47,7 @@ export function Card({ children, className, style, ...props }: CardProps) {
       )}
       {/* Fallback for Android in liquid-glass mode */}
       {(styleMode === 'liquid-glass' || styleMode === 'glass') && Platform.OS !== 'ios' && Platform.OS !== 'web' && (
-        <View style={[StyleSheet.absoluteFill, { backgroundColor: colors.card === '#ffffff' ? 'rgba(255,255,255,0.85)' : 'rgba(25,25,25,0.85)' }]} />
+        <View style={[StyleSheet.absoluteFill, { backgroundColor: colors.card === '#ffffff' ? 'rgba(255,255,255,0.92)' : 'rgba(25,25,25,0.90)' }]} />
       )}
       
       <View className="z-10">
@@ -71,9 +71,11 @@ export function CardTitle({
   className,
   ...props
 }: TextProps & { children: React.ReactNode; className?: string }) {
+  const { colors } = useTheme();
   return (
     <Text
-      className={`text-lg font-bold leading-tight tracking-tight text-foreground ${className || ''}`}
+      className={`text-lg font-bold leading-tight tracking-tight ${className || ''}`}
+      style={[{ color: colors.foreground }, props.style]}
       {...props}
     >
       {children}

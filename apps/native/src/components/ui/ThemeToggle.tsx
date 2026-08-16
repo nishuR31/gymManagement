@@ -18,10 +18,10 @@ export const ThemeToggle = React.memo(function ThemeToggle() {
   };
 
   return (
-    <View className="bg-card rounded-3xl p-5 border border-border mt-4" style={styles.shadow}>
+    <View className="rounded-3xl p-5 border mt-4" style={[styles.shadow, { backgroundColor: colors.card, borderColor: colors.border }]}>
       
       {/* ── Section A: Color Scheme ── */}
-      <Text className="text-foreground font-black text-lg mb-4">Color Engine</Text>
+      <Text className="font-black text-lg mb-4" style={{ color: colors.foreground }}>Color Engine</Text>
       <View className="flex-row flex-wrap gap-2 mb-8">
         
         <TouchableOpacity
@@ -67,7 +67,7 @@ export const ThemeToggle = React.memo(function ThemeToggle() {
       </View>
 
       {/* ── Section B: Material Engine ── */}
-      <Text className="text-foreground font-black text-lg mb-4">Material Engine</Text>
+      <Text className="font-black text-lg mb-4" style={{ color: colors.foreground }}>Material Engine</Text>
       <View className="gap-3">
         
         {/* Minimalist */}
@@ -82,8 +82,8 @@ export const ThemeToggle = React.memo(function ThemeToggle() {
               <Type size={20} color={styleMode === 'minimal' ? colors.primary : colors.mutedForeground} />
             </View>
             <View className="flex-1">
-              <Text className="text-foreground font-bold">Minimalist</Text>
-              <Text className="text-muted-foreground text-xs mt-1">Sharp, clean, focus on typography and space.</Text>
+              <Text className="font-bold" style={{ color: colors.foreground }}>Minimalist</Text>
+              <Text className="text-xs mt-1" style={{ color: colors.mutedForeground }}>Sharp, clean, focus on typography and space.</Text>
             </View>
           </View>
           {styleMode === 'minimal' && <View className="w-2.5 h-2.5 rounded-full bg-primary" />}
@@ -101,8 +101,8 @@ export const ThemeToggle = React.memo(function ThemeToggle() {
               <Box size={20} color={styleMode === 'clay' ? colors.primary : colors.mutedForeground} />
             </View>
             <View className="flex-1">
-              <Text className="text-foreground font-bold">Claymorphism</Text>
-              <Text className="text-muted-foreground text-xs mt-1">Soft, tactile, bubbly extruded 3D surfaces.</Text>
+              <Text className="font-bold" style={{ color: colors.foreground }}>Claymorphism</Text>
+              <Text className="text-xs mt-1" style={{ color: colors.mutedForeground }}>Soft, tactile, bubbly extruded 3D surfaces.</Text>
             </View>
           </View>
           {styleMode === 'clay' && <View className="w-2.5 h-2.5 rounded-full bg-primary" />}
@@ -120,8 +120,8 @@ export const ThemeToggle = React.memo(function ThemeToggle() {
               <Layers size={20} color={styleMode === 'glass' ? colors.primary : colors.mutedForeground} />
             </View>
             <View className="flex-1">
-              <Text className="text-foreground font-bold">Glassmorphism</Text>
-              <Text className="text-muted-foreground text-xs mt-1">Subtle, frosted semi-transparent layered cards.</Text>
+              <Text className="font-bold" style={{ color: colors.foreground }}>Glassmorphism</Text>
+              <Text className="text-xs mt-1" style={{ color: colors.mutedForeground }}>Subtle, frosted semi-transparent layered cards.</Text>
             </View>
           </View>
           {styleMode === 'glass' && <View className="w-2.5 h-2.5 rounded-full bg-primary" />}
@@ -139,8 +139,8 @@ export const ThemeToggle = React.memo(function ThemeToggle() {
               <Droplet size={20} color={styleMode === 'liquid-glass' ? colors.primary : colors.mutedForeground} />
             </View>
             <View className="flex-1">
-              <Text className="text-foreground font-bold">Liquid Glass</Text>
-              <Text className="text-muted-foreground text-xs mt-1">Heavy native iOS blur on all surfaces.</Text>
+              <Text className="font-bold" style={{ color: colors.foreground }}>Liquid Glass</Text>
+              <Text className="text-xs mt-1" style={{ color: colors.mutedForeground }}>Heavy native iOS blur on all surfaces.</Text>
             </View>
           </View>
           {styleMode === 'liquid-glass' && <View className="w-2.5 h-2.5 rounded-full bg-primary" />}

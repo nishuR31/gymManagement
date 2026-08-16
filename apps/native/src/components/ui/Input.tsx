@@ -64,7 +64,7 @@ export function Input({
   return (
     <View className="mb-4">
       {label ? (
-        <Text className="mb-1.5 text-sm font-medium text-muted-foreground">
+        <Text className="mb-1.5 text-sm font-medium" style={{ color: colors.mutedForeground }}>
           {label}
         </Text>
       ) : null}
@@ -108,7 +108,7 @@ export function Input({
       </View>
 
       {error ? (
-        <Text className="mt-1 text-xs text-destructive">{error}</Text>
+        <Text className="mt-1 text-xs" style={{ color: colors.destructive }}>{error}</Text>
       ) : null}
     </View>
   );

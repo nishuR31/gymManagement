@@ -13,7 +13,7 @@ import * as authApi from '../../features/auth/authApi';
 
 const changePasswordSchema = z.object({
   currentPassword: z.string().min(1, 'Current password is required'),
-  newPassword: z.string().min(8, 'Password must be at least 8 characters'),
+  newPassword: z.string().min(8, 'Password must be at least 8 characters').regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/, 'Password must contain uppercase, lowercase, number, and special character'),
   confirmPassword: z.string().min(8, 'Confirm password must be at least 8 characters'),
 }).refine((data) => data.newPassword === data.confirmPassword, {
   message: "Passwords don't match",

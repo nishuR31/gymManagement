@@ -49,7 +49,8 @@ export class MembershipService {
       entityId: plan.id,
       ...context
     }),
-      invalidateDashboardAndReports(this.dashboardReportCache)
+      invalidateDashboardAndReports(this.dashboardReportCache),
+      (this.dashboardReportCache?.delete(["public:membership-plans"]) ?? Promise.resolve())
     ]);
     return toPlanDto(plan);
   }
@@ -77,7 +78,8 @@ export class MembershipService {
       entityId: plan.id,
       ...context
     }),
-      invalidateDashboardAndReports(this.dashboardReportCache)
+      invalidateDashboardAndReports(this.dashboardReportCache),
+      (this.dashboardReportCache?.delete(["public:membership-plans"]) ?? Promise.resolve())
     ]);
     return toPlanDto(plan);
   }
@@ -94,7 +96,8 @@ export class MembershipService {
       entityId: plan.id,
       ...context
     }),
-      invalidateDashboardAndReports(this.dashboardReportCache)
+      invalidateDashboardAndReports(this.dashboardReportCache),
+      (this.dashboardReportCache?.delete(["public:membership-plans"]) ?? Promise.resolve())
     ]);
     return toPlanDto(plan);
   }

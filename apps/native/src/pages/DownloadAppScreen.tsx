@@ -6,9 +6,6 @@ import { APP_NAME } from '../utils/env';
 import { ScreenWrapper } from '../components/layout/ScreenWrapper';
 import { Card, CardContent } from '../components/ui/Card';
 import { useTheme } from '../hooks/useTheme';
-import { ThemeToggle } from '../components/ui/ThemeToggle';
-import { LiquidMetalButton } from '../components/ui/LiquidMetalButton';
-import { LiquidGlassPanel } from '../components/ui/LiquidGlassPanel';
 
 function Step({ number, title, description }: { number: string; title: string; description: string }) {
   const { colors } = useTheme();
@@ -18,8 +15,8 @@ function Step({ number, title, description }: { number: string; title: string; d
         <Text style={{ color: colors.primary }} className="font-black text-xs">{number}</Text>
       </View>
       <View className="flex-1 mt-1">
-        <Text className="text-lg font-bold text-foreground mb-1">{title}</Text>
-        <Text className="text-sm text-muted-foreground leading-relaxed">{description}</Text>
+        <Text style={{ color: colors.foreground }} className="text-lg font-bold mb-1">{title}</Text>
+        <Text style={{ color: colors.mutedForeground }} className="text-sm leading-relaxed">{description}</Text>
       </View>
     </View>
   );
@@ -34,8 +31,8 @@ function FeatureCard({ title, description }: { title: string; description: strin
         <View className="mb-4 w-8 h-8 rounded-full items-center justify-center border" style={{ borderColor: `${colors.primary}40`, backgroundColor: 'transparent' }}>
           <CheckCircle2 size={16} color={colors.primary} />
         </View>
-        <Text className="text-lg font-bold text-foreground mb-2">{title}</Text>
-        <Text className="text-sm text-muted-foreground leading-relaxed">{description}</Text>
+        <Text style={{ color: colors.foreground }} className="text-lg font-bold mb-2">{title}</Text>
+        <Text style={{ color: colors.mutedForeground }} className="text-sm leading-relaxed">{description}</Text>
       </CardContent>
     </Card>
   );
@@ -59,20 +56,10 @@ export function DownloadAppScreen() {
           <Smartphone size={14} color={colors.primary} />
           <Text className="text-xs font-black uppercase tracking-widest" style={{ color: colors.primary }}>{APP_NAME} APP</Text>
         </View>
-        <Text className="text-4xl md:text-6xl font-black text-foreground text-center mb-4 tracking-tight">Your gym pass in your pocket.</Text>
-        <Text className="text-base md:text-lg text-muted-foreground text-center max-w-2xl leading-relaxed mb-8">
+        <Text style={{ color: colors.foreground }} className="text-4xl md:text-6xl font-black text-center mb-4 tracking-tight">Your gym pass in your pocket.</Text>
+        <Text style={{ color: colors.mutedForeground }} className="text-base md:text-lg text-center max-w-2xl leading-relaxed mb-8">
           Download our app for better services, easy access, and a more convenient gym experience. View timelines, track your classes, and manage your membership seamlessly.
         </Text>
-
-        {/* Functional Layer: Liquid Glass Floating Toolbar */}
-        <View className="absolute bottom-10 left-4 right-4 items-center z-50">
-          <LiquidGlassPanel variant="regular" containerStyle={{ width: '100%', maxWidth: 400 }}>
-            <Text className="text-foreground font-bold text-center mb-2 text-sm uppercase tracking-widest">Functional Controls</Text>
-            <ThemeToggle />
-            <View className="h-4" />
-            <LiquidMetalButton title="Get Access Link" onPress={() => {}} />
-          </LiquidGlassPanel>
-        </View>
       </View>
 
       <View className="max-w-7xl mx-auto w-full px-4 lg:px-12 pb-20">
@@ -82,8 +69,8 @@ export function DownloadAppScreen() {
 
           {/* Left: Steps */}
           <View className="flex-1 pt-8">
-            <Text className="text-3xl font-black text-foreground mb-4">How to get started</Text>
-            <Text className="text-muted-foreground mb-10 text-sm">It takes less than a minute to setup your account and start using the app.</Text>
+            <Text style={{ color: colors.foreground }} className="text-3xl font-black mb-4">How to get started</Text>
+            <Text style={{ color: colors.mutedForeground }} className="mb-10 text-sm">It takes less than a minute to setup your account and start using the app.</Text>
 
             <Step number="01" title="Download" description="Get the app from the App Store or Google Play." />
             <Step number="02" title="Get Credentials" description="Get your login ID and temporary password from the owner, a staff member, or an authorized person." />
@@ -173,9 +160,21 @@ export function DownloadAppScreen() {
           </View>
         </View>
 
+        {/* Safety Disclaimer for Android */}
+        {platform === 'android' && (
+          <View className="mb-16 mt-[-40px] px-4 md:px-12 flex-row justify-end max-w-7xl mx-auto w-full">
+            <View className="w-full lg:w-1/2 p-4 rounded-xl border border-warning/30" style={{ backgroundColor: `${colors.warning}10` }}>
+              <Text className="text-warning font-bold text-sm mb-1 uppercase tracking-widest">Security Notice</Text>
+              <Text style={{ color: colors.mutedForeground }} className="text-xs leading-relaxed">
+                As this app is not yet available on the Google Play Store, your device may warn you about installing apps from unknown sources. This is a standard Android security measure. Our APK is perfectly safe, signed, and malware-free. No security risk — Android requires this scan for all apps installed outside the Play Store.
+              </Text>
+            </View>
+          </View>
+        )}
+
         {/* Functionalities Row */}
         <View>
-          <Text className="text-3xl font-black text-foreground mb-8 text-center">App Functionalities</Text>
+          <Text style={{ color: colors.foreground }} className="text-3xl font-black mb-8 text-center">App Functionalities</Text>
           <View className="flex-row flex-wrap gap-4 justify-center">
             <FeatureCard
               title="Fast Check-in"

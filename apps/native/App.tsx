@@ -58,6 +58,12 @@ function RootApp() {
 
   const activeColors = themeColors[theme === 'dark' || theme === 'amoled' ? 'dark' : 'light'];
 
+  const { setColorScheme } = require('nativewind').useColorScheme();
+
+  useEffect(() => {
+    setColorScheme(theme === 'dark' || theme === 'amoled' ? 'dark' : 'light');
+  }, [theme, setColorScheme]);
+
   useEffect(() => {
     loadApiBaseUrl()
       .catch(() => console.warn("Failed to load API base URL, using default"))

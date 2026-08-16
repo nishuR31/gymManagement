@@ -20,8 +20,8 @@ export const createMemberSchema = z.object({
   userId: z.string().min(1).optional(),
   firstName: z.string().trim().min(1).max(80),
   lastName: z.string().trim().min(1).max(80),
-  phone: z.string().trim().min(5).max(30),
-  email: z.string().email().trim().toLowerCase().optional(),
+  phone: z.string().trim().regex(/^\+?[1-9]\d{1,14}$/, "Phone number must include valid prefix and digits").min(5).max(30),
+  email: z.string().email().trim().regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, "Email is invalid").toLowerCase().or(z.literal('')).transform(e => e === '' ? undefined : e).optional(),
   dateOfBirth: z.coerce.date().optional(),
   gender: optionalText,
   address: z.string().trim().min(1).max(1000).optional(),
@@ -37,8 +37,8 @@ export const updateMemberSchema = z
   .object({
     firstName: z.string().trim().min(1).max(80).optional(),
     lastName: z.string().trim().min(1).max(80).optional(),
-    phone: z.string().trim().min(5).max(30).optional(),
-    email: z.string().email().trim().toLowerCase().nullable().optional(),
+    phone: z.string().trim().regex(/^\+?[1-9]\d{1,14}$/, "Phone number must include valid prefix and digits").min(5).max(30).optional(),
+    email: z.string().email().trim().regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, "Email is invalid").toLowerCase().or(z.literal('')).transform(e => e === '' ? null : e).nullable().optional(),
     dateOfBirth: z.coerce.date().nullable().optional(),
     gender: nullableText,
     address: z.string().trim().min(1).max(1000).nullable().optional(),
@@ -64,7 +64,7 @@ export const suspendBodySchema = z.object({
 });
 
 export class MemberController {
-  public constructor(private readonly memberService: MemberService) {}
+  public constructor(private readonly memberService: MemberService) { }
 
   public list = async (request: FastifyRequest): Promise<unknown> => {
     const actor = requireActor(request);

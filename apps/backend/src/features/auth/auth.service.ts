@@ -1,4 +1,5 @@
 import crypto from "node:crypto";
+import { performance } from "node:perf_hooks";
 // @ts-ignore
 import * as otplib from "otplib";
 const authenticator = otplib.authenticator;
@@ -11,7 +12,7 @@ import type { AuthUserDto, RoleName, TwoFactorSetupResponse } from "@gym/shared"
 import { canManageRole } from "../../core/config/auth.js";
 import type { Env } from "../../core/config/env.js";
 import { errors } from "../../core/errors/app-error.js";
-import type { AuthRepository, AuthUserRecord } from "./auth.repository.js";
+import type { AuthRepository, AuthUserRecord, RefreshAuthRecord } from "./auth.repository.js";
 import type { RequestActor, RequestContext } from "../../core/types/auth.js";
 import { addDays } from "../../core/utils/dates.js";
 import { hashPassword, verifyPassword } from "../../core/utils/password.js";
@@ -78,39 +79,55 @@ export class AuthService {
   }
 
   public async login(email: string, password: string, token: string | undefined, context: RequestContext): Promise<AuthResult> {
+    const t0 = performance.now();
+
+    // DB #1 — single query that now includes twoFactorSecret
     const user = await this.repository.findUserByEmail(email.toLowerCase());
+    const t1 = performance.now();
 
     if (!user || !user.isActive) {
       throw errors.unauthorized("Invalid email or password");
     }
 
+    // CPU — bcrypt
     const passwordMatches = await verifyPassword(password, user.passwordHash);
+    const t2 = performance.now();
+
     if (!passwordMatches) {
       throw errors.unauthorized("Invalid email or password");
     }
 
-    const securityUser = await this.repository.findUserForSecurity(user.id);
-    if (securityUser?.twoFactorEnabled) {
+    // 2FA check uses fields already on the user record — no second DB query
+    if (user.twoFactorEnabled) {
       if (!token) {
         throw errors.domain(403, "2FA_REQUIRED", "Two-factor authentication code required");
       }
-      if (!securityUser.twoFactorSecret) {
+      if (!user.twoFactorSecret) {
         throw errors.unauthorized("Two-factor authentication is improperly configured");
       }
-      const isValid = authenticator.verify({ token, secret: securityUser.twoFactorSecret });
+      const isValid = authenticator.verify({ token, secret: user.twoFactorSecret });
       if (!isValid) {
         throw errors.unauthorized("Invalid two-factor code");
       }
     }
 
+    // DB #2 + #3 — session + refresh token (parallelised inside issueTokens)
     const tokens = await this.issueTokens(user, context);
-    await this.repository.writeAuditLog({
+    const t3 = performance.now();
+
+    // Audit log is non-blocking — response is not delayed waiting for this write
+    void this.repository.writeAuditLog({
       userId: user.id,
       action: "AUTH_LOGIN",
       entity: "Session",
       entityId: tokens.refreshToken.slice(0, 8),
       ...context
-    });
+    }).catch(err => console.error("Failed to write auth audit log", err));
+
+    const total = t3 - t0;
+    console.info(
+      `[LOGIN_PERF] userLookup=${(t1 - t0).toFixed(1)}ms bcrypt=${(t2 - t1).toFixed(1)}ms issueTokens=${(t3 - t2).toFixed(1)}ms total=${total.toFixed(1)}ms`
+    );
 
     return {
       user: toUserDto(user),
@@ -119,7 +136,11 @@ export class AuthService {
   }
 
   public async memberLogin(email: string, password: string, token: string | undefined, context: RequestContext): Promise<AuthResult> {
+    const t0 = performance.now();
+
+    // DB #1 — single query that now includes twoFactorSecret
     const user = await this.repository.findUserByEmail(email.toLowerCase());
+    const t1 = performance.now();
 
     if (!user || user.role !== "MEMBER" || !user.memberId) {
       throw errors.domain(403, "NOT_A_MEMBER", "You are not a member of ValorFitness");
@@ -129,33 +150,45 @@ export class AuthService {
       throw errors.unauthorized("Invalid email or password");
     }
 
+    // CPU — bcrypt
     const passwordMatches = await verifyPassword(password, user.passwordHash);
+    const t2 = performance.now();
+
     if (!passwordMatches) {
       throw errors.unauthorized("Invalid email or password");
     }
 
-    const securityUser = await this.repository.findUserForSecurity(user.id);
-    if (securityUser?.twoFactorEnabled) {
+    // 2FA check uses fields already on the user record — no second DB query
+    if (user.twoFactorEnabled) {
       if (!token) {
         throw errors.domain(403, "2FA_REQUIRED", "Two-factor authentication code required");
       }
-      if (!securityUser.twoFactorSecret) {
+      if (!user.twoFactorSecret) {
         throw errors.unauthorized("Two-factor authentication is improperly configured");
       }
-      const isValid = authenticator.verify({ token, secret: securityUser.twoFactorSecret });
+      const isValid = authenticator.verify({ token, secret: user.twoFactorSecret });
       if (!isValid) {
         throw errors.unauthorized("Invalid two-factor code");
       }
     }
 
+    // DB #2 + #3 — session + refresh token (parallelised inside issueTokens)
     const tokens = await this.issueTokens(user, context);
-    await this.repository.writeAuditLog({
+    const t3 = performance.now();
+
+    // Audit log is non-blocking
+    void this.repository.writeAuditLog({
       userId: user.id,
       action: "AUTH_MEMBER_LOGIN",
       entity: "Session",
       entityId: tokens.refreshToken.slice(0, 8),
       ...context
-    });
+    }).catch(err => console.error("Failed to write auth audit log", err));
+
+    const total = t3 - t0;
+    console.info(
+      `[MEMBER_LOGIN_PERF] userLookup=${(t1 - t0).toFixed(1)}ms bcrypt=${(t2 - t1).toFixed(1)}ms issueTokens=${(t3 - t2).toFixed(1)}ms total=${total.toFixed(1)}ms`
+    );
 
     return {
       user: toUserDto(user),
@@ -167,7 +200,7 @@ export class AuthService {
 
   public async refresh(refreshToken: string, context: RequestContext): Promise<AuthResult> {
     const tokenHash = hashRefreshToken(refreshToken);
-    const persistedToken = await this.repository.findRefreshTokenByHash(tokenHash);
+    const persistedToken = await this.repository.findRefreshTokenForRefresh(tokenHash);
     const now = new Date();
 
     if (!persistedToken) {
@@ -199,22 +232,38 @@ export class AuthService {
 
     const nextRefreshToken = createRefreshToken();
     const nextRefreshTokenHash = hashRefreshToken(nextRefreshToken);
-    const nextRefreshTokenRecord = await this.repository.createRefreshToken({
-      tokenHash: nextRefreshTokenHash,
-      userId: persistedToken.userId,
-      sessionId: persistedToken.sessionId,
-      expiresAt: addDays(now, this.env.REFRESH_TOKEN_TTL_DAYS)
-    });
-    await this.repository.revokeRefreshToken(persistedToken.id, nextRefreshTokenRecord.id);
+    
+    try {
+      await this.repository.rotateRefreshToken(
+        persistedToken.id,
+        nextRefreshTokenHash,
+        persistedToken.userId,
+        persistedToken.sessionId,
+        addDays(now, this.env.REFRESH_TOKEN_TTL_DAYS)
+      );
+    } catch (error: any) {
+      if (error.message === "TOKEN_ALREADY_REVOKED") {
+        await this.repository.revokeSession(persistedToken.sessionId);
+        await this.repository.revokeRefreshTokensForSession(persistedToken.sessionId);
+        void this.repository.writeAuditLog({
+          userId: persistedToken.userId,
+          action: "AUTH_REFRESH_REUSE_DETECTED",
+          entity: "Session",
+          entityId: persistedToken.sessionId,
+          ...context
+        }).catch(err => console.error("Failed to write auth audit log", err));
+      }
+      throw errors.unauthorized("Invalid refresh token");
+    }
 
     const accessToken = this.tokenService.signAccessToken(toUserDto(persistedToken.user));
-    await this.repository.writeAuditLog({
+    void this.repository.writeAuditLog({
       userId: persistedToken.userId,
       action: "AUTH_REFRESH",
       entity: "Session",
       entityId: persistedToken.sessionId,
       ...context
-    });
+    }).catch(err => console.error("Failed to write auth audit log", err));
 
     return {
       user: toUserDto(persistedToken.user),
@@ -231,22 +280,33 @@ export class AuthService {
       return;
     }
 
+    const t0 = performance.now();
+
     const tokenHash = hashRefreshToken(refreshToken);
-    const persistedToken = await this.repository.findRefreshTokenByHash(tokenHash);
+    // DB #1 — lightweight lookup
+    const persistedToken = await this.repository.findRefreshTokenForLogout(tokenHash);
+    const t1 = performance.now();
 
     if (!persistedToken) {
       return;
     }
 
-    await this.repository.revokeRefreshToken(persistedToken.id);
-    await this.repository.revokeSession(persistedToken.sessionId);
-    await this.repository.writeAuditLog({
+    // DB #2 — single transaction: revoke token + session together
+    await this.repository.revokeTokenAndSession(persistedToken.id, persistedToken.sessionId);
+    const t2 = performance.now();
+
+    // Audit log is non-blocking — HTTP response is not delayed
+    void this.repository.writeAuditLog({
       userId: persistedToken.userId,
       action: "AUTH_LOGOUT",
       entity: "Session",
       entityId: persistedToken.sessionId,
       ...context
-    });
+    }).catch(err => console.error("Failed to write auth audit log", err));
+
+    console.info(
+      `[LOGOUT_PERF] tokenLookup=${(t1 - t0).toFixed(1)}ms revokeTransaction=${(t2 - t1).toFixed(1)}ms total=${(t2 - t0).toFixed(1)}ms`
+    );
   }
 
   public async requestPasswordReset(email: string, context: RequestContext): Promise<{ resetToken?: string }> {
@@ -300,6 +360,8 @@ export class AuthService {
       throw errors.unauthorized("Invalid user");
     }
 
+    // findUserForSecurity is still used here for correctness — this is not on the
+    // hot login path so the extra query is acceptable.
     const securityUser = await this.repository.findUserForSecurity(user.id);
     if (!securityUser || !securityUser.twoFactorEnabled || !securityUser.twoFactorSecret) {
       throw errors.unauthorized("Invalid user or 2FA not configured");
@@ -434,7 +496,7 @@ export class AuthService {
   public async getPasskeys(actor: RequestActor) {
     const user = await this.repository.findUserForSecurity(actor.id);
     if (!user) throw errors.unauthorized();
-    return user.passkeys.map(pk => ({
+    return user.passkeyRows.map(pk => ({
       id: pk.id,
       createdAt: pk.createdAt
     }));
@@ -450,7 +512,7 @@ export class AuthService {
       userID: new Uint8Array(Buffer.from(user.id)),
       userName: user.email,
       attestationType: "none",
-      excludeCredentials: user.passkeys.map(pk => ({
+      excludeCredentials: user.passkeyRows.map(pk => ({
         id: pk.credentialId,
         type: "public-key"
       })),
@@ -503,7 +565,7 @@ export class AuthService {
     const user = await this.repository.findUserForSecurity(actor.id);
     if (!user) throw errors.unauthorized();
 
-    const passkey = user.passkeys.find(pk => pk.id === passkeyId);
+    const passkey = user.passkeyRows.find(pk => pk.id === passkeyId);
     if (!passkey) throw errors.badRequest("Passkey not found");
 
     await this.repository.removePasskey(passkeyId);
@@ -517,17 +579,17 @@ export class AuthService {
   }
 
   public async generatePasskeyAuthentication(email: string) {
-    const user = await this.repository.findUserByEmail(email.toLowerCase());
+    // Uses dedicated passkey query — loads credentialId rows needed by WebAuthn.
+    const user = await this.repository.findUserForPasskey(email.toLowerCase());
     if (!user || !user.isActive) throw errors.unauthorized("Invalid user");
 
-    const userForSecurity = await this.repository.findUserForSecurity(user.id);
-    if (!userForSecurity || userForSecurity.passkeys.length === 0) {
+    if (user.passkeyRows.length === 0) {
       throw errors.unauthorized("No passkeys registered for this user");
     }
 
     const options = await generateAuthenticationOptions({
       rpID: this.env.PASSKEY_RP_ID,
-      allowCredentials: userForSecurity.passkeys.map(pk => ({
+      allowCredentials: user.passkeyRows.map(pk => ({
         id: pk.credentialId,
         type: "public-key"
       })),
@@ -538,15 +600,15 @@ export class AuthService {
   }
 
   public async verifyPasskeyAuthentication(email: string, body: AuthenticationResponseJSON, expectedChallenge: string, context: RequestContext): Promise<AuthResult> {
-    const user = await this.repository.findUserByEmail(email.toLowerCase());
+    // Uses dedicated passkey query — loads publicKey + counter blobs required for verifyAuthenticationResponse.
+    const user = await this.repository.findUserForPasskey(email.toLowerCase());
     if (!user || !user.isActive) throw errors.unauthorized("Invalid user");
 
-    const userForSecurity = await this.repository.findUserForSecurity(user.id);
-    if (!userForSecurity || userForSecurity.passkeys.length === 0) {
+    if (user.passkeyRows.length === 0) {
       throw errors.unauthorized("No passkeys registered for this user");
     }
 
-    const passkey = userForSecurity.passkeys.find(pk => pk.credentialId === body.id);
+    const passkey = user.passkeyRows.find(pk => pk.credentialId === body.id);
     if (!passkey) {
       throw errors.unauthorized("Passkey not found for this user");
     }
@@ -570,15 +632,14 @@ export class AuthService {
     }
 
     if (verification.verified) {
-      // Passkey auth successful
       const tokens = await this.issueTokens(user, context);
-      await this.repository.writeAuditLog({
+      void this.repository.writeAuditLog({
         userId: user.id,
         action: "AUTH_LOGIN_PASSKEY",
         entity: "Session",
         entityId: tokens.refreshToken.slice(0, 8),
         ...context
-      });
+      }).catch(err => console.error("Failed to write auth audit log", err));
 
       return {
         user: toUserDto(user),
@@ -590,15 +651,15 @@ export class AuthService {
   }
 
   public async verifyPasswordResetWithPasskey(email: string, body: AuthenticationResponseJSON, expectedChallenge: string, context: RequestContext): Promise<{ resetToken: string }> {
-    const user = await this.repository.findUserByEmail(email.toLowerCase());
+    // Uses dedicated passkey query — loads publicKey + counter blobs required for verifyAuthenticationResponse.
+    const user = await this.repository.findUserForPasskey(email.toLowerCase());
     if (!user || !user.isActive) throw errors.unauthorized("Invalid user");
 
-    const userForSecurity = await this.repository.findUserForSecurity(user.id);
-    if (!userForSecurity || userForSecurity.passkeys.length === 0) {
+    if (user.passkeyRows.length === 0) {
       throw errors.unauthorized("No passkeys registered for this user");
     }
 
-    const passkey = userForSecurity.passkeys.find(pk => pk.credentialId === body.id);
+    const passkey = user.passkeyRows.find(pk => pk.credentialId === body.id);
     if (!passkey) {
       throw errors.unauthorized("Passkey not found for this user");
     }
@@ -628,13 +689,13 @@ export class AuthService {
         `${this.env.PASSWORD_RESET_TOKEN_TTL_MINUTES}m`
       );
 
-      await this.repository.writeAuditLog({
+      void this.repository.writeAuditLog({
         userId: user.id,
         action: "PASSWORD_RESET_PASSKEY_VERIFIED",
         entity: "User",
         entityId: user.id,
         ...context
-      });
+      }).catch(err => console.error("Failed to write auth audit log", err));
 
       return { resetToken };
     } else {
@@ -662,7 +723,7 @@ export class AuthService {
     if (user.twoFactorEnabled) {
       await this.repository.disableTwoFactor(actor.id);
     }
-    for (const pk of user.passkeys) {
+    for (const pk of user.passkeyRows) {
       await this.repository.removePasskey(pk.id);
     }
     await this.repository.updateSecurityDisableRequested(actor.id, false);
@@ -697,13 +758,13 @@ export class AuthService {
     }
 
     const tokens = await this.issueTokens(updatedUser, context);
-    await this.repository.writeAuditLog({
+    void this.repository.writeAuditLog({
       userId: user.id,
       action: "FIRST_PASSWORD_SET",
       entity: "User",
       entityId: user.id,
       ...context
-    });
+    }).catch(err => console.error("Failed to write auth audit log", err));
 
     return {
       user: toUserDto(updatedUser),
@@ -711,31 +772,34 @@ export class AuthService {
     };
   }
 
+  /**
+   * Creates a session and refresh token concurrently using a single Prisma nested transaction.
+   * This reduces issueTokens from 2 sequential DB round-trips to 1 atomic write.
+   */
   private async issueTokens(user: AuthUserRecord, context: RequestContext): Promise<AuthTokens> {
     const now = new Date();
     const expiresAt = addDays(now, this.env.REFRESH_TOKEN_TTL_DAYS);
-    const session = await this.repository.createSession({
+
+    const sessionId = crypto.randomUUID();
+    const refreshTokenRaw = createRefreshToken();
+
+    await this.repository.createSessionAndToken({
+      sessionId,
       userId: user.id,
       expiresAt,
+      tokenHash: hashRefreshToken(refreshTokenRaw),
       ...context
-    });
-    const refreshToken = createRefreshToken();
-    await this.repository.createRefreshToken({
-      tokenHash: hashRefreshToken(refreshToken),
-      userId: user.id,
-      sessionId: session.id,
-      expiresAt
     });
 
     return {
       accessToken: this.tokenService.signAccessToken(toUserDto(user)),
-      refreshToken,
+      refreshToken: refreshTokenRaw,
       expiresIn: this.env.JWT_ACCESS_EXPIRES_IN
     };
   }
 }
 
-function toUserDto(user: AuthUserRecord): AuthUserDto {
+function toUserDto(user: AuthUserRecord | RefreshAuthRecord): AuthUserDto {
   return {
     id: user.id,
     email: user.email,

@@ -17,18 +17,18 @@ import { APP_NAME } from '../utils/env';
 import { themeColors } from '../constants/colors';
 import { useAppSelector } from '../store/hooks';
 
-const emailSchema = z.object({ email: z.string().email("Enter a valid email") });
+const emailSchema = z.object({ email: z.string().email("Enter a valid email address") });
 const passwordSchema = z.object({ password: z.string().min(8, "Password must be at least 8 characters") });
-const codeSchema = z.object({ code: z.string().min(4, "Enter valid code") });
+const codeSchema = z.object({ code: z.string().min(4, "Enter a valid verification code") });
 
 type EmailFormValues = z.infer<typeof emailSchema>;
 type PasswordFormValues = z.infer<typeof passwordSchema>;
 type CodeFormValues = z.infer<typeof codeSchema>;
 type AuthStep = "login" | "2fa" | "otp";
 
-
 export function MemberLoginScreen() {
   const dispatch = useAppDispatch();
+
   const navigation = useNavigation<any>();
   const theme = useAppSelector((state) => state.theme.theme);
   const activeColors = themeColors[theme === 'amoled' ? 'amoled' : theme === 'dark' ? 'dark' : 'light'];
@@ -51,12 +51,12 @@ export function MemberLoginScreen() {
 
   const onFinalLogin = async (pass?: string, currentEmail?: string) => {
     setIsSimulating(true);
-    const result = await dispatch(memberLoginThunk({ email: currentEmail || email || "sarah.connor@example.com", password: pass || "memberpassword" }));
+    const result = await dispatch(memberLoginThunk({ email: currentEmail || email, password: pass || "" }));
     setIsSimulating(false);
 
     if (memberLoginThunk.fulfilled.match(result)) {
       if (result.payload.user.mustChangePassword) {
-        Toast.show({ type: 'info', text1: 'Password change required' });
+        Toast.show({ type: 'info', text1: 'Password change required', text2: 'Please update your password to continue.' });
         return;
       }
       Toast.show({ type: 'success', text1: 'Welcome back!' });
@@ -67,16 +67,26 @@ export function MemberLoginScreen() {
     if (memberLoginThunk.rejected.match(result) && result.payload === "2FA_REQUIRED") {
       setPasswordCache(pass || "");
       setStep("2fa");
-      Toast.show({ type: 'success', text1: 'Password accepted. Enter 2FA code.' });
+      Toast.show({ type: 'info', text1: 'Two-factor authentication required', text2: 'Enter the code from your authenticator app.' });
       return;
     }
 
     if (result.payload === "NOT_A_MEMBER") {
-      Toast.show({ type: 'error', text1: `You are not a member of ${APP_NAME}` });
+      Toast.show({ type: 'error', text1: 'Access denied', text2: `You are not registered as a member of ${APP_NAME}.` });
       return;
     }
 
-    Toast.show({ type: 'error', text1: 'Authentication failed', text2: typeof result.payload === 'string' ? result.payload : "Network or server error" });
+    if (result.payload === "INVALID_CREDENTIALS") {
+      Toast.show({ type: 'error', text1: 'Incorrect email or password', text2: 'Please check your credentials and try again.' });
+      return;
+    }
+
+    Toast.show({
+      type: 'error',
+      text1: 'Login failed',
+      text2: typeof result.payload === 'string' ? result.payload : 'Network or server error. Please try again.',
+      visibilityTime: 5000,
+    });
   };
 
   const handleLoginNext = (v: EmailFormValues & PasswordFormValues) => {
@@ -85,38 +95,58 @@ export function MemberLoginScreen() {
   };
   const handleCodeSubmit = () => { onFinalLogin(passwordCache, email); };
 
-  const handlePasskey = () => { Toast.show({ type: 'info', text1: "Prompting for Passkey..." }); setTimeout(() => onFinalLogin(), 1500); };
+  const handlePasskey = () => {
+    Toast.show({ type: 'info', text1: "Prompting for Passkey…", text2: "Use your biometric or device PIN" });
+    setTimeout(() => onFinalLogin(), 1500);
+  };
 
   const renderStep = () => {
     if (step === "login") {
       return (
-        <View className="space-y-6 animate-fade-in mt-4">
+        <View className="space-y-6 mt-4">
           <Controller control={controlLogin} name="email" render={({ field: { onChange, onBlur, value } }) => (
-            <Input label="Member Email" onBlur={onBlur} onChangeText={onChange} value={value} error={errLogin.email?.message} autoCapitalize="none" keyboardType="email-address" />
+            <Input
+              label="Member Email"
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+              error={errLogin.email?.message}
+              autoCapitalize="none"
+              keyboardType="email-address"
+              placeholder="you@example.com"
+            />
           )} />
           <View className="mt-4">
             <Controller control={controlLogin} name="password" render={({ field: { onChange, onBlur, value } }) => (
-              <Input label="Password" onBlur={onBlur} onChangeText={onChange} value={value} error={errLogin.password?.message} secureTextEntry />
+              <Input
+                label="Password"
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+                error={errLogin.password?.message}
+                secureTextEntry
+                placeholder="Enter your password"
+              />
             )} />
           </View>
           <Button onPress={subLogin(handleLoginNext)} className="mt-4" isLoading={isSimulating} disabled={isSimulating}>
             <View className="flex-row items-center justify-center">
-              <Text className="text-primary-foreground font-bold mr-2">Sign In</Text>
+              <Text style={{ color: activeColors.primaryForeground }} className="font-bold mr-2">Sign In</Text>
               <ArrowRight size={16} color={activeColors.primaryForeground} />
             </View>
           </Button>
 
           <View className="flex-row items-center my-6">
-            <View className="flex-1 h-px bg-border" />
-            <Text className="mx-4 text-xs uppercase text-muted-foreground">Or continue with</Text>
-            <View className="flex-1 h-px bg-border" />
+            <View className="flex-1 h-px" style={{ backgroundColor: activeColors.border }} />
+            <Text className="mx-4 text-xs uppercase" style={{ color: activeColors.mutedForeground }}>Or continue with</Text>
+            <View className="flex-1 h-px" style={{ backgroundColor: activeColors.border }} />
           </View>
 
           <View className="gap-3">
             <Button variant="outline" onPress={handlePasskey} isLoading={isSimulating} disabled={isSimulating}>
               <View className="flex-row items-center justify-center">
                 <Fingerprint size={20} color={activeColors.foreground} style={{ marginRight: 8 }} />
-                <Text className="text-foreground font-bold">Continue with Passkey</Text>
+                <Text style={{ color: activeColors.foreground }} className="font-bold">Continue with Passkey</Text>
               </View>
             </Button>
           </View>
@@ -128,19 +158,31 @@ export function MemberLoginScreen() {
       return (
         <View className="space-y-6 mt-4">
           <View className="flex-row items-center gap-2 mb-4">
-            <TouchableOpacity onPress={() => setStep("login")} className="p-2 rounded-full bg-secondary">
+            <TouchableOpacity onPress={() => setStep("login")} style={{ backgroundColor: activeColors.secondary }} className="p-2 rounded-full">
               <ArrowLeft size={16} color={activeColors.foreground} />
             </TouchableOpacity>
-            <Text className="text-sm font-medium text-foreground">{step === "2fa" ? "Two-Factor Authentication" : "One-Time Password"}</Text>
+            <Text style={{ color: activeColors.foreground }} className="text-sm font-medium">
+              {step === "2fa" ? "Two-Factor Authentication" : "One-Time Password"}
+            </Text>
           </View>
-          <Text className="text-sm text-muted-foreground mb-4">
+          <Text style={{ color: activeColors.mutedForeground }} className="text-sm mb-4">
             {step === "2fa" ? "Enter the 6-digit code from your authenticator app." : `We sent a code to ${email}.`}
           </Text>
           <Controller control={controlCode} name="code" render={({ field: { onChange, onBlur, value } }) => (
-            <Input label="Verification Code" onBlur={onBlur} onChangeText={onChange} value={value} error={errCode.code?.message} placeholder="000000" keyboardType="number-pad" />
+            <Input
+              label="Verification Code"
+              onBlur={onBlur}
+              onChangeText={onChange}
+              value={value}
+              error={errCode.code?.message}
+              placeholder="000000"
+              keyboardType="number-pad"
+            />
           )} />
           <Button onPress={subCode(handleCodeSubmit)} disabled={isSimulating} className="mt-4">
-            {isSimulating ? <ActivityIndicator color={activeColors.primaryForeground} /> : <Text className="text-primary-foreground font-bold">Verify &amp; Sign In</Text>}
+            {isSimulating
+              ? <ActivityIndicator color={activeColors.primaryForeground} />
+              : <Text style={{ color: activeColors.primaryForeground }} className="font-bold">Verify & Sign In</Text>}
           </Button>
         </View>
       );
@@ -153,11 +195,18 @@ export function MemberLoginScreen() {
   const isWide = width > 768;
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} className="flex-1 bg-background">
-      <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: isWide ? 120 : 80 }} keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets={true}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={{ flex: 1, backgroundColor: activeColors.background }}
+    >
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1, paddingBottom: isWide ? 120 : 80 }}
+        keyboardShouldPersistTaps="handled"
+        automaticallyAdjustKeyboardInsets={true}
+      >
         <View className={`flex-1 ${isWide ? 'flex-row' : 'flex-col'}`}>
 
-          {/* Left Hero Section */}
+          {/* Left Hero Section — always dark (imagery) */}
           <View className={`${isWide ? 'w-1/2' : 'w-full h-56'} bg-zinc-950 relative overflow-hidden`}>
             <ImageBackground
               source={{ uri: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=1169&auto=format&fit=crop" }}
@@ -199,34 +248,37 @@ export function MemberLoginScreen() {
             </SafeAreaView>
           </View>
 
-          {/* Right Form Section */}
-          <View className={`${isWide ? 'w-1/2' : 'flex-1'} bg-background border-l border-border justify-center p-6`}>
+          {/* Right Form Section — fully theme-aware */}
+          <View
+            className={`${isWide ? 'w-1/2' : 'flex-1'} justify-center p-6`}
+            style={{ backgroundColor: activeColors.background, borderLeftColor: activeColors.border, borderLeftWidth: isWide ? 1 : 0 }}
+          >
             <View className="w-full max-w-md self-center">
 
               <View className="flex-row items-center justify-between mb-6">
                 <TouchableOpacity onPress={() => navigation.navigate("Home")} className="flex-row items-center gap-2">
                   <ArrowLeft size={16} color={activeColors.mutedForeground} />
-                  <Text className="text-sm font-medium text-muted-foreground">Back to website</Text>
+                  <Text style={{ color: activeColors.mutedForeground }} className="text-sm font-medium">Back to website</Text>
                 </TouchableOpacity>
                 {!isWide && (
                   <View className="flex-row items-center gap-2">
                     <Dumbbell size={18} color={activeColors.primary} />
-                    <Text className="font-black text-foreground">{APP_NAME}</Text>
+                    <Text style={{ color: activeColors.foreground }} className="font-black">{APP_NAME}</Text>
                   </View>
                 )}
               </View>
 
-              <Text className="text-3xl font-black text-foreground mb-2">Member Login</Text>
-              <Text className="text-sm text-muted-foreground mb-6">Access your personal gym portal securely.</Text>
+              <Text style={{ color: activeColors.foreground }} className="text-3xl font-black mb-2">Member Login</Text>
+              <Text style={{ color: activeColors.mutedForeground }} className="text-sm mb-6">Access your personal gym portal securely.</Text>
 
               <View className="min-h-[280px]">
                 {renderStep()}
               </View>
 
-              <View className="mt-8 pt-6 border-t border-border">
-                <Text className="text-sm font-medium text-foreground">Staff or Administrator?</Text>
+              <View className="mt-8 pt-6" style={{ borderTopWidth: 1, borderTopColor: activeColors.border }}>
+                <Text style={{ color: activeColors.foreground }} className="text-sm font-medium">Staff or Administrator?</Text>
                 <TouchableOpacity onPress={() => navigation.navigate("Login")} className="flex-row items-center mt-2">
-                  <Text className="text-sm font-bold text-primary mr-2">Use staff portal</Text>
+                  <Text style={{ color: activeColors.primary }} className="text-sm font-bold mr-2">Use staff portal</Text>
                   <ArrowRight size={14} color={activeColors.primary} />
                 </TouchableOpacity>
               </View>
@@ -237,6 +289,7 @@ export function MemberLoginScreen() {
         </View>
         <Footer />
       </ScrollView>
+      <Toast />
     </KeyboardAvoidingView>
   );
 }

@@ -27,7 +27,6 @@ export class SettingsService {
   }
 
   public async gymInfo(actor: RequestActor): Promise<GymInfoDto> {
-    ensureSignedIn(actor.role);
     const [details, hours] = await Promise.all([
       this.repository.find("gym-details"),
       this.repository.find("business-hours")
@@ -73,12 +72,6 @@ function ensureAdminOrAbove(role: RoleName): void {
   throw errors.forbidden();
 }
 
-function ensureSignedIn(role: RoleName): void {
-  if (role) {
-    return;
-  }
-  throw errors.forbidden();
-}
 
 function toGymDetails(value: unknown): Pick<GymInfoDto, "name" | "phone" | "email" | "address"> {
   if (!isRecord(value)) {

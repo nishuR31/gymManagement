@@ -92,45 +92,33 @@ export function SettingsScreen() {
         label="Control Room"
         title="Settings"
         subtitle="Gym details, business rules, receipts, and runtime config."
+        actions={
+          <Button
+            variant="secondary"
+            size="sm"
+            onPress={() => {
+              const next = theme === 'light' ? 'dark' : theme === 'dark' ? 'amoled' : 'light';
+              dispatch(setTheme(next));
+            }}
+          >
+            {theme === 'amoled' ? (
+              <MoonStar size={16} color={colors.foreground} />
+            ) : theme === 'dark' ? (
+              <Moon size={16} color={colors.foreground} />
+            ) : (
+              <Sun size={16} color={colors.foreground} />
+            )}
+          </Button>
+        }
       />
 
-      {/* App Appearance */}
+      {/* Styling */}
       <Card className="mb-4">
         <CardHeader>
-          <CardTitle>App Appearance</CardTitle>
+          <CardTitle>UI Styling</CardTitle>
         </CardHeader>
         <CardContent>
-          {/* Color scheme */}
-          <View className="mb-6">
-            <View className="mb-3">
-              <View className="flex-row items-center gap-2">
-                {theme === 'amoled' ? (
-                  <MoonStar size={16} color={colors.foreground} />
-                ) : theme === 'dark' ? (
-                  <Moon size={16} color={colors.foreground} />
-                ) : (
-                  <Sun size={16} color={colors.foreground} />
-                )}
-                <Text className="text-sm font-bold text-foreground">Color Scheme</Text>
-              </View>
-              <Text className="text-xs text-muted-foreground mt-1">Adjust the color palette to match your environment.</Text>
-            </View>
-            <View className="flex-row gap-2">
-              {(['light', 'dark', 'amoled'] as const).map((t) => (
-                <Button
-                  key={t}
-                  variant={theme === t ? 'primary' : 'secondary'}
-                  onPress={() => dispatch(setTheme(t))}
-                  className="flex-1"
-                  size="sm"
-                >
-                  {t.charAt(0).toUpperCase() + t.slice(1)}
-                </Button>
-              ))}
-            </View>
-          </View>
 
-          {/* Styling paradigm */}
           <View>
             <View className="mb-3">
               <View className="flex-row items-center gap-2">
@@ -139,16 +127,16 @@ export function SettingsScreen() {
               </View>
               <Text className="text-xs text-muted-foreground mt-1">Change the overall shape and feel of UI components.</Text>
             </View>
-            <View className="flex-row gap-2">
-              {(['minimal', 'glass', 'clay'] as const).map((s) => (
+            <View className="flex-row gap-2 flex-wrap">
+              {(['minimal', 'glass', 'clay', 'liquid-glass'] as const).map((s) => (
                 <Button
                   key={s}
                   variant={styleMode === s ? 'primary' : 'secondary'}
                   onPress={() => dispatch(setStyleMode(s))}
-                  className="flex-1"
+                  className="w-[48%] mb-2"
                   size="sm"
                 >
-                  {s.charAt(0).toUpperCase() + s.slice(1)}
+                  {s === 'liquid-glass' ? 'Liquid Glass' : s.charAt(0).toUpperCase() + s.slice(1)}
                 </Button>
               ))}
             </View>

@@ -1,0 +1,1075 @@
+{
+  "generatedAt": "2026-08-16T15:56:14.753Z",
+  "base": "https://gymmanagement-kejr.onrender.com",
+  "docs": "https://gymmanagement-kejr.onrender.com/docs/json",
+  "testPrefix": "TEST_API_",
+  "keepTestData": false,
+  "login": {
+    "method": "POST",
+    "path": "/auth/login"
+  },
+  "summary": {
+    "requests": 54,
+    "successful": 6,
+    "redirects": 0,
+    "clientErrors": 48,
+    "serverErrors": 0,
+    "networkErrors": 0,
+    "latency": {
+      "min": 444,
+      "p50": 531,
+      "p95": 1432,
+      "p99": 13757,
+      "max": 13757
+    }
+  },
+  "slowest": [
+    {
+      "role": "SUPER_ADMIN",
+      "type": "LOGIN",
+      "method": "POST",
+      "path": "/auth/login",
+      "status": 200,
+      "ms": 13757
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "LOGOUT",
+      "method": "POST",
+      "path": "/auth/logout",
+      "status": 204,
+      "ms": 4504
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "POST",
+      "method": "POST",
+      "path": "/public/inquiries",
+      "status": 201,
+      "ms": 1432
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/public/plans",
+      "status": 200,
+      "ms": 953
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/attendance/daily",
+      "status": 400,
+      "ms": 664
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/auth/passkeys",
+      "status": 401,
+      "ms": 633
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/payments/pending-dues",
+      "status": 401,
+      "ms": 619
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/members/",
+      "status": 401,
+      "ms": 617
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/notifications/",
+      "status": 401,
+      "ms": 615
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "POST",
+      "method": "POST",
+      "path": "/orders/",
+      "status": 401,
+      "ms": 615
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/attendance/current",
+      "status": 401,
+      "ms": 614
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/payments/analytics",
+      "status": 400,
+      "ms": 614
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/orders/",
+      "status": 401,
+      "ms": 614
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/plans/workout-templates",
+      "status": 401,
+      "ms": 614
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/inventory/low-stock",
+      "status": 401,
+      "ms": 613
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/",
+      "status": 200,
+      "ms": 612
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "POST",
+      "method": "POST",
+      "path": "/inventory/suppliers",
+      "status": 401,
+      "ms": 612
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/members/me",
+      "status": 401,
+      "ms": 611
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/reports/trainer-performance",
+      "status": 401,
+      "ms": 593
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "POST",
+      "method": "POST",
+      "path": "/membership-plans/",
+      "status": 401,
+      "ms": 591
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/auth/me",
+      "status": 401,
+      "ms": 584
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "POST",
+      "method": "POST",
+      "path": "/plans/workout-assignments",
+      "status": 400,
+      "ms": 584
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/dashboard/summary",
+      "status": 401,
+      "ms": 581
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/inventory/movements",
+      "status": 401,
+      "ms": 580
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/staff/leave-requests",
+      "status": 401,
+      "ms": 579
+    }
+  ],
+  "results": [
+    {
+      "role": "SUPER_ADMIN",
+      "type": "LOGIN",
+      "method": "POST",
+      "path": "/auth/login",
+      "status": 200,
+      "ms": 13757,
+      "data": {
+        "user": {
+          "id": "9a5e005d-6f87-4ac0-a0f0-91845b512393",
+          "email": "nishanrajak01@gmail.com",
+          "firstName": "Nishan",
+          "lastName": "Rajak",
+          "role": "SUPER_ADMIN",
+          "mustChangePassword": false,
+          "twoFactorEnabled": false,
+          "hasPasskeys": true,
+          "securityDisableRequested": false
+        },
+        "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5YTVlMDA1ZC02Zjg3LTRhYzAtYTBmMC05MTg0NWI1MTIzOTMiLCJlbWFpbCI6Im5pc2hhbnJhamFrMDFAZ21haWwuY29tIiwicm9sZSI6IlNVUEVSX0FETUlOIiwiaWF0IjoxNzg2ODk1NzM5LCJleHAiOjE3ODY4OTY2Mzl9.cC2qbVXgvy_e4lHbrm4jOSowx1oLPUTXtv_4pWsu_pM",
+        "expiresIn": "15m"
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/",
+      "status": 200,
+      "ms": 612,
+      "data": {
+        "status": "server up"
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/ping",
+      "status": 200,
+      "ms": 491,
+      "data": {
+        "status": "pong"
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/public/plans",
+      "status": 200,
+      "ms": 953,
+      "data": {
+        "data": [
+          {
+            "name": "Test",
+            "description": null,
+            "priceCents": 3999,
+            "durationDays": 60
+          },
+          {
+            "name": "Test",
+            "description": null,
+            "priceCents": 3999,
+            "durationDays": 60
+          },
+          {
+            "name": "1-Year Plan",
+            "description": null,
+            "priceCents": 844800,
+            "durationDays": 365
+          },
+          {
+            "name": "6-Month Plan",
+            "description": null,
+            "priceCents": 456000,
+            "durationDays": 180
+          },
+          {
+            "name": "Monthly + Coach",
+            "description": null,
+            "priceCents": 90000,
+            "durationDays": 30
+          },
+          {
+            "name": "Monthly Plan",
+            "description": null,
+            "priceCents": 80000,
+            "durationDays": 30
+          }
+        ]
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/auth/me",
+      "status": 401,
+      "ms": 584,
+      "data": {
+        "success": false,
+        "message": "Authentication required",
+        "errors": {
+          "code": "UNAUTHORIZED"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/auth/passkeys",
+      "status": 401,
+      "ms": 633,
+      "data": {
+        "success": false,
+        "message": "Authentication required",
+        "errors": {
+          "code": "UNAUTHORIZED"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/members/",
+      "status": 401,
+      "ms": 617,
+      "data": {
+        "success": false,
+        "message": "Authentication required",
+        "errors": {
+          "code": "UNAUTHORIZED"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/members/me",
+      "status": 401,
+      "ms": 611,
+      "data": {
+        "success": false,
+        "message": "Authentication required",
+        "errors": {
+          "code": "UNAUTHORIZED"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/members/expiring-soon",
+      "status": 401,
+      "ms": 469,
+      "data": {
+        "success": false,
+        "message": "Authentication required",
+        "errors": {
+          "code": "UNAUTHORIZED"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/membership-plans/",
+      "status": 401,
+      "ms": 554,
+      "data": {
+        "success": false,
+        "message": "Authentication required",
+        "errors": {
+          "code": "UNAUTHORIZED"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/attendance/current",
+      "status": 401,
+      "ms": 614,
+      "data": {
+        "success": false,
+        "message": "Authentication required",
+        "errors": {
+          "code": "UNAUTHORIZED"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/attendance/history",
+      "status": 401,
+      "ms": 450,
+      "data": {
+        "success": false,
+        "message": "Authentication required",
+        "errors": {
+          "code": "UNAUTHORIZED"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/attendance/daily",
+      "status": 400,
+      "ms": 664,
+      "data": {
+        "success": false,
+        "message": "querystring/date Invalid input: expected string, received undefined",
+        "errors": {
+          "code": "FST_ERR_VALIDATION"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/attendance/monthly",
+      "status": 400,
+      "ms": 524,
+      "data": {
+        "success": false,
+        "message": "querystring/month Invalid input: expected string, received undefined",
+        "errors": {
+          "code": "FST_ERR_VALIDATION"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/payments/analytics",
+      "status": 400,
+      "ms": 614,
+      "data": {
+        "success": false,
+        "message": "querystring/range Invalid option: expected one of \"daily\"|\"weekly\"|\"monthly\"|\"yearly\"",
+        "errors": {
+          "code": "FST_ERR_VALIDATION"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/payments/pending-dues",
+      "status": 401,
+      "ms": 619,
+      "data": {
+        "success": false,
+        "message": "Authentication required",
+        "errors": {
+          "code": "UNAUTHORIZED"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/inventory/products",
+      "status": 401,
+      "ms": 576,
+      "data": {
+        "success": false,
+        "message": "Authentication required",
+        "errors": {
+          "code": "UNAUTHORIZED"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/inventory/suppliers",
+      "status": 401,
+      "ms": 444,
+      "data": {
+        "success": false,
+        "message": "Authentication required",
+        "errors": {
+          "code": "UNAUTHORIZED"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/inventory/low-stock",
+      "status": 401,
+      "ms": 613,
+      "data": {
+        "success": false,
+        "message": "Authentication required",
+        "errors": {
+          "code": "UNAUTHORIZED"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/inventory/valuation",
+      "status": 401,
+      "ms": 444,
+      "data": {
+        "success": false,
+        "message": "Authentication required",
+        "errors": {
+          "code": "UNAUTHORIZED"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/inventory/movements",
+      "status": 401,
+      "ms": 580,
+      "data": {
+        "success": false,
+        "message": "Authentication required",
+        "errors": {
+          "code": "UNAUTHORIZED"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/orders/",
+      "status": 401,
+      "ms": 614,
+      "data": {
+        "success": false,
+        "message": "Authentication required",
+        "errors": {
+          "code": "UNAUTHORIZED"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/staff/profiles",
+      "status": 401,
+      "ms": 445,
+      "data": {
+        "success": false,
+        "message": "Authentication required",
+        "errors": {
+          "code": "UNAUTHORIZED"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/staff/leave-requests",
+      "status": 401,
+      "ms": 579,
+      "data": {
+        "success": false,
+        "message": "Authentication required",
+        "errors": {
+          "code": "UNAUTHORIZED"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/plans/workout-templates",
+      "status": 401,
+      "ms": 614,
+      "data": {
+        "success": false,
+        "message": "Authentication required",
+        "errors": {
+          "code": "UNAUTHORIZED"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/plans/diet-templates",
+      "status": 401,
+      "ms": 495,
+      "data": {
+        "success": false,
+        "message": "Authentication required",
+        "errors": {
+          "code": "UNAUTHORIZED"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/activity-logs/",
+      "status": 401,
+      "ms": 530,
+      "data": {
+        "success": false,
+        "message": "Authentication required",
+        "errors": {
+          "code": "UNAUTHORIZED"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/notifications/",
+      "status": 401,
+      "ms": 615,
+      "data": {
+        "success": false,
+        "message": "Authentication required",
+        "errors": {
+          "code": "UNAUTHORIZED"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/notifications/unread-count",
+      "status": 401,
+      "ms": 451,
+      "data": {
+        "success": false,
+        "message": "Authentication required",
+        "errors": {
+          "code": "UNAUTHORIZED"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/settings/",
+      "status": 401,
+      "ms": 449,
+      "data": {
+        "success": false,
+        "message": "Authentication required",
+        "errors": {
+          "code": "UNAUTHORIZED"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/settings/gym-info",
+      "status": 401,
+      "ms": 531,
+      "data": {
+        "success": false,
+        "message": "Authentication required",
+        "errors": {
+          "code": "UNAUTHORIZED"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/inquiries/",
+      "status": 401,
+      "ms": 451,
+      "data": {
+        "success": false,
+        "message": "Authentication required",
+        "errors": {
+          "code": "UNAUTHORIZED"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/reports/revenue",
+      "status": 401,
+      "ms": 466,
+      "data": {
+        "success": false,
+        "message": "Authentication required",
+        "errors": {
+          "code": "UNAUTHORIZED"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/reports/attendance",
+      "status": 400,
+      "ms": 453,
+      "data": {
+        "success": false,
+        "message": "querystring/month Invalid input: expected string, received undefined",
+        "errors": {
+          "code": "FST_ERR_VALIDATION"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/reports/memberships",
+      "status": 401,
+      "ms": 469,
+      "data": {
+        "success": false,
+        "message": "Authentication required",
+        "errors": {
+          "code": "UNAUTHORIZED"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/reports/inventory",
+      "status": 401,
+      "ms": 445,
+      "data": {
+        "success": false,
+        "message": "Authentication required",
+        "errors": {
+          "code": "UNAUTHORIZED"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/reports/payments",
+      "status": 401,
+      "ms": 446,
+      "data": {
+        "success": false,
+        "message": "Authentication required",
+        "errors": {
+          "code": "UNAUTHORIZED"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/reports/trainer-performance",
+      "status": 401,
+      "ms": 593,
+      "data": {
+        "success": false,
+        "message": "Authentication required",
+        "errors": {
+          "code": "UNAUTHORIZED"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/reports/growth-retention",
+      "status": 401,
+      "ms": 446,
+      "data": {
+        "success": false,
+        "message": "Authentication required",
+        "errors": {
+          "code": "UNAUTHORIZED"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "GET",
+      "method": "GET",
+      "path": "/dashboard/summary",
+      "status": 401,
+      "ms": 581,
+      "data": {
+        "success": false,
+        "message": "Authentication required",
+        "errors": {
+          "code": "UNAUTHORIZED"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "POST",
+      "method": "POST",
+      "path": "/public/inquiries",
+      "status": 201,
+      "ms": 1432,
+      "data": {
+        "success": true,
+        "message": "Success",
+        "payload": {
+          "inquiry": {
+            "id": "22b9325a-4294-4aa1-a73a-4c0ab0fcdfba",
+            "name": "TEST_API_name_1786895762720",
+            "email": "test_api_1786895762720@example.com",
+            "phone": "9000000000",
+            "message": "TEST_API_message",
+            "status": "NEW",
+            "createdAt": "2026-08-16T15:56:03.205Z"
+          }
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "POST",
+      "method": "POST",
+      "path": "/members/",
+      "status": 400,
+      "ms": 448,
+      "data": {
+        "success": false,
+        "message": "body/dateOfBirth Invalid input: expected date, received Date, body/joinedAt Invalid input: expected date, received Date",
+        "errors": {
+          "code": "FST_ERR_VALIDATION"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "POST",
+      "method": "POST",
+      "path": "/membership-plans/",
+      "status": 401,
+      "ms": 591,
+      "data": {
+        "success": false,
+        "message": "Authentication required",
+        "errors": {
+          "code": "UNAUTHORIZED"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "POST",
+      "method": "POST",
+      "path": "/attendance/check-in",
+      "status": 400,
+      "ms": 447,
+      "data": {
+        "success": false,
+        "message": "body/ Provide exactly one of memberId, qrPayload, or query",
+        "errors": {
+          "code": "FST_ERR_VALIDATION"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "POST",
+      "method": "POST",
+      "path": "/attendance/check-out",
+      "status": 400,
+      "ms": 447,
+      "data": {
+        "success": false,
+        "message": "body/ Provide exactly one of memberId or attendanceId",
+        "errors": {
+          "code": "FST_ERR_VALIDATION"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "POST",
+      "method": "POST",
+      "path": "/inventory/products",
+      "status": 400,
+      "ms": 478,
+      "data": {
+        "success": false,
+        "message": "body/imageUrl Invalid URL",
+        "errors": {
+          "code": "FST_ERR_VALIDATION"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "POST",
+      "method": "POST",
+      "path": "/inventory/suppliers",
+      "status": 401,
+      "ms": 612,
+      "data": {
+        "success": false,
+        "message": "Authentication required",
+        "errors": {
+          "code": "UNAUTHORIZED"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "POST",
+      "method": "POST",
+      "path": "/orders/",
+      "status": 401,
+      "ms": 615,
+      "data": {
+        "success": false,
+        "message": "Authentication required",
+        "errors": {
+          "code": "UNAUTHORIZED"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "POST",
+      "method": "POST",
+      "path": "/plans/workout-templates",
+      "status": 400,
+      "ms": 444,
+      "data": {
+        "success": false,
+        "message": "body/exercises Too small: expected array to have >=1 items",
+        "errors": {
+          "code": "FST_ERR_VALIDATION"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "POST",
+      "method": "POST",
+      "path": "/plans/workout-assignments",
+      "status": 400,
+      "ms": 584,
+      "data": {
+        "success": false,
+        "message": "body/startDate Invalid input: expected date, received Date",
+        "errors": {
+          "code": "FST_ERR_VALIDATION"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "POST",
+      "method": "POST",
+      "path": "/plans/diet-templates",
+      "status": 400,
+      "ms": 461,
+      "data": {
+        "success": false,
+        "message": "body/meals Too small: expected array to have >=1 items",
+        "errors": {
+          "code": "FST_ERR_VALIDATION"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "POST",
+      "method": "POST",
+      "path": "/plans/diet-assignments",
+      "status": 400,
+      "ms": 447,
+      "data": {
+        "success": false,
+        "message": "body/startDate Invalid input: expected date, received Date",
+        "errors": {
+          "code": "FST_ERR_VALIDATION"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "POST",
+      "method": "POST",
+      "path": "/notifications/",
+      "status": 401,
+      "ms": 519,
+      "data": {
+        "success": false,
+        "message": "Authentication required",
+        "errors": {
+          "code": "UNAUTHORIZED"
+        }
+      }
+    },
+    {
+      "role": "SUPER_ADMIN",
+      "type": "LOGOUT",
+      "method": "POST",
+      "path": "/auth/logout",
+      "status": 204,
+      "ms": 4504,
+      "data": null
+    }
+  ]
+}

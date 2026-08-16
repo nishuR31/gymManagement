@@ -19,7 +19,7 @@ interface RecordPaymentModalProps {
 }
 
 const PAYMENT_METHODS: PaymentMethod[] = [
-  'CASH', 'UPI', 'CARD', 'BANK_TRANSFER'
+  'CASH', 'UPI', 'CARD', 'ONLINE'
 ];
 
 export function RecordPaymentModal({ visible, invoice, onClose, onSuccess }: RecordPaymentModalProps) {

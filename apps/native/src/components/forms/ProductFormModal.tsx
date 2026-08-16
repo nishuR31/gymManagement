@@ -20,11 +20,9 @@ interface ProductFormModalProps {
 
 const CATEGORIES: ProductCategory[] = [
   'PROTEIN',
-  'SUPPLEMENT',
-  'BEVERAGE',
-  'SNACK',
+  'CREATINE',
+  'ACCESSORY',
   'MERCHANDISE',
-  'EQUIPMENT',
   'OTHER'
 ];
 

@@ -10,11 +10,15 @@ import type { RequestContext } from "../../core/types/auth.js";
 import { sendSuccess } from "../../core/utils/response.js";
 
 const emailSchema = z.string().email().trim().toLowerCase();
-const passwordSchema = z.string().min(8).max(128);
-
+const loginPasswordSchema = z.string().min(8).max(128);
+const passwordSchema = z.string().min(8).max(128)
+  .regex(/^(?=.*[a-z])/, "Password Must contain lowercase letter character")
+  .regex(/^(?=.*[A-Z])/, "Password Must contain uppercase letter character")
+  .regex(/^(?=.*\d)/, "Password Must contain digit character")
+  .regex(/^(?=.*[@$!%*?&])/, "Password Must contain special character");
 const loginBodySchema = z.object({
   email: emailSchema,
-  password: passwordSchema,
+  password: loginPasswordSchema,
   token: z.string().optional()
 });
 
@@ -107,14 +111,14 @@ export async function authRoutes(app: FastifyInstance, options: AuthRoutesOption
   }, async (request, reply) => {
     const body = z.object({ email: emailSchema }).parse(request.body);
     const optionsResult = await options.authService.generatePasskeyAuthentication(body.email);
-    
+
     reply.setCookie("passkeyLoginChallenge", optionsResult.challenge, {
       httpOnly: true,
       secure: options.env.COOKIE_SECURE,
       sameSite: options.env.COOKIE_SECURE ? "none" : "lax",
       path: "/auth/login/passkey"
     });
-    
+
     return optionsResult;
   });
 
@@ -128,7 +132,7 @@ export async function authRoutes(app: FastifyInstance, options: AuthRoutesOption
     if (!email) throw errors.badRequest("Missing email");
 
     const result = await options.authService.verifyPasskeyAuthentication(email, request.body as any, expectedChallenge, getRequestContext(request));
-    
+
     reply.clearCookie("passkeyLoginChallenge", {
       httpOnly: true,
       secure: options.env.COOKIE_SECURE,
@@ -236,7 +240,7 @@ export async function authRoutes(app: FastifyInstance, options: AuthRoutesOption
   }, async (request, reply) => {
     if (!request.actor) throw errors.unauthorized();
     const optionsResult = await options.authService.generatePasskeyRegistration(request.actor);
-    
+
     // Store challenge in session cookie (in a real app, use a dedicated session store)
     reply.setCookie("passkeyChallenge", optionsResult.challenge, {
       httpOnly: true,
@@ -244,7 +248,7 @@ export async function authRoutes(app: FastifyInstance, options: AuthRoutesOption
       sameSite: options.env.COOKIE_SECURE ? "none" : "lax",
       path: "/auth/passkeys"
     });
-    
+
     return optionsResult;
   });
 
@@ -257,14 +261,14 @@ export async function authRoutes(app: FastifyInstance, options: AuthRoutesOption
     if (!expectedChallenge) throw errors.badRequest("Missing passkey challenge");
 
     await options.authService.verifyPasskeyRegistration(request.actor, request.body as any, expectedChallenge, getRequestContext(request));
-    
+
     reply.clearCookie("passkeyChallenge", {
       httpOnly: true,
       secure: options.env.COOKIE_SECURE,
       sameSite: options.env.COOKIE_SECURE ? "none" : "lax",
       path: "/auth/passkeys"
     });
-    
+
     sendSuccess(reply, "Success", 204);
   });
 

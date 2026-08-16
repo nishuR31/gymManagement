@@ -44,41 +44,45 @@ export const Button = React.memo(function Button({
   }
 
   // ── Variant styles ──
-  let bgClass = '';
-  let textClass = '';
+  let bgStyle: any = {};
+  let textStyle: any = {};
+  let borderClass = '';
 
   switch (variant) {
     case 'primary':
       if (styleMode === 'glass') {
-        bgClass = 'bg-primary/70 border border-white/20 backdrop-blur-md';
+        bgStyle = { backgroundColor: `${colors.primary}B3` }; // 70% opacity
+        borderClass = 'border border-white/20 backdrop-blur-md';
       } else {
-        bgClass = 'bg-primary';
+        bgStyle = { backgroundColor: colors.primary };
       }
-      textClass = 'text-primary-foreground';
+      textStyle = { color: colors.primaryForeground };
       break;
     case 'secondary':
       if (styleMode === 'glass') {
-        bgClass = 'bg-secondary/70 border border-white/20 backdrop-blur-md';
+        bgStyle = { backgroundColor: `${colors.secondary}B3` }; // 70%
+        borderClass = 'border border-white/20 backdrop-blur-md';
       } else {
-        bgClass = 'bg-secondary';
+        bgStyle = { backgroundColor: colors.secondary };
       }
-      textClass = 'text-secondary-foreground';
+      textStyle = { color: colors.secondaryForeground };
       break;
     case 'destructive':
       if (styleMode === 'glass') {
-        bgClass = 'bg-destructive/70 border border-white/20 backdrop-blur-md';
+        bgStyle = { backgroundColor: `${colors.destructive}B3` };
+        borderClass = 'border border-white/20 backdrop-blur-md';
       } else {
-        bgClass = 'bg-destructive';
+        bgStyle = { backgroundColor: colors.destructive };
       }
-      textClass = 'text-destructive-foreground';
+      textStyle = { color: colors.destructiveForeground };
       break;
     case 'outline':
-      bgClass = 'border border-border bg-transparent';
-      textClass = 'text-foreground';
+      bgStyle = { backgroundColor: 'transparent', borderColor: colors.border, borderWidth: 1 };
+      textStyle = { color: colors.foreground };
       break;
     case 'ghost':
-      bgClass = 'bg-transparent hover:bg-accent';
-      textClass = 'text-foreground';
+      bgStyle = { backgroundColor: 'transparent' };
+      textStyle = { color: colors.foreground };
       break;
   }
 
@@ -115,14 +119,14 @@ export const Button = React.memo(function Button({
     <TouchableOpacity
       className={`
         flex-row items-center justify-center
-        ${bgClass}
+        ${borderClass}
         ${radiusClass}
         ${sizeClass}
         ${clayShadowClass}
         ${isDisabled ? 'opacity-50' : ''}
         ${className || ''}
       `}
-      style={props.style}
+      style={[bgStyle, props.style]}
       disabled={isDisabled}
       activeOpacity={0.75}
       {...props}
@@ -141,7 +145,8 @@ export const Button = React.memo(function Button({
           )}
           {typeof children === 'string' ? (
             <Text
-              className={`font-semibold text-center ${textSize} ${textClass}`}
+              className={`font-semibold text-center ${textSize}`}
+              style={textStyle}
               numberOfLines={1}
             >
               {children}

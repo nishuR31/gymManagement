@@ -17,7 +17,8 @@ import {
   ArrowRight,
   ShieldCheck,
   Users,
-  Scan
+  Scan,
+  Smartphone
 } from 'lucide-react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';

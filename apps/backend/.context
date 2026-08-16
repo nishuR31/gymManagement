@@ -1,0 +1,115 @@
+# Auth Performance Fix — Context
+
+## Status
+Phase 4 COMPLETE. All changes applied. TypeScript passes clean (0 errors).
+
+## What was done
+
+### Phase 1 — Auth Middleware (COMPLETE)
+- Removed `findUserById()` per-request DB lookup from JWT authentication
+- Built `request.actor` directly from verified JWT claims
+
+### Phase 2 — Auth Hot-Path Query Optimization (COMPLETE)
+- Login queries use `_count: { passkeys: true }` instead of loading full binary passkey rows
+- `issueTokens()` uses single atomic `createSessionAndToken()` nested write
+- Added lightweight `findRefreshTokenForLogout` and `findRefreshTokenForRefresh`
+- Fixed Redis cache: prevented `l2Redis = null` on error event; lowered `commandTimeout` to 500ms
+
+### Phase 3 — Targeted Optimizations (COMPLETE)
+All targeted optimizations applied per user specification.
+
+#### auth.repository.ts
+- `findRefreshTokenForRefresh` now uses hyper-narrow `select` (omits passkeys, passwordHash, etc.)
+  — user/session data loaded only as needed
+- Added `rotateRefreshToken()`: Prisma `$transaction` with raw `SELECT ... FOR UPDATE` lock
+  — prevents concurrent refresh token reuse at the DB level
+- `revokeAllUserSessions()` now wraps both `updateMany` calls in a single `$transaction`
+
+#### auth.service.ts
+- `refresh()` now uses atomic `rotateRefreshToken()` instead of two sequential writes
+- `TOKEN_ALREADY_REVOKED` in the rotation transaction triggers full session revocation + audit log
+- All `void this.repository.writeAuditLog(...)` calls now have `.catch(err => console.error(...))` to prevent silent failures
+
+#### cache.service.ts
+- L1 cache bounded to 1000 entries (LRU-style: FIFO eviction via Map insertion order)
+- L2 Redis `.set()` is now non-blocking — `void set().catch(err => ...)` so cache writes don't block the response
+
+#### product-order.repository.ts
+- `productOrderInclude` narrowed from `member: true, product: true` to strict field-level selects:
+  `member: { select: { memberCode, firstName, lastName, phone } }` and `product: { select: { name, imageUrl } }`
+
+#### inquiry.service.ts + app.ts
+- `InquiryService` now accepts optional `CacheService` injection
+- `publicPlans()` checks `public:membership-plans` L1/L2 cache before querying DB; 300s TTL
+- `app.ts` passes `redisCache` into `new InquiryService(..., redisCache)`
+
+#### membership.service.ts
+- `createPlan`, `updatePlan`, `deactivatePlan` all invalidate `public:membership-plans` cache key
+  alongside the existing dashboard/report invalidations
+
+#### settings.service.ts
+- Removed dead `ensureSignedIn()` function and the call in `gymInfo()`
+  (auth is already guaranteed upstream by the JWT middleware)
+
+### Phase 4 — Security Regression Fixes (COMPLETE)
+Applied all critical fixes from the backend(3).zip review.
+
+#### auth.repository.ts — passkey regression fixed
+- Added dedicated `findUserForPasskey(email)` method that loads full passkey rows (credentialId,
+  publicKey, counter) — used ONLY by WebAuthn paths, NOT the password login path
+- Normal `findUserByEmail()` keeps the lightweight `_count: { passkeys: true }` projection
+- `generatePasskeyAuthentication()`, `verifyPasskeyAuthentication()`, `verifyPasswordResetWithPasskey()`
+  all call `findUserForPasskey()` — passkey login is no longer broken
+
+#### auth.repository.ts — RefreshAuthRecord (clean types, no fake fields)
+- Introduced `RefreshAuthRecord` interface: minimal user projection for the token-rotation path
+  — has only what refresh actually needs: id, email, firstName, lastName, role, memberId,
+    isActive, mustChangePassword, twoFactorEnabled, hasPasskeys, securityDisableRequested
+- `RefreshTokenRecord.user` is now typed as `RefreshAuthRecord` (not the full `AuthUserRecord`)
+- `findRefreshTokenForRefresh()` now maps directly onto `RefreshAuthRecord` — no more
+  fake `passwordHash: ""` / `passkeys: []` / `twoFactorSecret: null` padding
+- `_count: { passkeys: true }` added to the refresh select to compute `hasPasskeys` cleanly
+
+#### auth.service.ts — toUserDto broadened
+- `toUserDto()` now accepts `AuthUserRecord | RefreshAuthRecord`
+- Enables the refresh path to call `toUserDto(persistedToken.user)` without any cast
+
+#### password.ts — bcrypt cost factor restored
+- Restored `passwordHashRounds` from 10 → 12 (production value)
+- A cost reduction from 12 to 10 is a security regression; needs measurement before changing
+
+## Accepted conscious tradeoffs (not regressions)
+- JWT authentication is now stateless (no per-request DB lookup) — role/deactivation changes
+  take effect after the access-token TTL (~15 min). Acceptable; could add Redis version check
+  later if near-instant revocation is required.
+- Security audit events (AUTH_LOGIN, AUTH_LOGOUT, AUTH_REFRESH_REUSE_DETECTED, etc.) are
+  fire-and-forget (non-blocking). Risk: crash between response and DB write loses the log row.
+  For full durability, use an outbox/queue. Currently: `.catch(err => console.error(...))` for
+  at-least-observed failure.
+
+## Key files
+- `src/features/auth/auth.repository.ts` — RefreshAuthRecord, RefreshTokenRecord, findUserForPasskey,
+  findRefreshTokenForRefresh, rotateRefreshToken
+- `src/features/auth/auth.service.ts` — atomic refresh flow, broadened toUserDto, audit log error handling
+- `src/core/cache/cache.service.ts` — bounded L1, async L2 set
+- `src/core/utils/password.ts` — bcrypt rounds = 12
+- `src/features/product-order/product-order.repository.ts` — narrow productOrderInclude
+- `src/features/inquiry/inquiry.service.ts` — publicPlans caching
+- `src/features/membership/membership.service.ts` — plan mutation cache invalidation
+- `src/features/settings/settings.service.ts` — removed dead ensureSignedIn
+
+## AccessTokenClaims (from token.service.ts)
+```ts
+{ sub: string; email: string; role: RoleName }
+```
+Fields NOT in token: mustChangePassword, twoFactorEnabled, hasPasskeys, securityDisableRequested
+
+## Notes
+- bcrypt rounds = 12 (production value, restored)
+- All `void writeAuditLog` calls now have `.catch(err => console.error(...))` for observability
+- Refresh token rotation is now atomic + safe against concurrent reuse (FOR UPDATE lock)
+- publicPlans cache TTL = 300s, invalidated on any plan mutation
+- productOrderInclude no longer loads full MemberProfile or Product rows
+- Passkey login uses dedicated `findUserForPasskey()` — does not bloat the password-login path
+- `RefreshAuthRecord` eliminates fake field padding in the refresh token domain type
+- `tsc --noEmit` → 0 errors ✓
