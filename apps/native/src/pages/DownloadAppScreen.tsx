@@ -86,13 +86,22 @@ export function DownloadAppScreen() {
             <View className="relative bg-[#3a3a3a] rounded-[60px] p-[2px] shadow-2xl" style={{ elevation: 20 }}>
 
               {/* Hardware Buttons */}
-              {/* Left Side: Volume & Action Button */}
-              <View className="absolute -left-[4px] top-[120px] w-[4px] h-[24px] bg-[#2a2a2a] rounded-l-md" />
-              <View className="absolute -left-[4px] top-[170px] w-[4px] h-[48px] bg-[#2a2a2a] rounded-l-md" />
-              <View className="absolute -left-[4px] top-[230px] w-[4px] h-[48px] bg-[#2a2a2a] rounded-l-md" />
-
-              {/* Right Side: Power Button */}
-              <View className="absolute -right-[4px] top-[180px] w-[4px] h-[64px] bg-[#2a2a2a] rounded-r-md" />
+              {platform === 'ios' ? (
+                <>
+                  {/* Left Side: Action Button & Volume */}
+                  <View className="absolute -left-[4px] top-[120px] w-[4px] h-[24px] bg-[#2a2a2a] rounded-l-md" />
+                  <View className="absolute -left-[4px] top-[170px] w-[4px] h-[48px] bg-[#2a2a2a] rounded-l-md" />
+                  <View className="absolute -left-[4px] top-[230px] w-[4px] h-[48px] bg-[#2a2a2a] rounded-l-md" />
+                  {/* Right Side: Power Button */}
+                  <View className="absolute -right-[4px] top-[180px] w-[4px] h-[64px] bg-[#2a2a2a] rounded-r-md" />
+                </>
+              ) : (
+                <>
+                  {/* Right Side: Power & Volume Rocker */}
+                  <View className="absolute -right-[4px] top-[150px] w-[4px] h-[40px] bg-[#2a2a2a] rounded-r-md" />
+                  <View className="absolute -right-[4px] top-[210px] w-[4px] h-[80px] bg-[#2a2a2a] rounded-r-md" />
+                </>
+              )}
 
               {/* Phone Container / Bezel */}
               <View

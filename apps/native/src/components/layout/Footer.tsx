@@ -1,7 +1,7 @@
 
 import { View, Text, TouchableOpacity, Linking } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { Dumbbell, Mail } from 'lucide-react-native';
+import { Dumbbell } from 'lucide-react-native';
 import { useTheme } from '../../hooks/useTheme';
 import { APP_NAME } from '../../utils/env';
 
@@ -70,7 +70,6 @@ export function Footer() {
               onPress={() => Linking.openURL('mailto:contact@valorfitness.com')}
               className="flex-row items-center gap-1.5"
             >
-              <Mail size={13} color={colors.primary} />
               <Text className="text-sm font-medium" style={{ color: colors.primary }}>contact@valorfitness.com</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => navigation.navigate('Privacy')}>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Alert, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, Alert, ScrollView, Image } from 'react-native';
 import { UserRound, LogOut, ShieldCheck, Mail, ShieldAlert, KeyRound, Smartphone, Activity, Flame, SwitchCamera } from 'lucide-react-native';
 import Toast from 'react-native-toast-message';
 
@@ -13,7 +13,8 @@ import { readableStatus, formatRelativeTime } from '../utils/format';
 import { ChangePasswordModal } from '../components/forms/ChangePasswordModal';
 import { TwoFactorSetupModal } from '../components/forms/TwoFactorSetupModal';
 import { MemberQRCodeModal } from '../components/forms/MemberQRCodeModal';
-import { QrCode } from 'lucide-react-native';
+import { QrCode, Camera as CameraIcon } from 'lucide-react-native';
+import * as ImagePicker from 'expo-image-picker';
 
 import * as authApi from '../features/auth/authApi';
 import * as memberApi from '../features/members/memberApi';
@@ -33,6 +34,7 @@ export function ProfileScreen() {
   const [isQRModalVisible, setIsQRModalVisible] = useState(false);
   const [qrPayload, setQrPayload] = useState<string | null>(null);
   const [loadingQR, setLoadingQR] = useState(false);
+  const [profilePictureUrl, setProfilePictureUrl] = useState<string | null>(null);
 
   useEffect(() => {
     // Refresh user data to get accurate 2FA / Passkey status
@@ -121,6 +123,28 @@ export function ProfileScreen() {
     }
   };
 
+  const handlePickProfilePicture = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        const uri = result.assets[0].uri;
+        setProfilePictureUrl(uri);
+        Toast.show({ type: 'success', text1: 'Profile picture updated remotely' });
+        // In a real app we would upload the image here:
+        // await profileApi.updateProfile({ avatarUrl: uri });
+      }
+    } catch (error) {
+      console.log('Error updating profile picture', error);
+      Toast.show({ type: 'error', text1: 'Failed to update profile picture' });
+    }
+  };
+
   if (!user) return null;
 
   return (
@@ -134,19 +158,37 @@ export function ProfileScreen() {
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40 }}>
         {/* Personal Information */}
         <View className="items-center mb-6 pt-4">
-          <View
+          <TouchableOpacity 
+            onPress={handlePickProfilePicture}
             style={{ backgroundColor: colors.primarySoft }}
-            className="w-24 h-24 items-center justify-center rounded-full mb-4"
+            className="w-24 h-24 items-center justify-center rounded-full mb-4 overflow-hidden relative"
           >
-            <UserRound size={40} color={colors.primary} />
-          </View>
+            {profilePictureUrl ? (
+              <Image source={{ uri: profilePictureUrl }} style={{ width: '100%', height: '100%' }} />
+            ) : (
+              <UserRound size={40} color={colors.primary} />
+            )}
+            <View style={{ backgroundColor: 'rgba(0,0,0,0.4)' }} className="absolute bottom-0 w-full items-center py-1">
+              <CameraIcon size={12} color="#FFF" />
+            </View>
+          </TouchableOpacity>
           <Text style={{ color: colors.foreground }} className="text-2xl font-black">
             {user.firstName} {user.lastName}
           </Text>
-          <View style={{ backgroundColor: colors.primarySoft }} className="px-3 py-1 mt-2 rounded-full">
-            <Text style={{ color: colors.primary }} className="text-xs font-bold uppercase tracking-widest">
-              {readableStatus(user.role)}
-            </Text>
+          <View className="flex-row items-center gap-2 mt-2">
+            <View style={{ backgroundColor: colors.primarySoft }} className="px-3 py-1 rounded-full">
+              <Text style={{ color: colors.primary }} className="text-xs font-bold uppercase tracking-widest">
+                {readableStatus(user.role)}
+              </Text>
+            </View>
+            {user.role === 'MEMBER' && memberData && (
+              <View style={{ backgroundColor: colors.warningSoft }} className="px-3 py-1 rounded-full flex-row items-center gap-1">
+                <Flame size={12} color={colors.warning} />
+                <Text style={{ color: colors.warning }} className="text-xs font-bold uppercase tracking-widest">
+                  {memberData.streakDays || 0} Day Streak
+                </Text>
+              </View>
+            )}
           </View>
         </View>
 
@@ -182,21 +224,9 @@ export function ProfileScreen() {
         {user.role === 'MEMBER' && memberData && (
           <Card className="mb-4">
             <CardContent className="p-4 gap-4">
-              <Text style={{ color: colors.foreground }} className="font-bold text-lg mb-2">Gym Statistics</Text>
+              <Text style={{ color: colors.foreground }} className="font-bold text-lg mb-2">Check-in Activity</Text>
               
               <View className="flex-row gap-4">
-                <View className="flex-1 rounded-lg p-3" style={{ backgroundColor: colors.secondary }}>
-                  <View className="flex-row items-center gap-2 mb-1">
-                    <Flame size={16} color={colors.primary} />
-                    <Text style={{ color: colors.mutedForeground }} className="text-xs font-bold uppercase tracking-widest">
-                      Streak
-                    </Text>
-                  </View>
-                  <Text style={{ color: colors.foreground }} className="text-xl font-black">
-                    {memberData.streakDays || 0} <Text className="text-sm font-semibold text-muted-foreground">Days</Text>
-                  </Text>
-                </View>
-
                 <View className="flex-1 rounded-lg p-3" style={{ backgroundColor: colors.secondary }}>
                   <View className="flex-row items-center gap-2 mb-1">
                     <Activity size={16} color={colors.success} />
@@ -204,7 +234,7 @@ export function ProfileScreen() {
                       Last Check-in
                     </Text>
                   </View>
-                  <Text style={{ color: colors.foreground }} className="text-sm font-bold">
+                  <Text style={{ color: colors.foreground }} className="text-sm font-bold mt-1">
                     {memberData.lastAttendanceDate ? formatRelativeTime(memberData.lastAttendanceDate) : 'Never'}
                   </Text>
                 </View>

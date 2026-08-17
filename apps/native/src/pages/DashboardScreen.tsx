@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, Platform } from 'react-native';
+import { View, Text, Platform, Modal } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { EmptyState } from '../components/ui/EmptyState';
 import { LoadBar } from '../components/ui/LoadBar';
@@ -105,9 +105,6 @@ export function DashboardScreen({ navigation }: any) {
         onSubtitlePress={() => setShowDatePicker(true)}
         actions={
           <>
-            <Button variant="ghost" size="icon" onPress={() => setShowDatePicker(true)}>
-              <Calendar size={22} color={colors.foreground} />
-            </Button>
             <Button variant="ghost" size="icon" onPress={handleLogout}>
               <LogOut size={22} color={colors.foreground} />
             </Button>
@@ -115,7 +112,7 @@ export function DashboardScreen({ navigation }: any) {
         }
       />
 
-      {showDatePicker && Platform.OS === 'web' ? (
+      {Platform.OS === 'web' && showDatePicker && (
         <View style={{
           position: 'absolute',
           top: 0,
@@ -153,13 +150,39 @@ export function DashboardScreen({ navigation }: any) {
             </Button>
           </View>
         </View>
-      ) : showDatePicker && (
+      )}
+
+      {Platform.OS === 'ios' && (
+        <Modal visible={showDatePicker} transparent animationType="slide">
+          <View style={{
+            flex: 1,
+            justifyContent: 'flex-end',
+            backgroundColor: 'rgba(0,0,0,0.5)',
+          }}>
+            <View style={{ backgroundColor: colors.card, paddingBottom: 20 }}>
+              <View className="flex-row justify-between items-center px-4 py-2" style={{ borderBottomWidth: 1, borderBottomColor: colors.border }}>
+                <Button variant="ghost" onPress={() => setShowDatePicker(false)}>Cancel</Button>
+                <Button variant="ghost" onPress={() => setShowDatePicker(false)}>Done</Button>
+              </View>
+              <DateTimePicker
+                value={date}
+                mode="date"
+                display="spinner"
+                onChange={onDateChange}
+                textColor={colors.foreground}
+                themeVariant={isDark ? 'dark' : 'light'}
+              />
+            </View>
+          </View>
+        </Modal>
+      )}
+
+      {Platform.OS === 'android' && showDatePicker && (
         <DateTimePicker
           value={date}
           mode="date"
           display="default"
           onChange={onDateChange}
-          themeVariant={colors.background === '#09090b' ? 'dark' : 'light'}
         />
       )}
 

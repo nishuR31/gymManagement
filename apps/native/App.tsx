@@ -42,6 +42,7 @@ import { loadApiBaseUrl, setAccessToken } from './src/services/api';
 import { registerForPushNotificationsAsync } from './src/services/notifications';
 
 import { themeColors } from './src/constants/colors';
+import { GlobalSettingsOverlay } from './src/components/layout/GlobalSettingsOverlay';
 
 const Stack = createNativeStackNavigator();
 
@@ -115,6 +116,7 @@ function RootApp() {
             <Stack.Screen name="DownloadApp" component={DownloadAppScreen} options={{ headerShown: false }} />
           </Stack.Navigator>
         </NavigationContainer>
+        <GlobalSettingsOverlay />
         <Toaster />
       </View>
     </SafeAreaProvider>

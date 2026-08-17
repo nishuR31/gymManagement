@@ -33,7 +33,7 @@ export function Input({
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   // ── Container border class by styleMode + state ──
-  let containerClass = 'flex-row items-center h-12 overflow-hidden ';
+  let containerClass = `flex-row overflow-hidden ${props.multiline ? 'items-start pt-3 pb-3' : 'items-center h-12'} `;
   const bgClass = isDark ? 'bg-white/10' : 'bg-black/5';
   const glassBgClass = isDark ? 'bg-white/10' : 'bg-white/40';
 
@@ -75,8 +75,8 @@ export function Input({
         ) : null}
 
         <TextInput
-          className={`flex-1 py-2 text-sm ${leftIcon ? 'pl-1' : 'pl-3'} ${secureTextEntry ? 'pr-10' : 'pr-3'} ${props.multiline ? 'min-h-[40px]' : 'h-10'}`}
-          style={[{ color: colors.foreground, backgroundColor: 'transparent', textAlignVertical: props.multiline ? 'top' : 'center' }, props.style]}
+          className={`flex-1 text-sm ${leftIcon ? 'pl-1' : 'pl-3'} ${secureTextEntry ? 'pr-10' : 'pr-3'} ${props.multiline ? 'min-h-[60px]' : 'h-full'}`}
+          style={[{ color: colors.foreground, backgroundColor: 'transparent', textAlignVertical: props.multiline ? 'top' : 'center', outlineStyle: 'none' } as any, props.style]}
           placeholderTextColor={colors.mutedForeground}
           secureTextEntry={isSecure}
           underlineColorAndroid="transparent"

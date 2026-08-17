@@ -86,15 +86,18 @@ export function ApiSettingsModal({ visible, onClose }: ApiSettingsModalProps) {
                 <Text className="text-xs text-muted-foreground mb-4">
                   Change the overall shape and feel of UI components.
                 </Text>
-                <View className="flex-row gap-3">
-                  <Button variant={styleMode === "minimal" ? "primary" : "secondary"} onPress={() => dispatch(setStyleMode("minimal"))} className="flex-1 h-10">
-                    Minimalist
+                <View className="flex-row flex-wrap gap-2">
+                  <Button variant={styleMode === "minimal" ? "primary" : "secondary"} onPress={() => dispatch(setStyleMode("minimal"))} className="flex-1 min-w-[48%] h-10">
+                    Minimal
                   </Button>
-                  <Button variant={styleMode === "glass" ? "primary" : "secondary"} onPress={() => dispatch(setStyleMode("glass"))} className="flex-1 h-10">
-                    Glassmorphism
+                  <Button variant={styleMode === "glass" ? "primary" : "secondary"} onPress={() => dispatch(setStyleMode("glass"))} className="flex-1 min-w-[48%] h-10">
+                    Glass
                   </Button>
-                  <Button variant={styleMode === "clay" ? "primary" : "secondary"} onPress={() => dispatch(setStyleMode("clay"))} className="flex-1 h-10">
-                    Claymorphism
+                  <Button variant={styleMode === "liquid-glass" ? "primary" : "secondary"} onPress={() => dispatch(setStyleMode("liquid-glass"))} className="flex-1 min-w-[48%] h-10">
+                    Liq Glass
+                  </Button>
+                  <Button variant={styleMode === "clay" ? "primary" : "secondary"} onPress={() => dispatch(setStyleMode("clay"))} className="flex-1 min-w-[48%] h-10">
+                    Clay
                   </Button>
                 </View>
               </View>

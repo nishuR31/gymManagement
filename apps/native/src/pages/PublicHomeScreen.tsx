@@ -14,12 +14,11 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigation } from '@react-navigation/native';
 import { AppDock } from '../components/layout/AppDock';
-import { ApiSettingsModal } from '../components/ApiSettingsModal';
 import { Footer } from '../components/layout/Footer';
 import { formatCents } from '../utils/format';
 
 import { useAppSelector } from '../store/hooks';
-import { themeColors } from '../constants/colors';
+import { themeColors } from '../constants/themeColors';
 import type { PublicMembershipPlanDto } from '@gym/shared';
 
 const inquirySchema = z.object({
@@ -41,11 +40,9 @@ export function PublicHomeScreen() {
   const theme = useAppSelector((state) => state.theme.theme);
   const activeColors = themeColors[theme === 'amoled' ? 'amoled' : theme === 'dark' ? 'dark' : 'light'];
 
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [plans, setPlans] = useState<PublicMembershipPlanDto[]>([]);
   const [now, setNow] = useState(new Date());
-  const spinValue = useRef(new Animated.Value(0)).current;
 
   // Live clock — updates every second
   useEffect(() => {
@@ -58,15 +55,7 @@ export function PublicHomeScreen() {
     listPublicPlans().then(setPlans).catch(() => { /* silent */ });
   }, []);
 
-  const handleSettingsPress = () => {
-    setIsSettingsOpen(true);
-    Animated.sequence([
-      Animated.timing(spinValue, { toValue: 1, duration: 300, useNativeDriver: true }),
-      Animated.timing(spinValue, { toValue: 0, duration: 0, useNativeDriver: true }),
-    ]).start();
-  };
 
-  const spin = spinValue.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '90deg'] });
 
   const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<InquiryForm>({
     resolver: zodResolver(inquirySchema),
@@ -103,23 +92,20 @@ export function PublicHomeScreen() {
           <View className="relative min-h-[600px] lg:min-h-[700px] justify-center">
             <Image
               source={{ uri: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=1600&q=80" }}
-              className="absolute inset-0 w-full h-full opacity-90"
+              className="absolute inset-0 w-full h-full"
+              style={{ opacity: 1 }}
               resizeMode="cover"
             />
-            <View className="absolute inset-0 bg-black/10" />
-            <View className="absolute inset-0 bg-gradient-to-b from-background/50 via-transparent to-background" />
+            {/* Subtle dark vignette only — image stays vivid */}
+            <View className="absolute inset-0" style={{ backgroundColor: 'rgba(0,0,0,0.38)' }} />
+            {/* Soft bottom fade into bg */}
+            <View className="absolute bottom-0 left-0 right-0 h-40" style={{ "backgroundColor": 'linear-gradient(to bottom, transparent, rgba(0,0,0,0.55))' }} />
 
             {/* Top Navigation */}
             <View className="absolute top-4 left-4 z-10 flex-row items-center gap-2 bg-black/50 rounded-full px-4 py-2">
               <Dumbbell size={18} color={activeColors.primary} />
               <Text className="text-white font-black text-sm">{APP_NAME}</Text>
             </View>
-
-            <TouchableOpacity onPress={handleSettingsPress} className="absolute top-4 right-4 p-2.5 bg-black/50 rounded-full z-10">
-              <Animated.View style={{ transform: [{ rotate: spin }] }}>
-                <Settings size={20} color="#ffffff" />
-              </Animated.View>
-            </TouchableOpacity>
 
             {/* Centered content */}
             <View className="w-full max-w-7xl self-center px-6 pt-24 pb-12 flex-row z-10">
@@ -188,9 +174,17 @@ export function PublicHomeScreen() {
             </View>
           </View>
 
-          {/* Three Feature Cards Section */}
-          <View className="bg-background w-full relative z-20 pb-12">
-            <View className={`w-full max-w-7xl self-center px-6 flex-row flex-wrap justify-between gap-4 ${isTablet ? 'flex-nowrap' : ''}`}>
+          {/* Three Feature Cards Section — with workout background */}
+          <View className="w-full relative z-20 pb-12 overflow-hidden">
+            {/* Second workout background */}
+            <Image
+              source={{ uri: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1600&q=80" }}
+              className="absolute inset-0 w-full h-full"
+              style={{ opacity: 0.18 }}
+              resizeMode="cover"
+            />
+            <View className="absolute inset-0 bg-background/70" />
+            <View className={`relative z-10 w-full max-w-7xl self-center px-6 flex-row flex-wrap justify-between gap-4 ${isTablet ? 'flex-nowrap' : ''}`}>
               <Card className="flex-1 min-w-[280px] bg-zinc-900 border-zinc-800">
                 <CardContent className="p-4 pt-4 flex-row items-center gap-4">
                   <View className="h-10 w-10 bg-zinc-800 rounded-md items-center justify-center">
@@ -240,7 +234,7 @@ export function PublicHomeScreen() {
                   <Text style={{ color: activeColors.mutedForeground }} className="text-base text-center max-w-xl">Choose the plan that fits your goals. All plans include full floor access.</Text>
                 </View>
 
-                <View className={`flex-row flex-wrap gap-4 justify-center ${isTablet ? 'flex-nowrap' : ''}`}>
+                <View className="flex-row flex-wrap gap-4 justify-center">
                   {plans.map((plan, index) => (
                     <View key={`plan-${index}`} style={{ flex: 1, minWidth: 260, maxWidth: 360 }}>
                       <Card style={{ borderColor: index === 0 ? activeColors.primary : activeColors.border }}>
@@ -279,13 +273,14 @@ export function PublicHomeScreen() {
 
           {/* Bottom Sections with Immersive Background */}
           <View className="relative w-full bg-background overflow-hidden min-h-[800px]">
-            <View className="absolute inset-0 bg-gradient-to-b from-background via-background/20 to-background/60" style={{ pointerEvents: 'none' }} />
             <Image
               source={{ uri: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=1600&q=80" }}
-              className="absolute inset-0 w-full h-full opacity-80"
+              className="absolute inset-0 w-full h-full"
+              style={{ opacity: 0.7 }}
               resizeMode="cover"
             />
-            <View className="absolute inset-0 bg-gradient-to-b from-background via-background/20 to-background/80 pointer-events-none" />
+            {/* Strong dark overlay so white text stays readable */}
+            <View className="absolute inset-0" style={{ backgroundColor: 'rgba(0,0,0,0.55)' }} />
 
             <View className="relative z-10 w-full max-w-7xl self-center px-6 py-16 flex-col lg:flex-row gap-12">
 
@@ -316,7 +311,7 @@ export function PublicHomeScreen() {
                         </View>
                         <Text className="text-white font-bold mb-2 text-sm text-center">{monthYear}</Text>
                         <View className="flex-row justify-between mb-1">
-                          {['S','M','T','W','T','F','S'].map((d, i) => (
+                          {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => (
                             <Text key={i} className="text-zinc-500 text-[10px] w-6 text-center">{d}</Text>
                           ))}
                         </View>
@@ -328,11 +323,10 @@ export function PublicHomeScreen() {
                           {Array.from({ length: daysInMonth }).map((_, i) => (
                             <Text
                               key={i}
-                              className={`text-[10px] w-6 text-center my-1.5 ${
-                                i + 1 === now.getDate()
+                              className={`text-[10px] w-6 text-center my-1.5 ${i + 1 === now.getDate()
                                   ? 'text-[#c59a58] font-bold bg-[#c59a58]/10 rounded'
                                   : 'text-zinc-300'
-                              }`}
+                                }`}
                             >
                               {i + 1}
                             </Text>
@@ -432,7 +426,6 @@ export function PublicHomeScreen() {
         </ScrollView>
       </KeyboardAvoidingView>
       <AppDock />
-      <ApiSettingsModal visible={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
     </SafeAreaView>
   );
 }
