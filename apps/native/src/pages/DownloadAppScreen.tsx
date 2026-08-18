@@ -105,8 +105,8 @@ export function DownloadAppScreen() {
 
               {/* Phone Container / Bezel */}
               <View
-                className="relative rounded-[58px] border-[10px] bg-zinc-950 overflow-hidden items-center p-6 w-[320px] h-[640px]"
-                style={{ borderColor: '#000000' }}
+                className="relative rounded-[58px] border-[10px] overflow-hidden items-center p-6 w-[320px] h-[640px]"
+                style={{ borderColor: '#000000', backgroundColor: colors.background }}
               >
 
                 {/* Screen Glare Effect */}
@@ -139,28 +139,30 @@ export function DownloadAppScreen() {
                 )}
 
                 {/* Segmented Control */}
-                <View className="mt-14 bg-zinc-900/80 backdrop-blur-md rounded-full p-1 flex-row w-[200px] mb-12 z-10 border border-white/5">
+                <View className="mt-14 backdrop-blur-md rounded-full p-1 flex-row w-[200px] mb-12 z-10 border" style={{ backgroundColor: colors.card, borderColor: colors.border }}>
                   <TouchableOpacity
                     onPress={() => setPlatform('ios')}
-                    className={`flex-1 items-center py-2.5 rounded-full ${platform === 'ios' ? 'bg-[#c59a58] shadow-md' : 'bg-transparent'}`}
+                    className={`flex-1 items-center py-2.5 rounded-full ${platform === 'ios' ? 'shadow-md' : 'bg-transparent'}`}
+                    style={platform === 'ios' ? { backgroundColor: colors.primary } : {}}
                   >
-                    <Text className={`text-xs font-bold ${platform === 'ios' ? 'text-zinc-950' : 'text-zinc-400'}`}>iOS</Text>
+                    <Text className="text-xs font-bold" style={{ color: platform === 'ios' ? colors.primaryForeground : colors.mutedForeground }}>iOS</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => setPlatform('android')}
-                    className={`flex-1 items-center py-2.5 rounded-full ${platform === 'android' ? 'bg-[#c59a58] shadow-md' : 'bg-transparent'}`}
+                    className={`flex-1 items-center py-2.5 rounded-full ${platform === 'android' ? 'shadow-md' : 'bg-transparent'}`}
+                    style={platform === 'android' ? { backgroundColor: colors.primary } : {}}
                   >
-                    <Text className={`text-xs font-bold ${platform === 'android' ? 'text-zinc-950' : 'text-zinc-400'}`}>Android</Text>
+                    <Text className="text-xs font-bold" style={{ color: platform === 'android' ? colors.primaryForeground : colors.mutedForeground }}>Android</Text>
                   </TouchableOpacity>
                 </View>
 
                 {/* QR Code */}
                 <View className="bg-white p-4 rounded-[28px] mb-10 z-10 shadow-2xl">
-                  <Image source={{ uri: qrCodeUrl }} className="w-48 h-48 rounded-xl" />
+                  <Image source={{ uri: qrCodeUrl }} style={{ width: 192, height: 192, borderRadius: 12 }} />
                 </View>
 
-                <Text className="text-white text-2xl font-black mb-2 tracking-tight z-10">Scan to download</Text>
-                <Text className="text-zinc-400 text-sm text-center mb-8 px-4 z-10">
+                <Text className="text-2xl font-black mb-2 tracking-tight z-10" style={{ color: colors.foreground }}>Scan to download</Text>
+                <Text className="text-sm text-center mb-8 px-4 z-10" style={{ color: colors.mutedForeground }}>
                   Point your camera to get the {platform === 'ios' ? 'iOS' : 'Android'} app
                 </Text>
 

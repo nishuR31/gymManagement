@@ -110,7 +110,9 @@ export function PublicFloatingDock() {
   if (styleMode === 'clay') {
     containerClass = "bg-card shadow-[0_15px_40px_rgba(0,0,0,0.25)]";
   } else if (styleMode === 'glass') {
-    containerClass = "bg-background/40 backdrop-blur-3xl border border-white/10 shadow-lg shadow-black/20";
+    containerClass = "bg-card/40 backdrop-blur-3xl border border-border shadow-lg";
+  } else if (styleMode === 'liquid-glass') {
+    containerClass = "bg-card/20 backdrop-blur-3xl border border-border shadow-lg";
   } else if (styleMode === 'minimal') {
     containerClass = "bg-card border-2 border-border";
   }

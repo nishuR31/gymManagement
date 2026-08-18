@@ -34,10 +34,11 @@ export function GlobalSettingsOverlay() {
   };
 
   const ThemeIcon = () => {
-    if (theme === 'system') return <Monitor size={20} color={colors?.foreground || '#fff'} />;
-    if (theme === 'light') return <Sun size={20} color={colors?.foreground || '#fff'} />;
-    if (theme === 'dark') return <Moon size={20} color={colors?.foreground || '#fff'} />;
-    return <MoonStar size={20} color={colors?.foreground || '#fff'} />;
+    const fallback = theme === 'light' ? '#000' : '#fff';
+    if (theme === 'system') return <Monitor size={20} color={colors?.foreground || fallback} />;
+    if (theme === 'light') return <Sun size={20} color={colors?.foreground || fallback} />;
+    if (theme === 'dark') return <Moon size={20} color={colors?.foreground || fallback} />;
+    return <MoonStar size={20} color={colors?.foreground || fallback} />;
   };
 
   let buttonClass = "p-3 rounded-full items-center justify-center bg-card border border-border";
@@ -45,7 +46,9 @@ export function GlobalSettingsOverlay() {
   if (styleMode === 'clay') {
     buttonClass = "p-3 rounded-full items-center justify-center bg-card shadow-[0_4px_16px_rgba(0,0,0,0.2)]";
   } else if (styleMode === 'glass') {
-    buttonClass = "p-3 rounded-full items-center justify-center bg-black/10 border border-white/10";
+    buttonClass = "p-3 rounded-full items-center justify-center bg-card/40 border border-border";
+  } else if (styleMode === 'liquid-glass') {
+    buttonClass = "p-3 rounded-full items-center justify-center bg-card/20 border border-border";
   } else if (styleMode === 'minimal') {
     buttonClass = "p-3 rounded-full items-center justify-center bg-card border-2 border-border";
   }
@@ -70,7 +73,7 @@ export function GlobalSettingsOverlay() {
           activeOpacity={0.7}
         >
           <Animated.View style={{ transform: [{ rotate: spin }] }}>
-            <Settings size={20} color={colors?.foreground || '#fff'} />
+            <Settings size={20} color={colors?.foreground || (theme === 'light' ? '#000' : '#fff')} />
           </Animated.View>
         </TouchableOpacity>
       </View>

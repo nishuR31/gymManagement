@@ -115,7 +115,7 @@ export function ScannerScreen() {
       <View className="flex-1 rounded-2xl overflow-hidden mt-4" style={{ backgroundColor: colors.secondary }}>
         {isFocused && (
           <CameraView
-            style={StyleSheet.absoluteFill}
+            style={{ flex: 1 }}
             facing="back"
             onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
             barcodeScannerSettings={{
