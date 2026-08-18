@@ -1,7 +1,7 @@
 # Native App — Context
 
 ## Status
-Active development. UI/UX fixes in progress.
+Active development. UI/UX polish in progress (Session 2026-08-19).
 
 ## Stack
 - React Native + Expo (bare managed)
@@ -14,25 +14,40 @@ Active development. UI/UX fixes in progress.
 ## Theme System
 - 3 themes: `light`, `dark`, `amoled` — Redux `state.theme.theme`
 - 4 style modes: `minimal`, `glass`, `clay`, `liquid-glass` — Redux `state.theme.styleMode`
-- NativeWind color vars: `text-foreground`, `bg-background`, `bg-card`, `text-muted-foreground`, etc.
-- Direct style: `colors.foreground`, `colors.background`, `colors.card`, etc. from `useTheme()` hook
-- `themeColors` constant in `src/constants/colors.ts` — light/dark/amoled palettes
-- **High-Level UI/UX Professionalization Rule (Theme Inversion Fix)**: NativeWind v4 CSS variables (e.g., `bg-card`, `text-foreground`) can fail to cascade reliably on React Native when toggling themes, resulting in dark components in light mode or eye-straining white components. **Always use explicit inline styles for colors** (e.g., `style={{ backgroundColor: colors.card, color: colors.foreground }}`) derived from `useTheme().colors` on core primitive components (`Card`, `Button`, `Input`, `PageHeader`, `ScreenWrapper`) instead of relying solely on Tailwind CSS classes for dynamic coloring.
+- **Source of truth**: `global.css` CSS variables → Tailwind classes (`text-foreground`, `bg-background`, etc.)
+- **For icons/inline styles only**: `useTheme().colors` object (synced with global.css)
+- **Rule**: Use Tailwind semantic classes for all text/bg. Use `colors.xxx` only for lucide icon `color=` props and unavoidable inline styles.
+- **Transparent overlays**: On image backgrounds use `text-white` / `text-white/60` directly (not theme tokens) — see Footer transparent mode.
 
 ## Key Files
-- `App.tsx` — root navigator, `<Toaster />` outside navigator
-- `src/constants/colors.ts` — `themeColors` object (light/dark/amoled palettes)
-- `src/components/ui/Input.tsx` — theme-aware input: `isDark ? bg-white/10 : bg-black/5`. Uses `useTheme()`. Text color via inline style.
-- `src/components/ui/Card.tsx` — glass/clay/minimal/default variants; uses `colors.card`; Android glass fallback at `rgba(*,*,0.92)` light / `rgba(*,*,0.90)` dark
-- `src/components/ui/Toaster.tsx` — global toast config; positioned `topOffset` from safe area insets
-- `src/components/layout/Footer.tsx` — brand + quick links + legal section. Email link: `Linking.openURL('mailto:contact@valorfitness.com')`.
-- `src/components/layout/AppDock.tsx` — renders `FloatingDock` or `PublicFloatingDock`
-- `src/features/public/publicApi.ts` — `listPublicPlans()`, `submitPublicInquiry()`
-- `src/features/members/memberApi.ts` — CRUD + QR + login; phone sent combined (prefix+number)
-- `src/features/memberships/membershipApi.ts` — `cancelSubscription(memberId, subscriptionId)`
+- `App.tsx` — root navigator; `<Toaster />` and `<GlobalSettingsOverlay />` are outside navigator
+- `global.css` — CSS variable definitions for all themes (light/dark/amoled)
+- `tailwind.config.js` — maps CSS vars to Tailwind color tokens
+- `src/hooks/useTheme.ts` — `colors` object for icon/inline use; also exports `isDark`, `theme`, `styleMode`
+- `src/components/ui/Input.tsx` — theme-aware; uses `isDark` for bg rgba
+- `src/components/ui/Card.tsx` — `bg-card border-border`; glass/clay/minimal/default variants
+- `src/components/ui/SectionBackground.tsx` — full-bleed image bg with dark overlay; no horizontal fade bands
+- `src/components/ui/Toaster.tsx` — global toast; positioned top-right, pushed left with `pr-24 md:pr-32` to avoid settings overlay overlap
+- `src/components/layout/Footer.tsx` — supports `transparent` prop: forces `text-white`/`text-white/60` on image backgrounds
+- `src/components/layout/AppDock.tsx` — renders `FloatingDock` (auth) or `PublicFloatingDock` (public)
+- `src/components/layout/FloatingDock.tsx` — icon color uses `colors.mutedForeground` (not `colors.muted`) for inactive items
+- `src/components/layout/PublicFloatingDock.tsx` — same icon fix; `colors.mutedForeground` for inactive
+- `src/components/layout/GlobalSettingsOverlay.tsx` — positioned `right: 32` to avoid scrollbar overlap
+- `src/components/layout/ScreenWrapper.tsx` — renders `<AppDock />` for screens inside the stack
+- `src/pages/PublicHomeScreen.tsx` — renders own `<AppDock />` (not in ScreenWrapper); bottom section has no `bg-background` so image bleeds into footer
+- `src/pages/MemberLoginScreen.tsx` — renders own `<AppDock />`
+- `src/features/staff/staffApi.ts` — Plans endpoints: `/plans/workout-templates`, `/plans/diet-templates` (require auth token)
+- `src/features/public/publicApi.ts` — `listPublicPlans()`, `submitPublicInquiry()` (no auth required)
+- `src/features/members/memberApi.ts` — CRUD + QR + login
+- `src/services/api.ts` — axios instance; base URL from `EXPO_PUBLIC_API_URL` or AsyncStorage override
+
+## AppDock Architecture
+- **NOT global in App.tsx** — React Navigation requires `useRoute()` to be inside a screen
+- `ScreenWrapper` renders `<AppDock />` for all internal screens
+- `PublicHomeScreen` and `MemberLoginScreen` render `<AppDock />` directly (they don't use ScreenWrapper)
+- **If adding new pages that don't use ScreenWrapper**, manually add `<AppDock />` at the bottom of the return
 
 ## Error Parsing Pattern (standard)
-All forms use this helper to extract API error messages:
 ```ts
 function parseApiError(error: any): string {
   const data = error?.response?.data;
@@ -43,86 +58,30 @@ function parseApiError(error: any): string {
   return 'An unexpected error occurred. Please try again.';
 }
 ```
-Toast pattern: `{ text1: 'Short title', text2: parseApiError(error), visibilityTime: 5000 }`
 
-## Strong Password Regex (active in ChangePasswordModal)
+## ✅ Fixed This Session
+1. **AppDock crashes** — `useRoute()` crash fixed: AppDock stays inside ScreenWrapper (not App.tsx root); public pages render their own AppDock
+2. **Dock icon colors** — Changed `colors.muted` → `colors.mutedForeground` for inactive icons in both FloatingDock and PublicFloatingDock
+3. **SectionBackground horizontal lines** — Removed top/bottom `bg-background/80 backdrop-blur-xl` bands
+4. **Footer on image bg** — Footer uses `transparent` prop; text → `text-white`/`text-white/60`; seamlessly bleeds into last image section
+5. **Toast position** — Pushed left with `pr-24 md:pr-32` to avoid settings icons overlap
+6. **Settings overlay position** — Moved `right: 16` → `right: 32` to clear browser scrollbar
+7. **Button layout shift** — Added explicit `minHeight` via inline `style` prop so loading spinner swap doesn't resize button
+8. **Plans → auth-only** — Removed `Plans` nav item from `PublicFloatingDock`; public CTAs now navigate to `MemberLogin` or `Login`
+9. **Homepage complete rework** — 3 seamless full-bleed `ImageBackground` sections (hero / experience / training + cta). No `bg-background` breaks. All text is white with opacity. Dark gradient overlays on each section. Feature chips use glassmorphism (`rgba(255,255,255,0.10)` bg + `border-white/15`). Footer embedded inside last section image. Contact form embedded in section 2 with translucent card.
+
+## ⚠️ Still Needs Attention
+- **Plans screen empty** — `PlansScreen` calls `/plans/workout-templates` which requires a staff auth Bearer token. Must be logged in as staff/admin.
+- **Web CSS gradients** — `ImageBackground` on web doesn't support CSS `linear-gradient` in `style`. The gradient overlay currently uses a flat `rgba` fallback. For web, a proper `<View style={{ background: 'linear-gradient(...)' }}` overlay would be more accurate.
+- **Remaining `colors.xxx` inline styles** — ~30 components still use legacy inline `colors.xxx` for text/bg instead of Tailwind classes (non-breaking).
+- **Passkey flow** — Simulated (no real WebAuthn on mobile RN)
+- **Staff creation UX** — Requires user UUID; no email-lookup endpoint
+
+## Phone Prefix Pattern (MemberFormModal)
+- Default: `+91`; combined: `${phonePrefix}${phone}` → `+919876543210`
+- `extractPhoneNumber(fullPhone)` splits on edit mode
+
+## Strong Password Regex
 ```
 /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
 ```
-Requires: min 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 special char.
-
-## Phone Prefix Pattern (MemberFormModal)
-- Dropdown: `PHONE_PREFIXES = ['+91', '+1', '+44', '+971', ...]`
-- Default: `+91`
-- Combined value sent: `${phonePrefix}${phone}` (e.g., `+919876543210`)
-- `extractPhoneNumber(fullPhone)` splits on edit mode
-
-## Completed Fixes (this session)
-
-### 1. DownloadAppScreen
-- Removed `LiquidGlassPanel` floating toolbar (ThemeToggle + LiquidMetalButton)
-- Removed unused imports; page is clean scroll content only
-- Improved Android security disclaimer copy
-
-### 2. SettingsScreen — confirmed correct ✓
-- Theme toggle is in PageHeader actions at top
-- `liquid-glass` is one of the 4 style buttons
-- No changes needed
-
-### 3. MemberFormModal
-- Added `+91` phone prefix dropdown (with common international codes)
-- Combined prefix+number sent to API
-- Precise error extraction via `parseApiError()`; shown as `text2` with 5s visibility
-- All text/bg explicitly `style={{ color: colors.X }}`
-- `<Toast />` inside modal (Android-safe)
-
-### 4. StaffFormModal
-- Role input → dropdown picker for STAFF/TRAINER/MANAGER/ADMIN
-- `parseApiError()` for precise error messages
-- Added helper tip about needing the user UUID
-- `<Toast />` inside modal
-
-### 5. MemberLoginScreen
-- Full theme-aware: all containers use `style={{ backgroundColor: activeColors.background }}`
-- Input labels, text, border all use `activeColors.*` directly
-- Better error messages for: `2FA_REQUIRED`, `NOT_A_MEMBER`, `INVALID_CREDENTIALS`, generic
-- `<Toast />` inside screen for on-top rendering
-- Email/password placeholders added
-
-### 6. PublicHomeScreen
-- Added membership plans section fetching from `publicApi.listPublicPlans()`
-  - Price displayed via `formatCents()`; plan features listed with Star icons
-  - "Most Popular" badge on first plan
-- Live clock: `setInterval(1000)` updating `now` state; time refreshes every second
-- Calendar: press-toggle instead of hover (mobile-compatible)
-- Calendar correctly computes first-day offset and correct number of days per month
-- Better inquiry form error messages and placeholder text
-
-### 7. Footer
-- Email contact: `Linking.openURL('mailto:contact@valorfitness.com')` with Mail icon
-- Gaps tightened (mb-8→mb-6, mb-4→mb-3)
-- Dock spacer: `h-14` → `h-10`
-
-### 8. Card (glass mode contrast)
-- Android glass fallback: light `rgba(255,255,255,0.92)` (was 0.85), dark `rgba(25,25,25,0.90)` (was 0.85)
-
-### 9. ChangePasswordModal — strong password already enforced ✓
-- Schema already has strong regex — no change needed
-
-### 10. MembersScreen — cancel subscription ✓
-- `handleCancelSubscription()` + "Cancel Membership" button already implemented for admins — no change needed
-
-### 11. High-Level PR UI/UX Professionalize (Theme Inversion Fix)
-- **Problem**: NativeWind v4 variables failed to cascade correctly during theme toggling, causing "eye-straining white text on white backgrounds" and inverted light/dark components.
-- **Solution**: Refactored core primitives to use explicit `style={{ color: colors.X, backgroundColor: colors.Y }}` from `useTheme()`.
-- **Affected Components**:
-  - `Button.tsx` (fully refactored all variants to use `bgStyle` and `textStyle` objects)
-  - `Card.tsx` (`CardTitle` text color explicitly set to `colors.foreground`)
-  - `Input.tsx` (Label and error text explicitly set to `mutedForeground` and `destructive`)
-  - `ScreenWrapper.tsx` (`PageHeader` and `SectionTitle` text colors explicitly mapped)
-
-## Identified Known Issues (future work)
-- Staff creation requires user UUID — poor UX; consider email-lookup endpoint
-- `ChangePasswordModal` uses `presentationStyle="pageSheet"` which may clip Toast on iOS in some cases
-- Passkey flow in MemberLoginScreen is simulated (no real WebAuthn on mobile RN)
-- PublicHomeScreen plans: no client-side cache, re-fetches on every mount

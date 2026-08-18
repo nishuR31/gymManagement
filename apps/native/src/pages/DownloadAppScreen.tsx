@@ -116,7 +116,7 @@ export function DownloadAppScreen() {
                 {platform === 'ios' ? (
                   <>
                     {/* iOS Dynamic Island */}
-                    <View className="absolute top-3 w-[110px] h-[32px] bg-black rounded-full z-20 flex-row items-center justify-between px-3" style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.5, shadowRadius: 4 }}>
+                    <View className="absolute top-3 w-[110px] h-[32px] bg-black rounded-full z-20 flex-row items-center justify-between px-3" style={{ boxShadow: '0px 2px 4px rgba(0,0,0,0.5)' }}>
                       <View className="w-[10px] h-[10px] rounded-full bg-zinc-800" />
                       <View className="w-[10px] h-[10px] rounded-full bg-[#0a0a0a] border border-zinc-900 shadow-[inset_0_0_4px_rgba(255,255,255,0.1)]" />
                     </View>
@@ -175,7 +175,7 @@ export function DownloadAppScreen() {
             <View className="w-full lg:w-1/2 p-4 rounded-xl border border-warning/30" style={{ backgroundColor: `${colors.warning}10` }}>
               <Text className="text-warning font-bold text-sm mb-1 uppercase tracking-widest">Security Notice</Text>
               <Text style={{ color: colors.mutedForeground }} className="text-xs leading-relaxed">
-                As this app is not yet available on the Google Play Store, your device may warn you about installing apps from unknown sources. This is a standard Android security measure. Our APK is perfectly safe, signed, and malware-free. No security risk — Android requires this scan for all apps installed outside the Play Store.
+                As this app is not yet available on the Google Play Store, your device may warn you about installing apps from unknown sources. This is a standard Android security measure. No security issues. Please read Privacy Policy. Safe to use, accept scan and download. No risk in downloading.
               </Text>
             </View>
           </View>

@@ -1,13 +1,12 @@
-import React from 'react';
 import { View, Text, Modal, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, Pressable } from 'react-native';
 import { X, RefreshCw, Sun, Moon, MoonStar, HardDrive } from 'lucide-react-native';
 import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { useAppSelector, useAppDispatch } from '../store/hooks';
-import { themeColors } from '../constants/colors';
-import { setTheme, setStyleMode, type Theme, type StyleMode } from '../features/theme/themeSlice';
+import { setTheme, setStyleMode } from '../features/theme/themeSlice';
 import { Button } from './ui/Button';
+import { useTheme } from '../hooks/useTheme';
 
 interface ApiSettingsModalProps {
   visible: boolean;
@@ -18,18 +17,18 @@ export function ApiSettingsModal({ visible, onClose }: ApiSettingsModalProps) {
   const dispatch = useAppDispatch();
   const theme = useAppSelector((state) => state.theme.theme);
   const styleMode = useAppSelector((state) => state.theme.styleMode);
-  const activeColors = themeColors[theme === 'dark' || theme === 'amoled' ? 'dark' : 'light'];
-  
+  const { colors } = useTheme() || {};
+
   const handleClearCache = async () => {
     try {
       const currentTheme = await AsyncStorage.getItem('gymos-theme');
       const currentStyle = await AsyncStorage.getItem('gymos-style');
-      
+
       await AsyncStorage.clear();
-      
+
       if (currentTheme) await AsyncStorage.setItem('gymos-theme', currentTheme);
       if (currentStyle) await AsyncStorage.setItem('gymos-style', currentStyle);
-      
+
       Toast.show({ type: 'success', text1: 'Cache cleared successfully!' });
       onClose();
     } catch (e) {
@@ -40,13 +39,13 @@ export function ApiSettingsModal({ visible, onClose }: ApiSettingsModalProps) {
   return (
     <Modal visible={visible} animationType="slide" transparent>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} className="flex-1">
-        <Pressable className={`flex-1 justify-end bg-black/60 ${theme === 'dark' || theme === 'amoled' ? 'dark' : ''} ${theme === 'amoled' ? 'amoled' : ''} theme-${styleMode}`} onPress={onClose}>
+        <Pressable className={`flex-1 justify-end bg-black/60`} onPress={onClose}>
           <View className="bg-card rounded-t-3xl overflow-hidden pt-4 pb-10 px-6 max-h-[80%]" onStartShouldSetResponder={() => true}>
-            
+
             <View className="flex-row items-center justify-between mb-6">
               <Text className="text-xl font-bold text-foreground">Valor Fitness Settings</Text>
               <TouchableOpacity onPress={onClose} className="p-2 bg-secondary rounded-full">
-                <X size={20} color={activeColors.foreground} />
+                <X size={20} color={colors?.foreground || '#fff'} />
               </TouchableOpacity>
             </View>
 
@@ -55,7 +54,7 @@ export function ApiSettingsModal({ visible, onClose }: ApiSettingsModalProps) {
               <View className="mb-6 p-4 rounded-xl border border-border bg-card shadow-sm">
                 <View className="flex-row items-center gap-3 mb-3">
                   <View className="p-2 bg-primary/10 rounded-md">
-                    {theme === 'amoled' ? <MoonStar size={20} color={activeColors.primary} /> : theme === 'dark' ? <Moon size={20} color={activeColors.primary} /> : <Sun size={20} color={activeColors.primary} />}
+                    {theme === 'amoled' ? <MoonStar size={20} color={colors?.primary || '#fff'} /> : theme === 'dark' ? <Moon size={20} color={colors?.primary || '#fff'} /> : <Sun size={20} color={colors?.primary || '#fff'} />}
                   </View>
                   <Text className="text-lg font-bold text-foreground">Color Scheme</Text>
                 </View>
@@ -79,7 +78,7 @@ export function ApiSettingsModal({ visible, onClose }: ApiSettingsModalProps) {
               <View className="mb-6 p-4 rounded-xl border border-border bg-card shadow-sm">
                 <View className="flex-row items-center gap-3 mb-3">
                   <View className="p-2 bg-primary/10 rounded-md">
-                    <Sun size={20} color={activeColors.primary} />
+                    <Sun size={20} color={colors?.primary || '#fff'} />
                   </View>
                   <Text className="text-lg font-bold text-foreground">Styling Paradigm</Text>
                 </View>
@@ -106,14 +105,14 @@ export function ApiSettingsModal({ visible, onClose }: ApiSettingsModalProps) {
               <View className="mb-6 p-4 rounded-xl border border-border bg-card shadow-sm">
                 <View className="flex-row items-center gap-3 mb-3">
                   <View className="p-2 bg-primary/10 rounded-md">
-                    <HardDrive size={20} color={activeColors.primary} />
+                    <HardDrive size={20} color={colors?.primary || '#fff'} />
                   </View>
                   <Text className="text-lg font-bold text-foreground">Troubleshooting</Text>
                 </View>
                 <Text className="text-xs text-muted-foreground mb-4">
                   If the app shows stale data, clearing cache forces it to reload.
                 </Text>
-                <Button onPress={handleClearCache} className="w-full h-11" leftIcon={<RefreshCw size={16} color={activeColors.primaryForeground} />}>
+                <Button onPress={handleClearCache} className="w-full h-11" leftIcon={<RefreshCw size={16} color={colors?.primaryForeground || '#000'} />}>
                   Clear Cache & Reload App
                 </Button>
               </View>

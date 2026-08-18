@@ -1,19 +1,11 @@
-import React, { useRef, useState } from 'react';
-import {
-  TextInput,
-  TextInputProps,
-  View,
-  Text,
-  TouchableOpacity,
-  Animated,
-} from 'react-native';
+import { useState } from 'react';
+import { TextInput, TextInputProps, View, Text, TouchableOpacity } from 'react-native';
 import { Eye, EyeOff } from 'lucide-react-native';
 import { useTheme } from '../../hooks/useTheme';
 
 interface InputProps extends TextInputProps {
   label?: string;
   error?: string;
-  /** Optional icon rendered on the left side inside the input */
   leftIcon?: React.ReactNode;
   className?: string;
 }
@@ -21,39 +13,18 @@ interface InputProps extends TextInputProps {
 export function Input({
   label,
   error,
-  className,
+  className = '',
   secureTextEntry,
   leftIcon,
   onFocus,
   onBlur,
   ...props
 }: InputProps) {
-  const { styleMode, colors, isDark } = useTheme();
+  const { isDark } = useTheme();
   const [isFocused, setIsFocused] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
-  // ── Container border class by styleMode + state ──
-  let containerClass = `flex-row overflow-hidden ${props.multiline ? 'items-start pt-3 pb-3' : 'items-center h-12'} `;
-  const bgClass = isDark ? 'bg-white/10' : 'bg-black/5';
-  const glassBgClass = isDark ? 'bg-white/10' : 'bg-white/40';
-
-  if (styleMode === 'clay') {
-    containerClass += isFocused
-      ? `rounded-2xl border-2 border-primary ${bgClass} shadow-md`
-      : `rounded-2xl border-2 border-transparent ${bgClass} shadow-sm`;
-  } else if (styleMode === 'glass' || styleMode === 'liquid-glass') {
-    containerClass += isFocused
-      ? `rounded-xl border border-primary ${glassBgClass}`
-      : `rounded-xl border border-white/10 ${glassBgClass}`;
-  } else if (styleMode === 'minimal') {
-    containerClass += isFocused
-      ? 'rounded-none border-b-2 border-primary bg-transparent'
-      : 'rounded-none border-b border-border bg-transparent';
-  } else {
-    containerClass += isFocused
-      ? `rounded-lg border border-primary ${bgClass}`
-      : `rounded-lg border border-input ${bgClass}`;
-  }
+  let containerClass = `flex-row overflow-hidden rounded-[8px] bg-black/5 dark:bg-white/5 border ${isFocused ? 'border-primary' : 'border-input'} ${props.multiline ? 'items-start pt-3 pb-3' : 'items-center h-12'}`;
 
   if (error) {
     containerClass += ' border-destructive border';
@@ -61,23 +32,26 @@ export function Input({
 
   const isSecure = secureTextEntry && !isPasswordVisible;
 
+  // React Native color fallback for placeholder/icons since lucide requires literal strings
+  const mutedColor = isDark ? '#A8A29E' : '#78716C'; 
+
   return (
     <View className="mb-4">
       {label ? (
-        <Text className="mb-1.5 text-sm font-medium" style={{ color: colors.mutedForeground }}>
+        <Text className="mb-1.5 text-sm font-medium text-muted-foreground">
           {label}
         </Text>
       ) : null}
 
-      <View className={`${containerClass} ${className || ''}`}>
+      <View className={`${containerClass} ${className}`}>
         {leftIcon ? (
           <View className="pl-3 pr-1">{leftIcon}</View>
         ) : null}
 
         <TextInput
-          className={`flex-1 text-sm ${leftIcon ? 'pl-1' : 'pl-3'} ${secureTextEntry ? 'pr-10' : 'pr-3'} ${props.multiline ? 'min-h-[60px]' : 'h-full'}`}
-          style={[{ color: colors.foreground, backgroundColor: 'transparent', textAlignVertical: props.multiline ? 'top' : 'center', outlineStyle: 'none' } as any, props.style]}
-          placeholderTextColor={colors.mutedForeground}
+          className={`flex-1 text-sm text-foreground bg-transparent outline-none ${leftIcon ? 'pl-1' : 'pl-3'} ${secureTextEntry ? 'pr-10' : 'pr-3'} ${props.multiline ? 'min-h-[60px]' : 'h-full'}`}
+          style={{ textAlignVertical: props.multiline ? 'top' : 'center', outlineStyle: 'none' } as any}
+          placeholderTextColor={mutedColor}
           secureTextEntry={isSecure}
           underlineColorAndroid="transparent"
           onFocus={(e) => {
@@ -99,16 +73,16 @@ export function Input({
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
             {isPasswordVisible ? (
-              <EyeOff size={18} color={colors.mutedForeground} />
+              <EyeOff size={18} color={mutedColor} />
             ) : (
-              <Eye size={18} color={colors.mutedForeground} />
+              <Eye size={18} color={mutedColor} />
             )}
           </TouchableOpacity>
         )}
       </View>
 
       {error ? (
-        <Text className="mt-1 text-xs" style={{ color: colors.destructive }}>{error}</Text>
+        <Text className="mt-1 text-xs text-destructive">{error}</Text>
       ) : null}
     </View>
   );

@@ -73,7 +73,7 @@ export function StaffScreen() {
         subtitle="Manage staff accounts and permissions"
         actions={
           <Button variant="primary" size="sm" onPress={() => setIsStaffFormVisible(true)}>
-            <Text className="text-white font-bold">+ Staff</Text>
+            + Staff
           </Button>
         }
       />

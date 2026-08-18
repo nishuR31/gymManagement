@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Layers, Moon, Sun, Monitor, Smartphone, Droplet, Box, Type } from 'lucide-react-native';
 import { useTheme } from '../../hooks/useTheme';
 import { useAppDispatch } from '../../store/hooks';
@@ -18,7 +18,7 @@ export const ThemeToggle = React.memo(function ThemeToggle() {
   };
 
   return (
-    <View className="rounded-3xl p-5 border mt-4" style={[styles.shadow, { backgroundColor: colors.card, borderColor: colors.border }]}>
+    <View className="rounded-3xl p-5 border mt-4 shadow-sm" style={{ backgroundColor: colors.card, borderColor: colors.border }}>
       
       {/* ── Section A: Color Scheme ── */}
       <Text className="font-black text-lg mb-4" style={{ color: colors.foreground }}>Color Engine</Text>
@@ -151,12 +151,4 @@ export const ThemeToggle = React.memo(function ThemeToggle() {
   );
 });
 
-const styles = StyleSheet.create({
-  shadow: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-});
+

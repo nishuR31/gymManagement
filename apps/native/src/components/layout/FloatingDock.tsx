@@ -70,8 +70,9 @@ export function FloatingDock() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
-
   const currentRoute = route.name;
+
+
   const isAdmin = user?.role === 'SUPER_ADMIN' || user?.role === 'ADMIN';
   
   const FLOATING_DOCK_HEIGHT = isMobile ? 56 : 64;
@@ -85,16 +86,8 @@ export function FloatingDock() {
 
     return (
       <TouchableOpacity
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'center',
-          height: 44,
-          paddingHorizontal: 14,
-          gap: 6,
-          borderRadius: 22,
-          backgroundColor: isActive ? `${colors.primary}22` : 'transparent',
-        }}
+        className={`flex-row items-center justify-center h-11 px-3.5 rounded-full ${isActive ? 'bg-primary/10' : ''}`}
+        style={{ gap: 6 }}
         onPress={() => {
           setIsMenuOpen(false);
           if (currentRoute !== targetRoute) navigation.navigate(targetRoute);
@@ -103,13 +96,7 @@ export function FloatingDock() {
       >
         <Icon size={20} color={isActive ? colors.primary : colors.mutedForeground} />
         {showText && (
-          <Text
-            style={{
-              color: isActive ? colors.primary : colors.mutedForeground,
-              fontWeight: '600',
-              fontSize: 14,
-            }}
-          >
+          <Text className={`font-semibold text-sm ${isActive ? 'text-primary' : 'text-muted-foreground'}`}>
             {label}
           </Text>
         )}
@@ -122,15 +109,10 @@ export function FloatingDock() {
     const isPinned = pinnedRoutes.includes(targetRoute);
 
     return (
-      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 2, backgroundColor: isActive ? `${colors.primary}18` : 'transparent', borderRadius: 12 }}>
+      <View className={`flex-row items-center mb-0.5 rounded-xl ${isActive ? 'bg-primary/10' : ''}`}>
         <TouchableOpacity
-          style={{
-            flex: 1,
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 12,
-            padding: 14,
-          }}
+          className="flex-1 flex-row items-center p-3.5"
+          style={{ gap: 12 }}
           onPress={() => {
             setIsMenuOpen(false);
             if (currentRoute !== targetRoute) navigation.navigate(targetRoute);
@@ -138,13 +120,7 @@ export function FloatingDock() {
           activeOpacity={0.7}
         >
           <Icon size={20} color={isActive ? colors.primary : colors.foreground} />
-          <Text
-            style={{
-              color: isActive ? colors.primary : colors.foreground,
-              fontSize: 15,
-              fontWeight: isActive ? '700' : '500',
-            }}
-          >
+          <Text className={`text-[15px] ${isActive ? 'font-bold text-primary' : 'font-medium text-foreground'}`}>
             {name}
           </Text>
         </TouchableOpacity>
@@ -160,46 +136,26 @@ export function FloatingDock() {
     );
   };
 
-  let containerStyle: any = {
-    position: 'absolute',
-    bottom: dockBottom,
-    alignSelf: 'center',
-    height: FLOATING_DOCK_HEIGHT,
-    borderRadius: FLOATING_DOCK_HEIGHT / 2,
-    backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.border,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 8,
-    gap: 12,
-  };
-
-  let containerClass = "elevation-12 shadow-sm";
+  let containerClass = "bg-card border border-border shadow-sm";
 
   if (styleMode === 'clay') {
-    containerStyle.borderWidth = 0;
-    containerClass = "shadow-[0_15px_40px_rgba(0,0,0,0.25)]";
-    containerStyle.shadowColor = '#000';
-    containerStyle.shadowOffset = { width: 0, height: 12 };
-    containerStyle.shadowOpacity = 0.3;
-    containerStyle.shadowRadius = 24;
-    containerStyle.elevation = 16;
+    containerClass = "bg-card shadow-[0_15px_40px_rgba(0,0,0,0.25)]";
   } else if (styleMode === 'glass') {
     containerClass = "bg-background/40 backdrop-blur-3xl border border-white/10 shadow-lg shadow-black/20";
-    containerStyle.backgroundColor = 'transparent';
   } else if (styleMode === 'minimal') {
-    containerStyle.borderRadius = 0;
-    containerStyle.borderWidth = 2;
-    containerClass = "shadow-none";
+    containerClass = "bg-card border-2 border-border";
   }
 
   return (
     <>
       <View
-        className={containerClass}
-        style={containerStyle}
+        className={`absolute self-center flex-row items-center justify-center px-2 ${containerClass}`}
+        style={{
+          bottom: dockBottom,
+          height: FLOATING_DOCK_HEIGHT,
+          borderRadius: FLOATING_DOCK_HEIGHT / 2,
+          gap: 12,
+        }}
       >
         {/* Backend Pinger Dot (Blue/Orange) */}
         <PulsingDot
@@ -208,7 +164,7 @@ export function FloatingDock() {
           accessibilityLabel={isBackendOnline ? 'Server Online' : 'Server Offline'}
         />
 
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <View className="flex-row items-center">
           <NavItem icon={Home} targetRoute="Home" label="Home" />
         </View>
 
@@ -221,26 +177,13 @@ export function FloatingDock() {
         </ScrollView>
 
         <TouchableOpacity
-          style={{
-            height: 44,
-            paddingHorizontal: 18,
-            borderRadius: 22,
-            backgroundColor: colors.primary,
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 8,
-          }}
+          className="h-11 px-4 rounded-full bg-primary flex-row items-center"
+          style={{ gap: 8 }}
           onPress={() => setIsMenuOpen(true)}
           activeOpacity={0.8}
         >
           <Menu size={18} color={colors.primaryForeground} />
-          <Text
-            style={{
-              color: colors.primaryForeground,
-              fontWeight: '700',
-              fontSize: 14,
-            }}
-          >
+          <Text className="text-primary-foreground font-bold text-sm">
             More
           </Text>
         </TouchableOpacity>
@@ -262,20 +205,18 @@ export function FloatingDock() {
         <View style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <Pressable style={{ flex: 1 }} onPress={() => setIsMenuOpen(false)} />
           <View
+            className="bg-card rounded-t-[32px] p-6"
             style={{
-              backgroundColor: colors.card,
-              borderTopLeftRadius: 32,
-              borderTopRightRadius: 32,
-              padding: 24,
               paddingBottom: Math.max(insets.bottom, 24),
               maxHeight: '80%',
+              boxShadow: '0px -4px 20px rgba(0,0,0,0.15)',
             }}
           >
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-              <Text style={{ fontSize: 20, fontWeight: '900', color: colors.foreground }}>Menu</Text>
+            <View className="flex-row items-center justify-between mb-5">
+              <Text className="text-xl font-black text-foreground">Menu</Text>
               <TouchableOpacity
                 onPress={() => setIsMenuOpen(false)}
-                style={{ width: 36, height: 36, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.secondary, borderRadius: 18 }}
+                className="w-9 h-9 items-center justify-center bg-secondary rounded-full"
               >
                 <X size={18} color={colors.foreground} />
               </TouchableOpacity>
@@ -283,11 +224,11 @@ export function FloatingDock() {
 
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 20 }}>
               <View style={{ gap: 4 }}>
-                <Text style={{ fontSize: 12, fontWeight: '800', textTransform: 'uppercase', color: colors.mutedForeground, letterSpacing: 1, marginTop: 8, marginBottom: 8, paddingHorizontal: 4 }}>Core</Text>
+                <Text className="text-xs font-extrabold uppercase text-muted-foreground tracking-widest mt-2 mb-2 px-1">Core</Text>
                 <MenuItem name="Dashboard" icon={LayoutDashboard} targetRoute="Dashboard" />
                 <MenuItem name="Attendance" icon={Activity} targetRoute="Attendance" />
                 
-                <Text style={{ fontSize: 12, fontWeight: '800', textTransform: 'uppercase', color: colors.mutedForeground, letterSpacing: 1, marginTop: 16, marginBottom: 8, paddingHorizontal: 4 }}>Operations</Text>
+                <Text className="text-xs font-extrabold uppercase text-muted-foreground tracking-widest mt-4 mb-2 px-1">Operations</Text>
                 <MenuItem name="Members" icon={Users} targetRoute="Members" />
                 {isAdmin && <MenuItem name="Memberships" icon={CreditCard} targetRoute="Memberships" />}
                 {isAdmin && <MenuItem name="Plans" icon={NotebookText} targetRoute="Plans" />}
@@ -296,7 +237,7 @@ export function FloatingDock() {
                 <MenuItem name="Scanner" icon={Scan} targetRoute="Scanner" />
                 <MenuItem name="Payments" icon={CreditCard} targetRoute="Payments" />
                 
-                <Text style={{ fontSize: 12, fontWeight: '800', textTransform: 'uppercase', color: colors.mutedForeground, letterSpacing: 1, marginTop: 16, marginBottom: 8, paddingHorizontal: 4 }}>Management</Text>
+                <Text className="text-xs font-extrabold uppercase text-muted-foreground tracking-widest mt-4 mb-2 px-1">Management</Text>
                 <MenuItem name="Reports" icon={PieChart} targetRoute="Reports" />
                 <MenuItem name="Redlist" icon={AlertTriangle} targetRoute="Redlist" />
                 {isAdmin && <MenuItem name="Staff" icon={ShieldCheck} targetRoute="Staff" />}

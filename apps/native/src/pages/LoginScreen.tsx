@@ -13,11 +13,12 @@ import { Footer } from '../components/layout/Footer';
 import { loginThunk, logoutThunk } from '../features/auth/authSlice';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { APP_NAME } from '../utils/env';
-import { themeColors } from '../constants/colors';
+import { useTheme } from '../hooks/useTheme';
+import { AppDock } from '../components/layout/AppDock';
 
 
 const emailSchema = z.object({ email: z.string().email("Enter a valid email") });
-const passwordSchema = z.object({ password: z.string().min(8, "Password must be at least 8 characters") });
+const passwordSchema = z.object({ password: z.string().min(8, "Password must be at least 8 characters").regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$/, "Password must be strong") });
 const codeSchema = z.object({ code: z.string().min(4, "Enter valid code") });
 
 type EmailFormValues = z.infer<typeof emailSchema>;
@@ -29,8 +30,12 @@ export function LoginScreen({ navigation }: any) {
   const dispatch = useAppDispatch();
   const { width } = useWindowDimensions();
   const isTablet = width >= 768;
-  const theme = useAppSelector((state) => state.theme.theme);
-  const activeColors = themeColors[theme === 'amoled' ? 'amoled' : theme === 'dark' ? 'dark' : 'light'];
+  const { isDark } = useTheme();
+
+  const foregroundColor = isDark ? '#FAFAFA' : '#09090B';
+  const mutedForegroundColor = isDark ? '#A1A1AA' : '#71717A';
+  const primaryColor = '#E50000'; // Assuming valor brand color
+  const primaryForegroundColor = '#FFFFFF';
 
   const [step, setStep] = useState<AuthStep>("login");
   const [email, setEmail] = useState("");
@@ -79,9 +84,9 @@ export function LoginScreen({ navigation }: any) {
     setEmail(v.email);
     onFinalLogin(v.password, v.email);
   };
-  const handleCodeSubmit = (v: CodeFormValues) => { onFinalLogin(passwordCache, email); };
+  const handleCodeSubmit = (_v: CodeFormValues) => { onFinalLogin(passwordCache, email); };
 
-  const handlePasskey = () => { Toast.show({ type: 'success', text1: "Prompting for Passkey..." }); setTimeout(() => onFinalLogin(), 1500); };
+  const handlePasskey = () => { Toast.show({ type: 'success', text1: "Prompting for Passkey..." }); onFinalLogin(); };
 
   const renderStep = () => {
     if (step === "login") {
@@ -96,7 +101,7 @@ export function LoginScreen({ navigation }: any) {
             )} />
             <Button onPress={subLogin(handleLoginNext)} className="w-full h-11" isLoading={isSimulating} disabled={isSimulating}>
               <Text className="text-primary-foreground font-bold mr-2">Sign In</Text>
-              <ArrowRight size={16} color={activeColors.primaryForeground} />
+              <ArrowRight size={16} color={primaryForegroundColor} />
             </Button>
           </View>
 
@@ -111,7 +116,7 @@ export function LoginScreen({ navigation }: any) {
 
           <View className="gap-3">
             <Button variant="outline" onPress={handlePasskey} className="w-full h-11" isLoading={isSimulating} disabled={isSimulating}>
-              <Fingerprint size={20} color={activeColors.foreground} />
+              <Fingerprint size={20} color={foregroundColor} />
               <Text className="text-foreground font-bold ml-2">Continue with Passkey</Text>
             </Button>
           </View>
@@ -124,7 +129,7 @@ export function LoginScreen({ navigation }: any) {
         <View className="gap-6 animate-fade-in w-full">
           <View className="flex-row items-center gap-2 pb-2">
             <TouchableOpacity onPress={() => setStep("login")} className="p-2 -ml-2 rounded-full">
-              <ArrowLeft size={20} color={activeColors.foreground} />
+              <ArrowLeft size={20} color={foregroundColor} />
             </TouchableOpacity>
             <Text className="text-sm font-bold text-foreground">{step === "2fa" ? "Two-Factor Authentication" : "One-Time Password"}</Text>
           </View>
@@ -136,7 +141,7 @@ export function LoginScreen({ navigation }: any) {
               <Input label="Verification Code" placeholder="000000" keyboardType="numeric" value={value} onChangeText={onChange} error={errCode.code?.message} />
             )} />
             <Button onPress={subCode(handleCodeSubmit)} disabled={isSimulating} className="w-full h-11">
-              {isSimulating ? <ActivityIndicator size="small" color={activeColors.primaryForeground} /> : <Text className="text-primary-foreground font-bold">Verify & Sign In</Text>}
+              {isSimulating ? <ActivityIndicator size="small" color={primaryForegroundColor} /> : <Text className="text-primary-foreground font-bold">Verify & Sign In</Text>}
             </Button>
           </View>
         </View>
@@ -183,9 +188,9 @@ export function LoginScreen({ navigation }: any) {
                     </View>
                     <Text className="text-5xl font-black text-white leading-tight mb-8 text-center w-full">Elevate your gym's performance.</Text>
                     <View className="gap-5 items-center w-full mt-4">
-                      <View className="flex-row items-center gap-4 w-full justify-center"><Users size={24} color={activeColors.primary} /><Text className="font-semibold text-white text-xl">Member lifecycle controls</Text></View>
-                      <View className="flex-row items-center gap-4 w-full justify-center"><BarChart3 size={24} color={activeColors.primary} /><Text className="font-semibold text-white text-xl">Reports and revenue snapshots</Text></View>
-                      <View className="flex-row items-center gap-4 w-full justify-center"><LockKeyhole size={24} color={activeColors.primary} /><Text className="font-semibold text-white text-xl">Enterprise-grade security</Text></View>
+                      <View className="flex-row items-center gap-4 w-full justify-center"><Users size={24} color={primaryColor} /><Text className="font-semibold text-white text-xl">Member lifecycle controls</Text></View>
+                      <View className="flex-row items-center gap-4 w-full justify-center"><BarChart3 size={24} color={primaryColor} /><Text className="font-semibold text-white text-xl">Reports and revenue snapshots</Text></View>
+                      <View className="flex-row items-center gap-4 w-full justify-center"><LockKeyhole size={24} color={primaryColor} /><Text className="font-semibold text-white text-xl">Enterprise-grade security</Text></View>
                     </View>
                   </View>
                 )}
@@ -199,12 +204,12 @@ export function LoginScreen({ navigation }: any) {
               
               <View className="flex-row items-center justify-between mb-6">
                 <TouchableOpacity onPress={() => navigation.navigate("Home")} className="flex-row items-center gap-2">
-                  <ArrowLeft size={16} color={activeColors.mutedForeground} />
+                  <ArrowLeft size={16} color={mutedForegroundColor} />
                   <Text className="text-sm font-medium text-muted-foreground">Back to website</Text>
                 </TouchableOpacity>
                 {!isTablet && (
                   <View className="flex-row items-center gap-2">
-                    <Dumbbell size={18} color={activeColors.primary} />
+                    <Dumbbell size={18} color={primaryColor} />
                     <Text className="font-black text-foreground">{APP_NAME}</Text>
                   </View>
                 )}
@@ -221,7 +226,7 @@ export function LoginScreen({ navigation }: any) {
                 <Text className="text-sm font-medium text-foreground">Member account?</Text>
                 <TouchableOpacity onPress={() => navigation.navigate("MemberLogin")} className="flex-row items-center mt-2">
                   <Text className="text-sm font-bold text-primary mr-2">Use member portal</Text>
-                  <ArrowRight size={14} color={activeColors.primary} />
+                  <ArrowRight size={14} color={primaryColor} />
                 </TouchableOpacity>
               </View>
               
@@ -230,6 +235,7 @@ export function LoginScreen({ navigation }: any) {
         </View>
         <Footer />
       </ScrollView>
+      <AppDock />
     </KeyboardAvoidingView>
   );
 }

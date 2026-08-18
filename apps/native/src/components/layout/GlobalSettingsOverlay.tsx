@@ -9,7 +9,7 @@ import { ApiSettingsModal } from '../ApiSettingsModal';
 
 export function GlobalSettingsOverlay() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const { colors, theme, styleMode } = useTheme();
+  const { colors, theme, styleMode } = useTheme() || {};
   const dispatch = useAppDispatch();
   const insets = useSafeAreaInsets();
   
@@ -34,44 +34,31 @@ export function GlobalSettingsOverlay() {
   };
 
   const ThemeIcon = () => {
-    if (theme === 'system') return <Monitor size={20} color={colors.foreground} />;
-    if (theme === 'light') return <Sun size={20} color={colors.foreground} />;
-    if (theme === 'dark') return <Moon size={20} color={colors.foreground} />;
-    return <MoonStar size={20} color={colors.foreground} />;
+    if (theme === 'system') return <Monitor size={20} color={colors?.foreground || '#fff'} />;
+    if (theme === 'light') return <Sun size={20} color={colors?.foreground || '#fff'} />;
+    if (theme === 'dark') return <Moon size={20} color={colors?.foreground || '#fff'} />;
+    return <MoonStar size={20} color={colors?.foreground || '#fff'} />;
   };
 
-  let containerStyle: any = { 
-    top: Math.max(insets.top, 16) + 16, 
-    right: 16 
-  };
-  
-  let buttonStyle: any = {
-    backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.border,
-  };
+  let buttonClass = "p-3 rounded-full items-center justify-center bg-card border border-border";
   
   if (styleMode === 'clay') {
-    buttonStyle.borderWidth = 0;
-    buttonStyle.elevation = 8;
-    buttonStyle.shadowColor = '#000';
-    buttonStyle.shadowOffset = { width: 0, height: 4 };
-    buttonStyle.shadowOpacity = 0.2;
-    buttonStyle.shadowRadius = 8;
+    buttonClass = "p-3 rounded-full items-center justify-center bg-card shadow-[0_4px_16px_rgba(0,0,0,0.2)]";
   } else if (styleMode === 'glass') {
-    buttonStyle.backgroundColor = 'rgba(0,0,0,0.1)';
-    buttonStyle.borderColor = 'rgba(255,255,255,0.1)';
+    buttonClass = "p-3 rounded-full items-center justify-center bg-black/10 border border-white/10";
   } else if (styleMode === 'minimal') {
-    buttonStyle.borderWidth = 2;
+    buttonClass = "p-3 rounded-full items-center justify-center bg-card border-2 border-border";
   }
 
   return (
     <>
-      <View className="absolute z-[999] flex-row gap-3" style={containerStyle} pointerEvents="box-none">
+      <View 
+        className="absolute z-[999] flex-row gap-3" 
+        style={{ top: Math.max(insets.top, 16) + 16, right: 32 }}
+      >
         <TouchableOpacity 
           onPress={handleThemeToggle} 
-          className="p-3 rounded-full items-center justify-center"
-          style={buttonStyle}
+          className={buttonClass}
           activeOpacity={0.7}
         >
           <ThemeIcon />
@@ -79,12 +66,11 @@ export function GlobalSettingsOverlay() {
 
         <TouchableOpacity 
           onPress={handleSettingsPress} 
-          className="p-3 rounded-full items-center justify-center"
-          style={buttonStyle}
+          className={buttonClass}
           activeOpacity={0.7}
         >
           <Animated.View style={{ transform: [{ rotate: spin }] }}>
-            <Settings size={20} color={colors.foreground} />
+            <Settings size={20} color={colors?.foreground || '#fff'} />
           </Animated.View>
         </TouchableOpacity>
       </View>

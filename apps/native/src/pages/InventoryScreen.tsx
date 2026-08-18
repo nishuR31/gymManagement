@@ -6,7 +6,7 @@ import Toast from 'react-native-toast-message';
 import { Card, CardContent } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { EmptyState } from '../components/ui/EmptyState';
-import { ScreenWrapper, PageHeader } from '../components/layout/ScreenWrapper';
+import { ScreenWrapper } from '../components/layout/ScreenWrapper';
 import { useTheme } from '../hooks/useTheme';
 import * as inventoryApi from '../features/inventory/inventoryApi';
 import type { ProductDto } from '@gym/shared';
@@ -55,7 +55,7 @@ export function InventoryScreen() {
             Management
           </Text>
           <Button variant="primary" size="sm" onPress={() => { setEditingProduct(null); setIsFormVisible(true); }}>
-            <Text className="text-white font-bold">+ Product</Text>
+            + Product
           </Button>
         </View>
         <Text className="text-3xl font-black text-foreground leading-tight mb-1">

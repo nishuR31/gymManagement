@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { View, Text, Modal, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { X } from 'lucide-react-native';
 import QRCode from 'react-native-qrcode-svg';
@@ -44,11 +44,7 @@ export function MemberQRCodeModal({
             padding: 24,
             borderRadius: 16,
             marginBottom: 24,
-            elevation: 4,
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.1,
-            shadowRadius: 8
+            boxShadow: '0px 2px 8px rgba(0,0,0,0.1)'
           }}>
             {loading ? (
               <View style={{ width: 200, height: 200, justifyContent: 'center', alignItems: 'center' }}>

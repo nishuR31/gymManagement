@@ -1,31 +1,31 @@
-import { useState, useRef, useEffect } from 'react';
-import { View, Text, ScrollView, Image, KeyboardAvoidingView, Platform, TouchableOpacity, useWindowDimensions, Animated } from 'react-native';
+import {
+  View, Text, ScrollView, ImageBackground,
+  KeyboardAvoidingView, Platform, useWindowDimensions
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useForm, Controller } from "react-hook-form";
-import { CreditCard, Dumbbell, ShieldCheck, Sparkles, ArrowRight, Settings, Users, History, MapPin, CheckCircle, Calendar, Clock } from "lucide-react-native";
+import {
+  Dumbbell, ShieldCheck, Sparkles, ArrowRight,
+  Users, MapPin, CheckCircle, Activity, Calendar
+} from "lucide-react-native";
 import { APP_NAME } from "../utils/env";
 import Toast from 'react-native-toast-message';
 import { Button } from "../components/ui/Button";
-import { Card, CardContent } from "../components/ui/Card";
 import { Input } from "../components/ui/Input";
-import { submitPublicInquiry, listPublicPlans } from "../features/public/publicApi";
+import { submitPublicInquiry } from "../features/public/publicApi";
 import { getApiErrorMessage } from "../utils/apiError";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigation } from '@react-navigation/native';
 import { AppDock } from '../components/layout/AppDock';
 import { Footer } from '../components/layout/Footer';
-import { formatCents } from '../utils/format';
-
-import { useAppSelector } from '../store/hooks';
-import { themeColors } from '../constants/themeColors';
-import type { PublicMembershipPlanDto } from '@gym/shared';
+import { useTheme } from '../hooks/useTheme';
 
 const inquirySchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Please enter a valid email address"),
   phone: z.union([
-    z.string().regex(/^\+?[0-9\s\-()]{8,15}$/, "Enter a valid phone number (e.g. +91 9876543210)"),
+    z.string().regex(/^\+?[0-9\s\-()]{8,15}$/, "Enter a valid phone number"),
     z.literal("")
   ]),
   message: z.string().min(10, "Message must be at least 10 characters"),
@@ -37,25 +37,30 @@ export function PublicHomeScreen() {
   const { width } = useWindowDimensions();
   const isTablet = width >= 768;
   const navigation = useNavigation<any>();
-  const theme = useAppSelector((state) => state.theme.theme);
-  const activeColors = themeColors[theme === 'amoled' ? 'amoled' : theme === 'dark' ? 'dark' : 'light'];
+  const { isDark, colors, theme } = useTheme();
+  const isAmoled = theme === 'amoled';
 
-  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-  const [plans, setPlans] = useState<PublicMembershipPlanDto[]>([]);
-  const [now, setNow] = useState(new Date());
+  // ── Per-theme tokens ──────────────────────────────────────────────────────
+  // AMOLED: push toward pure black. Dark: moderate overlay so photos show. Light: warm cream tint.
+  const heroOverlay     = isAmoled ? 'rgba(0,0,0,0.76)' : isDark ? 'rgba(0,0,0,0.48)' : 'rgba(250,247,242,0.62)';
+  const section2Overlay = isAmoled ? 'rgba(0,0,0,0.88)' : isDark ? 'rgba(0,0,0,0.74)' : 'rgba(245,240,232,0.82)';
+  const section3Overlay = isAmoled ? 'rgba(0,0,0,0.85)' : isDark ? 'rgba(0,0,0,0.70)' : 'rgba(250,247,242,0.78)';
 
-  // Live clock — updates every second
-  useEffect(() => {
-    const timer = setInterval(() => setNow(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  // Load public membership plans
-  useEffect(() => {
-    listPublicPlans().then(setPlans).catch(() => { /* silent */ });
-  }, []);
-
-
+  const headingColor  = isDark ? '#FFFFFF'   : colors.foreground;
+  const bodyColor     = isDark ? 'rgba(255,255,255,0.72)' : colors.mutedForeground;
+  const badgeBg       = isDark ? 'rgba(255,255,255,0.10)' : 'rgba(122,78,45,0.08)';
+  const badgeBorder   = isDark ? 'rgba(255,255,255,0.20)' : 'rgba(122,78,45,0.25)';
+  const badgeText     = isDark ? 'rgba(255,255,255,0.90)' : colors.primary;
+  const chipBg        = isDark ? 'rgba(255,255,255,0.09)' : 'rgba(255,255,255,0.72)';
+  const chipBorder    = isDark ? 'rgba(255,255,255,0.14)' : 'rgba(0,0,0,0.08)';
+  const chipIconBg    = isDark ? 'rgba(185,130,90,0.80)'  : colors.primary;
+  const cardBg        = isDark ? 'rgba(255,255,255,0.07)' : 'rgba(255,255,255,0.82)';
+  const cardBorder    = isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.07)';
+  const cardTextMuted = isDark ? 'rgba(255,255,255,0.55)' : colors.mutedForeground;
+  const ctaOutlineBg      = isDark ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.65)';
+  const ctaOutlineBorder  = isDark ? 'rgba(255,255,255,0.28)' : 'rgba(0,0,0,0.10)';
+  const ctaOutlineColor   = isDark ? '#FFFFFF' : colors.foreground;
+  const brandBadgeBg = isDark ? 'rgba(0,0,0,0.40)' : 'rgba(255,255,255,0.75)';
 
   const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<InquiryForm>({
     resolver: zodResolver(inquirySchema),
@@ -72,12 +77,26 @@ export function PublicHomeScreen() {
     }
   };
 
-  const dayStr = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-  const timeStr = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', second: '2-digit' });
-  const dayLong = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-  const monthYear = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-  const firstDow = new Date(now.getFullYear(), now.getMonth(), 1).getDay();
+  const featureItems = [
+    { icon: MapPin,      label: 'Single-gym focus',   sub: 'Built for one serious training floor' },
+    { icon: CheckCircle, label: 'Coached workflows',   sub: 'Members, plans, attendance, billing' },
+    { icon: Sparkles,    label: 'Operational clarity', sub: 'Staff tools without admin clutter' },
+  ];
+
+  const experienceItems = [
+    {
+      icon: Dumbbell,   n: '01', title: 'Strength floor',
+      desc: 'Purpose-built training space for progressive strength, conditioning blocks, and focused solo sessions.',
+    },
+    {
+      icon: ShieldCheck, n: '02', title: 'Personal coaching',
+      desc: 'Coaches keep plans, check-ins, and member progress aligned so accountability feels natural.',
+    },
+    {
+      icon: Activity,    n: '03', title: 'Progress tracking',
+      desc: "Every session logged. Members see how far they've come — motivation baked right in.",
+    },
+  ];
 
   return (
     <SafeAreaView className="flex-1 bg-background relative">
@@ -88,341 +107,233 @@ export function PublicHomeScreen() {
           automaticallyAdjustKeyboardInsets={true}
         >
 
-          {/* Hero Section */}
-          <View className="relative min-h-[600px] lg:min-h-[700px] justify-center">
-            <Image
-              source={{ uri: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=1600&q=80" }}
-              className="absolute inset-0 w-full h-full"
-              style={{ opacity: 1 }}
-              resizeMode="cover"
-            />
-            {/* Subtle dark vignette only — image stays vivid */}
-            <View className="absolute inset-0" style={{ backgroundColor: 'rgba(0,0,0,0.38)' }} />
-            {/* Soft bottom fade into bg */}
-            <View className="absolute bottom-0 left-0 right-0 h-40" style={{ "backgroundColor": 'linear-gradient(to bottom, transparent, rgba(0,0,0,0.55))' }} />
+          {/* ═══════════════════════════════════════════════════════
+              SECTION 1 — HERO
+              Dark: female athlete photo, strong dark overlay, white text
+              Light: same photo, warm translucent cream overlay, dark text
+          ════════════════════════════════════════════════════════ */}
+          <ImageBackground
+            source={require('../../assets/home/hero.webp')}
+            resizeMode="cover"
+            className="w-full"
+            style={{ minHeight: '100dvh' as any }}
+          >
+            {/* Overlay */}
+            <View style={{ position: 'absolute', inset: 0, backgroundColor: heroOverlay }} />
 
-            {/* Top Navigation */}
-            <View className="absolute top-4 left-4 z-10 flex-row items-center gap-2 bg-black/50 rounded-full px-4 py-2">
-              <Dumbbell size={18} color={activeColors.primary} />
-              <Text className="text-white font-black text-sm">{APP_NAME}</Text>
+            {/* Brand badge */}
+            <View
+              className="absolute top-5 left-5 z-10 flex-row items-center gap-2 rounded-full px-4 py-2"
+              style={{ backgroundColor: brandBadgeBg }}
+            >
+              <Dumbbell size={16} color={colors.primary} />
+              <Text style={{ color: headingColor }} className="font-bold text-sm">{APP_NAME}</Text>
             </View>
 
-            {/* Centered content */}
-            <View className="w-full max-w-7xl self-center px-6 pt-24 pb-12 flex-row z-10">
-              {/* Left Column */}
-              <View className="flex-1 justify-center lg:pt-12">
-                <View className="flex-row items-center bg-primary/20 self-start px-3 py-1.5 rounded-full mb-4">
-                  <Sparkles size={14} color={activeColors.primary} />
-                  <Text className="text-primary font-bold ml-2 text-xs uppercase tracking-widest">{APP_NAME}</Text>
-                </View>
-                <Text
-                  className="text-5xl md:text-7xl lg:text-[80px] font-black text-foreground leading-[1.1] mb-4 drop-shadow-sm tracking-tight"
-                  numberOfLines={2}
-                  adjustsFontSizeToFit
-                >
-                  Train with intent.{'\n'}Track every win.
+            {/* Hero content */}
+            <View className="flex-1 justify-center w-full max-w-5xl self-center px-6 pt-28 pb-16 z-10">
+              {/* Badge pill */}
+              <View
+                className="flex-row items-center self-start px-3 py-1.5 rounded-full mb-5"
+                style={{ backgroundColor: badgeBg, borderWidth: 1, borderColor: badgeBorder }}
+              >
+                <Sparkles size={13} color={colors.primary} />
+                <Text style={{ color: badgeText }} className="font-bold ml-2 text-xs uppercase tracking-widest">
+                  {APP_NAME}
                 </Text>
-                <Text className="text-muted-foreground font-medium text-base md:text-xl mb-8 max-w-2xl leading-relaxed">
-                  Strength training, personal coaching, flexible memberships, and a front desk experience that keeps every visit moving.
-                </Text>
-
-                <View className="flex-row flex-wrap gap-3">
-                  <Button onPress={() => navigation.navigate("Plans")} rightIcon={<ArrowRight size={16} color={activeColors.primaryForeground} />}>
-                    View Plans
-                  </Button>
-                </View>
               </View>
 
-              {/* Right Column (Tablet Only) */}
-              {isTablet && (
-                <View className="w-[420px] justify-center pl-12 lg:pt-12">
-                  <Card className="mb-4 bg-zinc-950/80 border-zinc-800">
-                    <CardContent className="p-4 pt-4 flex-row items-center gap-4">
-                      <View className="h-12 w-12 bg-[#c59a58] rounded-md items-center justify-center">
-                        <Users size={24} color="#000" />
-                      </View>
-                      <View className="flex-col justify-center">
-                        <Text className="text-xs font-black text-zinc-400 uppercase tracking-wider mb-0.5">Member-first</Text>
-                        <Text className="text-sm font-bold text-white">Live floor ops</Text>
-                      </View>
-                    </CardContent>
-                  </Card>
-                  <Card className="mb-4 bg-zinc-950/80 border-zinc-800">
-                    <CardContent className="p-4 pt-4 flex-row items-center gap-4">
-                      <View className="h-12 w-12 bg-[#c59a58] rounded-md items-center justify-center">
-                        <History size={24} color="#000" />
-                      </View>
-                      <View className="flex-col justify-center">
-                        <Text className="text-xs font-black text-zinc-400 uppercase tracking-wider mb-0.5">Fast Desk</Text>
-                        <Text className="text-sm font-bold text-white">Check-ins in seconds</Text>
-                      </View>
-                    </CardContent>
-                  </Card>
-                  <Card className="bg-zinc-950/80 border-zinc-800">
-                    <CardContent className="p-4 pt-4 flex-row items-center gap-4">
-                      <View className="h-12 w-12 bg-[#c59a58] rounded-md items-center justify-center">
-                        <ShieldCheck size={24} color="#000" />
-                      </View>
-                      <View className="flex-col justify-center">
-                        <Text className="text-xs font-black text-zinc-400 uppercase tracking-wider mb-0.5">Secure</Text>
-                        <Text className="text-sm font-bold text-white">Role-based access</Text>
-                      </View>
-                    </CardContent>
-                  </Card>
-                </View>
-              )}
+              <Text
+                style={{ color: headingColor, fontSize: isTablet ? 72 : 46, lineHeight: isTablet ? 80 : 54 }}
+                className="font-black leading-tight mb-5 tracking-tight"
+              >
+                Train with intent.{'\n'}Track every win.
+              </Text>
+              <Text style={{ color: bodyColor }} className="font-medium text-base md:text-lg mb-10 max-w-xl leading-relaxed">
+                Strength training, personal coaching, flexible memberships, and a front desk experience that keeps every visit moving.
+              </Text>
+
+              <View className="flex-row flex-wrap gap-3">
+                <Button
+                  onPress={() => navigation.navigate("MemberLogin")}
+                  rightIcon={<ArrowRight size={16} color={colors.primaryForeground} />}
+                >
+                  Member Login
+                </Button>
+                <Button
+                  variant="outline"
+                  onPress={() => navigation.navigate("Login")}
+                  style={{ backgroundColor: ctaOutlineBg, borderColor: ctaOutlineBorder }}
+                >
+                  <Text style={{ color: ctaOutlineColor }} className="font-bold">Staff Portal</Text>
+                </Button>
+              </View>
             </View>
-          </View>
 
-          {/* Three Feature Cards Section — with workout background */}
-          <View className="w-full relative z-20 pb-12 overflow-hidden">
-            {/* Second workout background */}
-            <Image
-              source={{ uri: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1600&q=80" }}
-              className="absolute inset-0 w-full h-full"
-              style={{ opacity: 0.18 }}
-              resizeMode="cover"
-            />
-            <View className="absolute inset-0 bg-background/70" />
-            <View className={`relative z-10 w-full max-w-7xl self-center px-6 flex-row flex-wrap justify-between gap-4 ${isTablet ? 'flex-nowrap' : ''}`}>
-              <Card className="flex-1 min-w-[280px] bg-zinc-900 border-zinc-800">
-                <CardContent className="p-4 pt-4 flex-row items-center gap-4">
-                  <View className="h-10 w-10 bg-zinc-800 rounded-md items-center justify-center">
-                    <MapPin size={18} color="#c59a58" />
+            {/* Feature chips at bottom */}
+            <View className="z-10 w-full max-w-5xl self-center px-6 pb-12 flex-col md:flex-row gap-3">
+              {featureItems.map((item, i) => (
+                <View
+                  key={i}
+                  className="flex-1 flex-row items-center gap-3 rounded-2xl px-4 py-3"
+                  style={{ backgroundColor: chipBg, borderWidth: 1, borderColor: chipBorder }}
+                >
+                  <View
+                    className="h-9 w-9 rounded-lg items-center justify-center flex-shrink-0"
+                    style={{ backgroundColor: chipIconBg }}
+                  >
+                    <item.icon size={16} color="#fff" />
                   </View>
-                  <View className="flex-1 flex-col justify-center">
-                    <Text className="text-sm font-bold text-white mb-0.5">Single-gym focus</Text>
-                    <Text className="text-xs font-medium text-zinc-400">Built for one serious training floor</Text>
+                  <View className="flex-1">
+                    <Text style={{ color: headingColor }} className="font-bold text-sm">{item.label}</Text>
+                    <Text style={{ color: bodyColor }} className="text-xs mt-0.5">{item.sub}</Text>
                   </View>
-                </CardContent>
-              </Card>
-              <Card className="flex-1 min-w-[280px] bg-zinc-900 border-zinc-800">
-                <CardContent className="p-4 pt-4 flex-row items-center gap-4">
-                  <View className="h-10 w-10 bg-zinc-800 rounded-md items-center justify-center">
-                    <CheckCircle size={18} color="#c59a58" />
-                  </View>
-                  <View className="flex-1 flex-col justify-center">
-                    <Text className="text-sm font-bold text-white mb-0.5">Coached workflows</Text>
-                    <Text className="text-xs font-medium text-zinc-400">Members, plans, attendance, billing</Text>
-                  </View>
-                </CardContent>
-              </Card>
-              <Card className="flex-1 min-w-[280px] bg-zinc-900 border-zinc-800">
-                <CardContent className="p-4 pt-4 flex-row items-center gap-4">
-                  <View className="h-10 w-10 bg-zinc-800 rounded-md items-center justify-center">
-                    <Sparkles size={18} color="#c59a58" />
-                  </View>
-                  <View className="flex-1 flex-col justify-center">
-                    <Text className="text-sm font-bold text-white mb-0.5">Operational clarity</Text>
-                    <Text className="text-xs font-medium text-zinc-400">Staff tools without admin clutter</Text>
-                  </View>
-                </CardContent>
-              </Card>
-            </View>
-          </View>
-
-          {/* ── Public Membership Plans ── */}
-          {plans.length > 0 && (
-            <View className="bg-background w-full py-16 px-6">
-              <View className="w-full max-w-7xl self-center">
-                <View className="items-center mb-10">
-                  <View className="flex-row items-center bg-primary/10 px-3 py-1.5 rounded-full mb-3 self-start mx-auto">
-                    <CreditCard size={14} color={activeColors.primary} />
-                    <Text style={{ color: activeColors.primary }} className="font-bold ml-2 text-xs uppercase tracking-widest">Membership Plans</Text>
-                  </View>
-                  <Text style={{ color: activeColors.foreground }} className="text-4xl font-black text-center mb-3">Simple, transparent pricing.</Text>
-                  <Text style={{ color: activeColors.mutedForeground }} className="text-base text-center max-w-xl">Choose the plan that fits your goals. All plans include full floor access.</Text>
                 </View>
+              ))}
+            </View>
+          </ImageBackground>
 
-                <View className="flex-row flex-wrap gap-4 justify-center">
-                  {plans.map((plan, index) => (
-                    <View key={`plan-${index}`} style={{ flex: 1, minWidth: 260, maxWidth: 360 }}>
-                      <Card style={{ borderColor: index === 0 ? activeColors.primary : activeColors.border }}>
-                        <CardContent className="p-6 pt-6">
-                          {index === 0 && (
-                            <View style={{ backgroundColor: activeColors.primary }} className="self-start px-2.5 py-1 rounded-full mb-3">
-                              <Text style={{ color: activeColors.primaryForeground }} className="text-[10px] font-black uppercase tracking-widest">Most Popular</Text>
-                            </View>
-                          )}
-                          <Text style={{ color: activeColors.foreground }} className="text-xl font-black mb-1">{plan.name}</Text>
-                          <Text style={{ color: activeColors.primary }} className="text-3xl font-black mb-1">
-                            {formatCents(plan.priceCents)}
-                          </Text>
-                          <Text style={{ color: activeColors.mutedForeground }} className="text-xs mb-5">per {plan.durationDays} days</Text>
+          {/* ═══════════════════════════════════════════════════════
+              SECTION 2 — EXPERIENCE + CONTACT FORM
+              Dark: male gym athlete, deep dark overlay, white text
+              Light: same photo, warm cream overlay, dark text, white glass cards
+          ════════════════════════════════════════════════════════ */}
+          <ImageBackground
+            source={require('../../assets/home/experience.webp')}
+            resizeMode="cover"
+            className="w-full"
+          >
+            <View style={{ position: 'absolute', inset: 0, backgroundColor: section2Overlay }} />
 
-                          {plan.description ? (
-                            <Text style={{ color: activeColors.mutedForeground }} className="text-sm leading-relaxed mb-6">{plan.description}</Text>
-                          ) : null}
+            <View className="relative z-10 w-full max-w-5xl self-center px-6 py-20 flex-col lg:flex-row gap-14">
+              {/* Left — copy + experience cards */}
+              <View className="flex-1 lg:pr-10">
+                <Text style={{ color: colors.primary }} className="font-bold uppercase text-xs tracking-widest mb-3">
+                  What members feel
+                </Text>
+                <Text
+                  style={{ color: headingColor, fontSize: isTablet ? 48 : 34, lineHeight: isTablet ? 56 : 42 }}
+                  className="font-black leading-tight mb-8"
+                >
+                  A gym experience that feels{'\n'}organized from warm-up to checkout.
+                </Text>
 
-                          <Button
-                            variant={index === 0 ? 'primary' : 'outline'}
-                            onPress={() => navigation.navigate('MemberLogin')}
-                          >
-                            <Text style={{ color: index === 0 ? activeColors.primaryForeground : activeColors.foreground }} className="font-bold">
-                              Get Started
-                            </Text>
-                          </Button>
-                        </CardContent>
-                      </Card>
+                <View className="gap-4">
+                  {experienceItems.map((item, i) => (
+                    <View
+                      key={i}
+                      className="rounded-2xl p-4 flex-row gap-4"
+                      style={{ backgroundColor: cardBg, borderWidth: 1, borderColor: cardBorder }}
+                    >
+                      <View className="h-10 w-10 bg-primary rounded-xl items-center justify-center flex-shrink-0">
+                        <item.icon size={18} color="#fff" />
+                      </View>
+                      <View className="flex-1">
+                        <View className="flex-row justify-between items-center mb-1">
+                          <Text style={{ color: headingColor }} className="font-bold text-base">{item.title}</Text>
+                          <Text style={{ color: cardTextMuted }} className="font-mono text-xs font-bold">{item.n}</Text>
+                        </View>
+                        <Text style={{ color: cardTextMuted }} className="text-sm leading-relaxed">{item.desc}</Text>
+                      </View>
                     </View>
                   ))}
                 </View>
               </View>
-            </View>
-          )}
 
-          {/* Bottom Sections with Immersive Background */}
-          <View className="relative w-full bg-background overflow-hidden min-h-[800px]">
-            <Image
-              source={{ uri: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=1600&q=80" }}
-              className="absolute inset-0 w-full h-full"
-              style={{ opacity: 0.7 }}
-              resizeMode="cover"
-            />
-            {/* Strong dark overlay so white text stays readable */}
-            <View className="absolute inset-0" style={{ backgroundColor: 'rgba(0,0,0,0.55)' }} />
-
-            <View className="relative z-10 w-full max-w-7xl self-center px-6 py-16 flex-col lg:flex-row gap-12">
-
-              {/* Left Column */}
-              <View className="flex-1">
-                {/* Live date/time bar */}
-                <View className="flex-row items-center self-start bg-black/60 px-4 py-2.5 rounded-full border border-white/5 mb-8 gap-6 z-50">
-                  <View className="relative">
-                    <TouchableOpacity
-                      onPress={() => setIsCalendarOpen((v) => !v)}
-                      className="flex-row items-center"
-                    >
-                      <Calendar size={14} color="#c59a58" />
-                      <Text className="text-white text-xs font-bold ml-2">{dayStr}</Text>
-                    </TouchableOpacity>
-
-                    {isCalendarOpen && (
-                      <View className="absolute top-8 left-0 bg-zinc-900 border border-zinc-800 rounded-lg p-4 w-56 shadow-2xl mt-2 z-50">
-                        <TouchableOpacity
-                          onPress={() => setIsCalendarOpen(false)}
-                          className="absolute top-2 right-2 p-1"
-                        >
-                          <Text className="text-zinc-400 text-xs">✕</Text>
-                        </TouchableOpacity>
-                        <View className="mb-3 border-b border-zinc-800 pb-3">
-                          <Text className="text-white font-bold text-sm">{dayLong}</Text>
-                          <Text className="text-[#c59a58] font-medium text-xs mt-0.5">{timeStr}</Text>
-                        </View>
-                        <Text className="text-white font-bold mb-2 text-sm text-center">{monthYear}</Text>
-                        <View className="flex-row justify-between mb-1">
-                          {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => (
-                            <Text key={i} className="text-zinc-500 text-[10px] w-6 text-center">{d}</Text>
-                          ))}
-                        </View>
-                        <View className="flex-row flex-wrap">
-                          {/* Leading empty cells */}
-                          {Array.from({ length: firstDow }).map((_, i) => (
-                            <Text key={`e${i}`} className="text-[10px] w-6 text-center my-1.5" />
-                          ))}
-                          {Array.from({ length: daysInMonth }).map((_, i) => (
-                            <Text
-                              key={i}
-                              className={`text-[10px] w-6 text-center my-1.5 ${i + 1 === now.getDate()
-                                  ? 'text-[#c59a58] font-bold bg-[#c59a58]/10 rounded'
-                                  : 'text-zinc-300'
-                                }`}
-                            >
-                              {i + 1}
-                            </Text>
-                          ))}
-                        </View>
-                      </View>
-                    )}
-                  </View>
-
-                  <View className="flex-row items-center">
-                    <Clock size={14} color="#c59a58" />
-                    <Text className="text-white text-xs font-bold ml-2">{timeStr}</Text>
-                  </View>
-                </View>
-
-                <Text className="text-[#c59a58] font-black uppercase text-xs tracking-widest mb-3 drop-shadow-sm">What members feel</Text>
-                <Text className="text-4xl md:text-5xl font-black text-white mb-10 leading-[1.1] drop-shadow-md">
-                  A gym experience that feels{'\n'}organized from warm-up to{'\n'}checkout.
-                </Text>
-
-                {/* Offerings Cards */}
-                <View className="flex-row flex-wrap gap-4 w-full">
-                  <Card className="flex-1 min-w-[220px] bg-[#1a1a1a]/90 border-transparent">
-                    <CardContent className="p-5 pt-5">
-                      <Text className="text-white font-bold text-lg mb-4 leading-tight">Strength floor</Text>
-                      <View className="flex-row justify-between items-center mb-6">
-                        <View className="h-10 w-10 bg-[#c59a58] rounded-md items-center justify-center">
-                          <Dumbbell size={18} color="#000" />
-                        </View>
-                        <Text className="font-mono text-zinc-500 font-black text-xs">01</Text>
-                      </View>
-                      <Text className="text-zinc-400 text-sm leading-relaxed">Purpose-built training space for progressive strength, conditioning blocks, and focused solo sessions.</Text>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="flex-1 min-w-[220px] bg-[#1a1a1a]/90 border-transparent">
-                    <CardContent className="p-5 pt-5">
-                      <Text className="text-white font-bold text-lg mb-4 leading-tight">Personal coaching</Text>
-                      <View className="flex-row justify-between items-center mb-6">
-                        <View className="h-10 w-10 bg-[#c59a58] rounded-md items-center justify-center">
-                          <ShieldCheck size={18} color="#000" />
-                        </View>
-                        <Text className="font-mono text-zinc-500 font-black text-xs">02</Text>
-                      </View>
-                      <Text className="text-zinc-400 text-sm leading-relaxed">Coaches keep plans, check-ins, and member progress aligned so accountability feels natural.</Text>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="flex-1 min-w-[220px] bg-[#1a1a1a]/90 border-transparent">
-                    <CardContent className="p-5 pt-5">
-                      <Text className="text-white font-bold text-lg mb-4 leading-tight">Flexible plans</Text>
-                      <View className="flex-row justify-between items-center mb-6">
-                        <View className="h-10 w-10 bg-[#c59a58] rounded-md items-center justify-center">
-                          <CreditCard size={18} color="#000" />
-                        </View>
-                        <Text className="font-mono text-zinc-500 font-black text-xs">03</Text>
-                      </View>
-                      <Text className="text-zinc-400 text-sm leading-relaxed">Memberships are clear, renewable, and easy for the front desk to manage without friction.</Text>
-                    </CardContent>
-                  </Card>
-                </View>
-              </View>
-
-              {/* Right Column: Contact Form */}
-              <View className="w-full lg:w-[420px]">
-                <Card className="bg-[#1a1a1a]/90 border-transparent h-full">
-                  <CardContent className="p-6">
-                    <Text className="text-xl font-bold text-white mb-2">Contact {APP_NAME}</Text>
-                    <Text className="text-zinc-400 text-sm mb-6">Have a question or want to join? Drop us a message.</Text>
+              {/* Right — contact form */}
+              <View className="w-full lg:w-[400px] flex-shrink-0">
+                <View
+                  className="rounded-3xl overflow-hidden"
+                  style={{ backgroundColor: cardBg, borderWidth: 1, borderColor: cardBorder }}
+                >
+                  <View className="p-6">
+                    <Text style={{ color: headingColor }} className="text-xl font-black mb-1">
+                      Contact {APP_NAME}
+                    </Text>
+                    <Text style={{ color: cardTextMuted }} className="text-sm mb-6">
+                      Have a question or want to join? Drop us a message.
+                    </Text>
 
                     <Controller control={control} name="name" render={({ field: { onChange, onBlur, value } }) => (
-                      <Input label="Your Name" onBlur={onBlur} onChangeText={onChange} value={value} error={errors.name?.message} className="bg-[#111111] border-transparent" placeholder="John Smith" />
+                      <Input label="Your Name" onBlur={onBlur} onChangeText={onChange} value={value} error={errors.name?.message} placeholder="John Smith" />
                     )} />
-
                     <Controller control={control} name="email" render={({ field: { onChange, onBlur, value } }) => (
-                      <Input label="Email Address" onBlur={onBlur} onChangeText={onChange} value={value} error={errors.email?.message} autoCapitalize="none" keyboardType="email-address" className="bg-[#111111] border-transparent" placeholder="you@example.com" />
+                      <Input label="Email Address" onBlur={onBlur} onChangeText={onChange} value={value} error={errors.email?.message} autoCapitalize="none" keyboardType="email-address" placeholder="you@example.com" />
                     )} />
-
                     <Controller control={control} name="phone" render={({ field: { onChange, onBlur, value } }) => (
-                      <Input label="Phone (Optional)" onBlur={onBlur} onChangeText={onChange} value={value} error={errors.phone?.message} keyboardType="phone-pad" className="bg-[#111111] border-transparent" placeholder="+91 9876543210" />
+                      <Input label="Phone (Optional)" onBlur={onBlur} onChangeText={onChange} value={value} error={errors.phone?.message} keyboardType="phone-pad" placeholder="+91 9876543210" />
                     )} />
-
                     <Controller control={control} name="message" render={({ field: { onChange, onBlur, value } }) => (
-                      <Input label="Message" onBlur={onBlur} onChangeText={onChange} value={value} error={errors.message?.message} multiline numberOfLines={4} className="min-h-[100px] bg-[#111111] border-transparent mb-2" placeholder="Tell us what you're looking for…" />
+                      <Input label="Message" onBlur={onBlur} onChangeText={onChange} value={value} error={errors.message?.message} multiline numberOfLines={4} className="min-h-[90px] mb-2" placeholder="Tell us what you're looking for…" />
                     )} />
 
-                    <Button onPress={handleSubmit(onSubmit)} className="mt-6 w-full bg-[#c59a58]" isLoading={isSubmitting} rightIcon={<ArrowRight size={16} color="#ffffff" />}>
-                      <Text className="text-white font-bold">Send Inquiry</Text>
+                    <Button
+                      onPress={handleSubmit(onSubmit)}
+                      className="mt-5 w-full"
+                      isLoading={isSubmitting}
+                      rightIcon={<ArrowRight size={16} color={colors.primaryForeground} />}
+                    >
+                      Send Inquiry
                     </Button>
-                  </CardContent>
-                </Card>
+                  </View>
+                </View>
               </View>
             </View>
-          </View>
+          </ImageBackground>
 
-          <Footer />
+          {/* ═══════════════════════════════════════════════════════
+              SECTION 3 — CTA + FOOTER
+              Dark: training photo, dark overlay
+              Light: cta photo, soft warm overlay, dark text
+          ════════════════════════════════════════════════════════ */}
+          <ImageBackground
+            source={isDark
+              ? require('../../assets/home/training.webp')
+              : require('../../assets/home/cta.webp')
+            }
+            resizeMode="cover"
+            className="w-full"
+          >
+            <View style={{ position: 'absolute', inset: 0, backgroundColor: section3Overlay }} />
+
+            <View className="relative z-10 w-full max-w-5xl self-center px-6 py-24 items-center">
+              <Text style={{ color: colors.primary }} className="font-bold uppercase text-xs tracking-widest mb-4 text-center">
+                Ready to start?
+              </Text>
+              <Text
+                style={{ color: headingColor, fontSize: isTablet ? 52 : 36, lineHeight: isTablet ? 60 : 44 }}
+                className="font-black text-center leading-tight mb-5"
+              >
+                Your fitness journey{'\n'}starts here.
+              </Text>
+              <Text style={{ color: bodyColor }} className="text-base text-center max-w-md leading-relaxed mb-10">
+                Join a gym system designed to help you train smarter, track your progress, and stay accountable every step of the way.
+              </Text>
+
+              <View className="flex-row flex-wrap gap-4 justify-center">
+                <Button
+                  onPress={() => navigation.navigate("MemberLogin")}
+                  rightIcon={<ArrowRight size={16} color={colors.primaryForeground} />}
+                >
+                  Access Member Portal
+                </Button>
+                <Button
+                  variant="outline"
+                  onPress={() => navigation.navigate("DownloadApp")}
+                  style={{ backgroundColor: ctaOutlineBg, borderColor: ctaOutlineBorder }}
+                >
+                  <View className="flex-row items-center gap-2">
+                    <Calendar size={16} color={ctaOutlineColor} />
+                    <Text style={{ color: ctaOutlineColor }} className="font-bold">Get the App</Text>
+                  </View>
+                </Button>
+              </View>
+            </View>
+
+            {/* Footer bleeds into this section's photo */}
+            <Footer transparent={true} />
+          </ImageBackground>
+
         </ScrollView>
       </KeyboardAvoidingView>
       <AppDock />

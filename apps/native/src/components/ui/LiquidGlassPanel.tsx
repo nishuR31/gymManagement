@@ -50,12 +50,7 @@ const styles = StyleSheet.create({
   container: {
     overflow: 'hidden',
     borderRadius: 20,
-    // Add subtle shadow for the panel
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 5,
+    boxShadow: '0px 4px 12px rgba(0,0,0,0.1)',
   },
   blur: {
     // Ensuring the blur view covers perfectly

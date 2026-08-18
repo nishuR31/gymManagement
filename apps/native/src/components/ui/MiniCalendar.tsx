@@ -1,13 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { View, Text } from 'react-native';
 import { Calendar as CalendarIcon, Clock } from 'lucide-react-native';
-import { useAppSelector } from '../../store/hooks';
-import { themeColors } from '../../constants/colors';
+import { useTheme } from '../../hooks/useTheme';
 
 export function MiniCalendar() {
   const [time, setTime] = useState(new Date());
-  const theme = useAppSelector((state) => state.theme.theme);
-  const activeColors = themeColors[theme === 'amoled' ? 'amoled' : theme === 'dark' ? 'dark' : 'light'];
+  const { isDark } = useTheme();
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
@@ -25,16 +23,20 @@ export function MiniCalendar() {
   const minutes = time.getMinutes().toString().padStart(2, '0');
   const timeStr = `${hours}:${minutes} ${ampm}`;
 
+  const primaryColor = isDark ? '#E50000' : '#E50000'; // Assuming valor brand color
+  const foregroundColor = isDark ? '#FAFAFA' : '#09090B';
+  const mutedColor = isDark ? '#A1A1AA' : '#71717A';
+
   return (
-    <View className="flex-row items-center justify-center self-start gap-4 rounded-full border px-4 py-2 shadow-sm" style={{ backgroundColor: `${activeColors.background}80`, borderColor: `${activeColors.border}80` }}>
+    <View className="flex-row items-center justify-center self-start gap-4 rounded-full border border-border/80 bg-background/80 px-4 py-2 shadow-sm">
       <View className="flex-row items-center gap-2">
-        <CalendarIcon size={16} color={activeColors.primary} />
-        <Text className="font-semibold text-sm" style={{ color: activeColors.foreground }}>{day}, {date}</Text>
+        <CalendarIcon size={16} color={primaryColor} />
+        <Text className="font-semibold text-sm text-foreground">{day}, {date}</Text>
       </View>
-      <View className="w-[1px] h-4" style={{ backgroundColor: `${activeColors.border}80` }} />
+      <View className="w-[1px] h-4 bg-border/80" />
       <View className="flex-row items-center gap-2">
-        <Clock size={16} color={activeColors.primary} />
-        <Text className="font-medium text-sm" style={{ color: activeColors.mutedForeground }}>{timeStr}</Text>
+        <Clock size={16} color={primaryColor} />
+        <Text className="font-medium text-sm text-muted-foreground">{timeStr}</Text>
       </View>
     </View>
   );

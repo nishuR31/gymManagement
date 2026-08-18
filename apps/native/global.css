@@ -4,104 +4,133 @@
 
 @layer base {
   :root {
-    /* ── Core palette ── */
-    --background: 42 50% 90%;
-    --foreground: 24 12% 10%;     /* #1a1714 warm near-black */
-    --card: 42 40% 99%;
-    --card-foreground: 24 12% 10%;
-    --popover: 42 40% 99%;
-    --popover-foreground: 24 12% 10%;
-    --primary: 38 52% 43%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 40 22% 90%;
-    --secondary-foreground: 24 12% 10%;
-    --muted: 40 22% 90%;
-    --muted-foreground: 25 8% 28%;  /* #4a4540 — high contrast on cream */
-    --accent: 40 22% 90%;
-    --accent-foreground: 24 12% 10%;
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 38 18% 84%;
-    --input: 38 18% 84%;
-    --ring: 38 52% 43%;
-    /* ── Semantic colors ── */
-    --warning: 38 92% 46%;
-    --warning-foreground: 24 12% 10%;
-    --success: 142 72% 29%;
-    --success-foreground: 0 0% 100%;
-    /* ── Soft badge backgrounds ── */
-    --success-soft: 142 60% 92%;
-    --warning-soft: 38 92% 92%;
-    --accent-soft: 0 84.2% 93%;
-    --primary-soft: 38 52% 92%;
+    /* ── Core palette (Light) ── */
+    --background: #FAFAF9;
+    --foreground: #181614;
+
+    --card: #FFFFFF;
+    --card-foreground: #181614;
+
+    --popover: #FFFFFF;
+    --popover-foreground: #181614;
+
+    --primary: #7A4E2D;
+    --primary-foreground: #FFFFFF;
+    --primary-hover: #663F24;
+    --primary-soft: #F2E7DE;
+
+    --secondary: #F5F5F4;
+    --secondary-foreground: #181614;
+
+    --muted: #F5F5F4;
+    --muted-foreground: #78716C;
+
+    --accent: #F5F5F4;
+    --accent-foreground: #181614;
+
+    --destructive: #ef4444;
+    --destructive-foreground: #ffffff;
+    --destructive-soft: rgba(239, 68, 68, 0.12);
+
+    --success: #22c55e;
+    --success-foreground: #ffffff;
+    --success-soft: rgba(34, 197, 94, 0.12);
+
+    --warning: #f59e0b;
+    --warning-foreground: #181614;
+    --warning-soft: rgba(245, 158, 11, 0.12);
+
+    --border: #E7E5E4;
+    --input: #E7E5E4;
+    --ring: #7A4E2D;
+
+    --surface: #FFFFFF;
+    --surface-elevated: #F5F5F4;
+    --subtle: #78716C;
+
+    /* ── On-Media (Overlays) ── */
+    --on-media-foreground: #FFFFFF;
+    --on-media-muted: rgba(255, 255, 255, 0.78);
+    --on-media-subtle: rgba(255, 255, 255, 0.60);
+    --on-media-primary: #B9825A;
   }
 
   .dark {
-    --background: 20 14.3% 4.1%;
-    --foreground: 40 14% 96%;       /* #f5f0eb warm white */
-    --card: 24 9% 11%;
-    --card-foreground: 40 14% 96%;
-    --popover: 20 14.3% 4.1%;
-    --popover-foreground: 40 14% 96%;
-    --primary: 38 52% 56%;          /* brighter gold on dark */
-    --primary-foreground: 20 14.3% 4.1%;
-    --secondary: 24 9% 14%;
-    --secondary-foreground: 40 14% 96%;
-    --muted: 24 9% 14%;
-    --muted-foreground: 30 8% 74%;  /* #c4bdb6 — much more readable */
-    --accent: 24 9% 14%;
-    --accent-foreground: 40 14% 96%;
-    --destructive: 0 80% 72%;
-    --destructive-foreground: 20 14.3% 4.1%;
-    --border: 24 8% 18%;
-    --input: 24 8% 18%;
-    --ring: 38 52% 56%;
-    --warning: 38 92% 62%;
-    --warning-foreground: 20 14.3% 4.1%;
-    --success: 142 60% 56%;
-    --success-foreground: 20 14.3% 4.1%;
-    --success-soft: 142 40% 14%;
-    --warning-soft: 38 60% 14%;
-    --accent-soft: 0 40% 14%;
-    --primary-soft: 38 40% 14%;
+    /* ── Core palette (Dark) ── */
+    --background: #0C0A09;
+    --foreground: #FAFAF9;
+
+    --card: #151210;
+    --card-foreground: #FAFAF9;
+
+    --popover: #151210;
+    --popover-foreground: #FAFAF9;
+
+    --primary: #B9825A;
+    --primary-foreground: #0C0A09;
+    --primary-hover: #7A4E2D;
+    --primary-soft: rgba(185, 130, 90, 0.15);
+
+    --secondary: #1C1917;
+    --secondary-foreground: #FAFAF9;
+
+    --muted: #1C1917;
+    --muted-foreground: #A8A29E;
+
+    --accent: #1C1917;
+    --accent-foreground: #FAFAF9;
+
+    --destructive: #f87171;
+    --destructive-foreground: #09090b;
+    --destructive-soft: rgba(248, 113, 113, 0.15);
+
+    --success: #4ade80;
+    --success-foreground: #09090b;
+    --success-soft: rgba(74, 222, 128, 0.15);
+
+    --warning: #fbbf24;
+    --warning-foreground: #09090b;
+    --warning-soft: rgba(251, 191, 36, 0.15);
+
+    --border: #292524;
+    --input: #292524;
+    --ring: #B9825A;
+
+    --surface: #151210;
+    --surface-elevated: #1C1917;
+    --subtle: #A8A29E;
+
+    /* ── On-Media ── */
+    --on-media-foreground: #FFFFFF;
+    --on-media-muted: rgba(255, 255, 255, 0.78);
+    --on-media-subtle: rgba(255, 255, 255, 0.60);
+    --on-media-primary: #B9825A;
   }
 
   .amoled {
-    --background: 0 0% 0%;
-    --foreground: 60 9.1% 97.8%;
-    --card: 24 9.8% 3%;
-    --card-foreground: 60 9.1% 97.8%;
-    --popover: 0 0% 0%;
-    --popover-foreground: 60 9.1% 97.8%;
-    --primary: 38 52% 43%;
-    --primary-foreground: 60 9.1% 97.8%;
-    --secondary: 0 0% 5%;
-    --secondary-foreground: 60 9.1% 97.8%;
-    --muted: 0 0% 5%;
-    --muted-foreground: 24 5.4% 63.9%;
-    --accent: 0 0% 5%;
-    --accent-foreground: 60 9.1% 97.8%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 60 9.1% 97.8%;
-    --border: 0 0% 10%;
-    --input: 0 0% 10%;
-    --ring: 38 52% 43%;
-    --warning: 38 92% 50%;
-    --warning-foreground: 20 14.3% 4.1%;
-    --success: 142 72% 29%;
-    --success-foreground: 60 9.1% 97.8%;
-    /* AMOLED soft badge backgrounds */
-    --success-soft: 142 30% 8%;
-    --warning-soft: 38 40% 8%;
-    --accent-soft: 0 30% 8%;
-    --primary-soft: 38 30% 8%;
-  }
+    --background: #000000;
+    --foreground: #FAFAF9;
 
-  /* Style paradigm overrides */
-  /* We no longer override colors here, just shapes/shadows (handled elsewhere) */
-  .theme-clay {}
-  .theme-minimal {}
-  .dark.theme-minimal {}
+    --card: #000000;
+    --card-foreground: #FAFAF9;
+
+    --popover: #0A0A0A;
+    --popover-foreground: #FAFAF9;
+
+    --secondary: #111111;
+    --secondary-foreground: #FAFAF9;
+
+    --muted: #111111;
+    --muted-foreground: #A8A29E;
+
+    --accent: #111111;
+    --accent-foreground: #FAFAF9;
+
+    --surface: #000000;
+    --surface-elevated: #0A0A0A;
+    --border: #1A1A1A;
+    --input: #1A1A1A;
+  }
 }
 
 /* Custom Scrollbar */
@@ -116,17 +145,17 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: hsl(var(--background));
+  background: var(--background);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: hsl(var(--muted));
+  background: var(--muted-foreground);
   border-radius: 9999px;
-  border: 2px solid hsl(var(--background)); /* Adds padding effect around thumb */
+  border: 2px solid var(--background);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--muted-foreground));
+  background: var(--subtle);
 }
 
 ::-webkit-scrollbar-corner {

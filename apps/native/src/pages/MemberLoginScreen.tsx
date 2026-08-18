@@ -8,17 +8,17 @@ import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
-import { useAppDispatch } from '../store/hooks';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { memberLoginThunk } from '../features/auth/authSlice';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
-import { Footer } from '../components/layout/Footer';
 import { APP_NAME } from '../utils/env';
-import { themeColors } from '../constants/colors';
-import { useAppSelector } from '../store/hooks';
+import { useTheme } from '../hooks/useTheme';
+import { Footer } from '../components/layout/Footer';
+import { AppDock } from '../components/layout/AppDock';
 
 const emailSchema = z.object({ email: z.string().email("Enter a valid email address") });
-const passwordSchema = z.object({ password: z.string().min(8, "Password must be at least 8 characters") });
+const passwordSchema = z.object({ password: z.string().min(8, "Password must be at least 8 characters").regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$/, "Password must be strong") });
 const codeSchema = z.object({ code: z.string().min(4, "Enter a valid verification code") });
 
 type EmailFormValues = z.infer<typeof emailSchema>;
@@ -30,8 +30,12 @@ export function MemberLoginScreen() {
   const dispatch = useAppDispatch();
 
   const navigation = useNavigation<any>();
-  const theme = useAppSelector((state) => state.theme.theme);
-  const activeColors = themeColors[theme === 'amoled' ? 'amoled' : theme === 'dark' ? 'dark' : 'light'];
+  const { isDark } = useTheme();
+
+  const foregroundColor = isDark ? '#FAFAFA' : '#09090B';
+  const mutedForegroundColor = isDark ? '#A1A1AA' : '#71717A';
+  const primaryColor = '#E50000'; // Assuming valor brand color
+  const primaryForegroundColor = '#FFFFFF';
 
   const [step, setStep] = useState<AuthStep>("login");
   const [email, setEmail] = useState("");
@@ -97,7 +101,7 @@ export function MemberLoginScreen() {
 
   const handlePasskey = () => {
     Toast.show({ type: 'info', text1: "Prompting for Passkey…", text2: "Use your biometric or device PIN" });
-    setTimeout(() => onFinalLogin(), 1500);
+    onFinalLogin();
   };
 
   const renderStep = () => {
@@ -131,22 +135,22 @@ export function MemberLoginScreen() {
           </View>
           <Button onPress={subLogin(handleLoginNext)} className="mt-4" isLoading={isSimulating} disabled={isSimulating}>
             <View className="flex-row items-center justify-center">
-              <Text style={{ color: activeColors.primaryForeground }} className="font-bold mr-2">Sign In</Text>
-              <ArrowRight size={16} color={activeColors.primaryForeground} />
+              <Text style={{ color: primaryForegroundColor }} className="font-bold mr-2">Sign In</Text>
+              <ArrowRight size={16} color={primaryForegroundColor} />
             </View>
           </Button>
 
           <View className="flex-row items-center my-6">
-            <View className="flex-1 h-px" style={{ backgroundColor: activeColors.border }} />
-            <Text className="mx-4 text-xs uppercase" style={{ color: activeColors.mutedForeground }}>Or continue with</Text>
-            <View className="flex-1 h-px" style={{ backgroundColor: activeColors.border }} />
+            <View className="flex-1 h-px bg-border" />
+            <Text className="mx-4 text-xs uppercase text-muted-foreground">Or continue with</Text>
+            <View className="flex-1 h-px bg-border" />
           </View>
 
           <View className="gap-3">
             <Button variant="outline" onPress={handlePasskey} isLoading={isSimulating} disabled={isSimulating}>
               <View className="flex-row items-center justify-center">
-                <Fingerprint size={20} color={activeColors.foreground} style={{ marginRight: 8 }} />
-                <Text style={{ color: activeColors.foreground }} className="font-bold">Continue with Passkey</Text>
+                <Fingerprint size={20} color={foregroundColor} style={{ marginRight: 8 }} />
+                <Text style={{ color: foregroundColor }} className="font-bold">Continue with Passkey</Text>
               </View>
             </Button>
           </View>
@@ -158,14 +162,14 @@ export function MemberLoginScreen() {
       return (
         <View className="space-y-6 mt-4">
           <View className="flex-row items-center gap-2 mb-4">
-            <TouchableOpacity onPress={() => setStep("login")} style={{ backgroundColor: activeColors.secondary }} className="p-2 rounded-full">
-              <ArrowLeft size={16} color={activeColors.foreground} />
+            <TouchableOpacity onPress={() => setStep("login")} className="p-2 rounded-full bg-secondary">
+              <ArrowLeft size={16} color={foregroundColor} />
             </TouchableOpacity>
-            <Text style={{ color: activeColors.foreground }} className="text-sm font-medium">
+            <Text style={{ color: foregroundColor }} className="text-sm font-medium">
               {step === "2fa" ? "Two-Factor Authentication" : "One-Time Password"}
             </Text>
           </View>
-          <Text style={{ color: activeColors.mutedForeground }} className="text-sm mb-4">
+          <Text style={{ color: mutedForegroundColor }} className="text-sm mb-4">
             {step === "2fa" ? "Enter the 6-digit code from your authenticator app." : `We sent a code to ${email}.`}
           </Text>
           <Controller control={controlCode} name="code" render={({ field: { onChange, onBlur, value } }) => (
@@ -181,8 +185,8 @@ export function MemberLoginScreen() {
           )} />
           <Button onPress={subCode(handleCodeSubmit)} disabled={isSimulating} className="mt-4">
             {isSimulating
-              ? <ActivityIndicator color={activeColors.primaryForeground} />
-              : <Text style={{ color: activeColors.primaryForeground }} className="font-bold">Verify & Sign In</Text>}
+              ? <ActivityIndicator color={primaryForegroundColor} />
+              : <Text style={{ color: primaryForegroundColor }} className="font-bold">Verify & Sign In</Text>}
           </Button>
         </View>
       );
@@ -197,7 +201,7 @@ export function MemberLoginScreen() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={{ flex: 1, backgroundColor: activeColors.background }}
+      className="flex-1 bg-background"
     >
       <ScrollView
         contentContainerStyle={{ flexGrow: 1, paddingBottom: isWide ? 120 : 80 }}
@@ -218,7 +222,7 @@ export function MemberLoginScreen() {
             <SafeAreaView className="flex-1 p-8 lg:p-20 z-10">
               <TouchableOpacity onPress={() => navigation.navigate("Home")} className="flex-row items-center gap-3 absolute top-12 left-8 lg:top-20 lg:left-20 z-20">
                 <View className="w-9 h-9 bg-primary items-center justify-center rounded-lg shadow-lg">
-                  <Dumbbell size={18} color={activeColors.primaryForeground} />
+                  <Dumbbell size={18} color={primaryForegroundColor} />
                 </View>
                 <Text className="text-lg font-black text-white">{APP_NAME}</Text>
               </TouchableOpacity>
@@ -238,9 +242,9 @@ export function MemberLoginScreen() {
                     </View>
                     <Text className="text-5xl font-black text-white leading-tight mb-8 text-center w-full">Unlock your true potential.</Text>
                     <View className="gap-5 items-center w-full mt-4">
-                      <View className="flex-row items-center gap-4 w-full justify-center"><BadgeCheck size={24} color={activeColors.primary} /><Text className="font-semibold text-white text-xl">Track your training progress</Text></View>
-                      <View className="flex-row items-center gap-4 w-full justify-center"><KeyRound size={24} color={activeColors.primary} /><Text className="font-semibold text-white text-xl">Manage your memberships</Text></View>
-                      <View className="flex-row items-center gap-4 w-full justify-center"><Dumbbell size={24} color={activeColors.primary} /><Text className="font-semibold text-white text-xl">Book classes and sessions</Text></View>
+                      <View className="flex-row items-center gap-4 w-full justify-center"><BadgeCheck size={24} color={primaryColor} /><Text className="font-semibold text-white text-xl">Track your training progress</Text></View>
+                      <View className="flex-row items-center gap-4 w-full justify-center"><KeyRound size={24} color={primaryColor} /><Text className="font-semibold text-white text-xl">Manage your memberships</Text></View>
+                      <View className="flex-row items-center gap-4 w-full justify-center"><Dumbbell size={24} color={primaryColor} /><Text className="font-semibold text-white text-xl">Book classes and sessions</Text></View>
                     </View>
                   </View>
                 )}
@@ -250,36 +254,35 @@ export function MemberLoginScreen() {
 
           {/* Right Form Section — fully theme-aware */}
           <View
-            className={`${isWide ? 'w-1/2' : 'flex-1'} justify-center p-6`}
-            style={{ backgroundColor: activeColors.background, borderLeftColor: activeColors.border, borderLeftWidth: isWide ? 1 : 0 }}
+            className={`justify-center p-6 bg-background ${isWide ? 'w-1/2 border-l border-border' : 'flex-1'}`}
           >
             <View className="w-full max-w-md self-center">
 
               <View className="flex-row items-center justify-between mb-6">
                 <TouchableOpacity onPress={() => navigation.navigate("Home")} className="flex-row items-center gap-2">
-                  <ArrowLeft size={16} color={activeColors.mutedForeground} />
-                  <Text style={{ color: activeColors.mutedForeground }} className="text-sm font-medium">Back to website</Text>
+                  <ArrowLeft size={16} color={mutedForegroundColor} />
+                  <Text style={{ color: mutedForegroundColor }} className="text-sm font-medium">Back to website</Text>
                 </TouchableOpacity>
                 {!isWide && (
                   <View className="flex-row items-center gap-2">
-                    <Dumbbell size={18} color={activeColors.primary} />
-                    <Text style={{ color: activeColors.foreground }} className="font-black">{APP_NAME}</Text>
+                    <Dumbbell size={18} color={primaryColor} />
+                    <Text style={{ color: foregroundColor }} className="font-black">{APP_NAME}</Text>
                   </View>
                 )}
               </View>
 
-              <Text style={{ color: activeColors.foreground }} className="text-3xl font-black mb-2">Member Login</Text>
-              <Text style={{ color: activeColors.mutedForeground }} className="text-sm mb-6">Access your personal gym portal securely.</Text>
+              <Text style={{ color: foregroundColor }} className="text-3xl font-black mb-2">Member Login</Text>
+              <Text style={{ color: mutedForegroundColor }} className="text-sm mb-6">Access your personal gym portal securely.</Text>
 
               <View className="min-h-[280px]">
                 {renderStep()}
               </View>
 
-              <View className="mt-8 pt-6" style={{ borderTopWidth: 1, borderTopColor: activeColors.border }}>
-                <Text style={{ color: activeColors.foreground }} className="text-sm font-medium">Staff or Administrator?</Text>
+              <View className="mt-8 pt-6 border-t border-border">
+                <Text style={{ color: foregroundColor }} className="text-sm font-medium">Staff or Administrator?</Text>
                 <TouchableOpacity onPress={() => navigation.navigate("Login")} className="flex-row items-center mt-2">
-                  <Text style={{ color: activeColors.primary }} className="text-sm font-bold mr-2">Use staff portal</Text>
-                  <ArrowRight size={14} color={activeColors.primary} />
+                  <Text style={{ color: primaryColor }} className="text-sm font-bold mr-2">Use staff portal</Text>
+                  <ArrowRight size={14} color={primaryColor} />
                 </TouchableOpacity>
               </View>
 
@@ -290,6 +293,7 @@ export function MemberLoginScreen() {
         <Footer />
       </ScrollView>
       <Toast />
+      <AppDock />
     </KeyboardAvoidingView>
   );
 }

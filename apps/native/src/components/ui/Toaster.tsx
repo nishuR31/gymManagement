@@ -2,23 +2,20 @@ import Toast from 'react-native-toast-message';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { CheckCircle2, AlertCircle, Info, AlertTriangle, X } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { DOCK_HEIGHT } from '../layout/ScreenWrapper';
 
 function ToastBody({
   icon,
-  iconColor,
   borderColor,
   text1,
   text2,
 }: {
   icon: React.ReactNode;
-  iconColor: string;
   borderColor: string;
   text1: string;
   text2?: string;
 }) {
   return (
-    <View className="w-full pl-4 pr-4 md:pr-8 items-end self-end max-w-sm" style={{ marginTop: 16 }}>
+    <View className="w-full pl-4 pr-24 md:pr-32 items-end self-end max-w-sm" style={{ marginTop: 16 }}>
       <View
         style={{ borderColor }}
         className="bg-zinc-950 border shadow-2xl p-4 flex-row items-start w-full rounded-2xl"
@@ -51,7 +48,6 @@ export function Toaster() {
     success: (props: any) => (
       <ToastBody
         icon={<CheckCircle2 size={20} color="#10b981" />}
-        iconColor="#10b981"
         borderColor="#10b98133"
         text1={props.text1}
         text2={props.text2}
@@ -60,7 +56,6 @@ export function Toaster() {
     error: (props: any) => (
       <ToastBody
         icon={<AlertCircle size={20} color="#ef4444" />}
-        iconColor="#ef4444"
         borderColor="#ef444433"
         text1={props.text1}
         text2={props.text2}
@@ -69,7 +64,6 @@ export function Toaster() {
     warning: (props: any) => (
       <ToastBody
         icon={<AlertTriangle size={20} color="#f59e0b" />}
-        iconColor="#f59e0b"
         borderColor="#f59e0b33"
         text1={props.text1}
         text2={props.text2}
@@ -78,7 +72,6 @@ export function Toaster() {
     info: (props: any) => (
       <ToastBody
         icon={<Info size={20} color="#3b82f6" />}
-        iconColor="#3b82f6"
         borderColor="#3b82f633"
         text1={props.text1}
         text2={props.text2}

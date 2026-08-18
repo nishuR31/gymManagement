@@ -12,33 +12,18 @@ import { Footer } from './Footer';
 import { useTheme } from '../../hooks/useTheme';
 import { useWindowDimensions } from 'react-native';
 
-// Height of the floating dock pill + its bottom margin
 export const DOCK_HEIGHT = 80;
 
 interface ScreenWrapperProps {
   children: React.ReactNode;
-  /** Show the floating navigation dock (default: true) */
   showDock?: boolean;
-  /** Whether the content is scrollable (default: true) */
   scrollable?: boolean;
-  /** Pull-to-refresh: set to true when loading to show spinner */
   refreshing?: boolean;
-  /** Pull-to-refresh callback */
   onRefresh?: () => void;
-  /** Extra className for the outer SafeAreaView */
   className?: string;
-  /** contentContainerStyle extras for the ScrollView */
   contentPaddingBottom?: number;
 }
 
-/**
- * ScreenWrapper — the single layout primitive for all authenticated screens.
- * Handles:
- *  - SafeAreaView with correct edges for iOS notch / Android status bar
- *  - ScrollView with dynamic bottom padding for the FloatingDock
- *  - RefreshControl wiring
- *  - FloatingDock placement with safe-area-aware bottom offset
- */
 export function ScreenWrapper({
   children,
   showDock = true,
@@ -48,32 +33,32 @@ export function ScreenWrapper({
   className = '',
   contentPaddingBottom = 0,
 }: ScreenWrapperProps) {
-  const { colors } = useTheme();
+  const { isDark } = useTheme();
   const insets = useSafeAreaInsets();
 
   const { width } = useWindowDimensions();
   const isTablet = width >= 768;
   const extraPad = isTablet ? 48 : 16;
 
-  // Bottom padding = dock height + bottom inset (iPhone home indicator) + extra breathing room
   const bottomPad = showDock
     ? DOCK_HEIGHT + insets.bottom + extraPad + contentPaddingBottom
     : insets.bottom + extraPad + contentPaddingBottom;
+
+  const primaryColor = isDark ? '#B9825A' : '#7A4E2D';
 
   const refreshControl =
     onRefresh ? (
       <RefreshControl
         refreshing={refreshing}
         onRefresh={onRefresh}
-        tintColor={colors.primary}
-        colors={[colors.primary]}
+        tintColor={primaryColor}
+        colors={[primaryColor]}
       />
     ) : undefined;
 
   return (
     <SafeAreaView
-      className={`flex-1 ${className}`}
-      style={{ backgroundColor: colors.background }}
+      className={`flex-1 bg-background ${className}`}
       edges={['top', 'left', 'right']}
     >
       {scrollable ? (
@@ -98,33 +83,25 @@ export function ScreenWrapper({
   );
 }
 
-// ─────────────────────────────────────────────
-// PageHeader — consistent branding header used at the top of every screen
-// ─────────────────────────────────────────────
-
 interface PageHeaderProps {
-  /** Small label above the title (e.g. "Front Desk") */
   label?: string;
   title: string;
   subtitle?: string;
-  /** Slot for action buttons (right side) */
   actions?: React.ReactNode;
-  /** Optional callback for when the subtitle is pressed */
   onSubtitlePress?: () => void;
 }
 
 export function PageHeader({ label, title, subtitle, actions, onSubtitlePress }: PageHeaderProps) {
-  const { colors } = useTheme();
   return (
-    <View className="mb-6 rounded-xl border px-4 py-4" style={{ backgroundColor: colors.card, borderColor: colors.border }}>
+    <View className="mb-6 rounded-xl border px-4 py-4 bg-card border-border">
       <View className="flex-row items-start justify-between">
         <View className="flex-1 mr-2">
           {label ? (
-            <Text className="text-xs font-black uppercase tracking-[0.18em] mb-1" style={{ color: colors.primary }}>
+            <Text className="text-xs font-black uppercase tracking-[0.18em] mb-1 text-primary">
               {label}
             </Text>
           ) : null}
-          <Text className="text-3xl font-black leading-tight" style={{ color: colors.foreground }}>
+          <Text className="text-3xl font-black leading-tight text-foreground">
             {title}
           </Text>
           {subtitle ? (
@@ -132,14 +109,13 @@ export function PageHeader({ label, title, subtitle, actions, onSubtitlePress }:
               <React.Fragment>
                 <Text
                   onPress={onSubtitlePress}
-                  className="mt-1 text-sm font-semibold underline"
-                  style={{ color: colors.primary }}
+                  className="mt-1 text-sm font-semibold underline text-primary"
                 >
                   {subtitle}
                 </Text>
               </React.Fragment>
             ) : (
-              <Text className="mt-1 text-sm font-semibold" style={{ color: colors.mutedForeground }}>
+              <Text className="mt-1 text-sm font-semibold text-muted-foreground">
                 {subtitle}
               </Text>
             )
@@ -153,24 +129,14 @@ export function PageHeader({ label, title, subtitle, actions, onSubtitlePress }:
   );
 }
 
-// ─────────────────────────────────────────────
-// SectionTitle — consistent section heading
-// ─────────────────────────────────────────────
-
 export function SectionTitle({ children }: { children: string }) {
-  const { colors } = useTheme();
   return (
-    <Text className="text-base font-black mb-3 mt-1" style={{ color: colors.foreground }}>
+    <Text className="text-base font-black mb-3 mt-1 text-foreground">
       {children}
     </Text>
   );
 }
 
-// ─────────────────────────────────────────────
-// Divider — thin horizontal rule
-// ─────────────────────────────────────────────
-
 export function Divider({ className = '' }: { className?: string }) {
-  const { colors } = useTheme();
-  return <View className={`h-px ${className}`} style={{ backgroundColor: colors.border }} />;
+  return <View className={`h-px bg-border ${className}`} />;
 }

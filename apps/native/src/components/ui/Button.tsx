@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  Text,
-  TouchableOpacity,
-  TouchableOpacityProps,
-  ActivityIndicator,
-
-  View,
-} from 'react-native';
+import { Text, TouchableOpacity, TouchableOpacityProps, ActivityIndicator, View } from 'react-native';
 import { useTheme } from '../../hooks/useTheme';
 
 interface ButtonProps extends TouchableOpacityProps {
@@ -25,64 +18,38 @@ export const Button = React.memo(function Button({
   leftIcon,
   rightIcon,
   children,
-  className,
+  className = '',
   disabled,
   ...props
 }: ButtonProps) {
-  const { styleMode, colors, isDark } = useTheme();
-
-  // ── Border radius by styleMode ──
-  let radiusClass = 'rounded-lg'; // 8px default
-  let clayShadowClass = '';
-  if (styleMode === 'clay') {
-    radiusClass = 'rounded-2xl'; // 16px
-    clayShadowClass = 'shadow-[0_4px_14px_rgba(0,0,0,0.15)]'; 
-  } else if (styleMode === 'glass' || styleMode === 'liquid-glass') {
-    radiusClass = 'rounded-xl'; // 12px
-  } else if (styleMode === 'minimal') {
-    radiusClass = 'rounded-none'; // 0px
-  }
+  const { isDark } = useTheme();
 
   // ── Variant styles ──
-  let bgStyle: any = {};
-  let textStyle: any = {};
+  let bgClass = '';
+  let textClass = '';
   let borderClass = '';
 
   switch (variant) {
     case 'primary':
-      if (styleMode === 'glass') {
-        bgStyle = { backgroundColor: `${colors.primary}B3` }; // 70% opacity
-        borderClass = 'border border-white/20 backdrop-blur-md';
-      } else {
-        bgStyle = { backgroundColor: colors.primary };
-      }
-      textStyle = { color: colors.primaryForeground };
+      bgClass = 'bg-primary';
+      textClass = 'text-primary-foreground';
       break;
     case 'secondary':
-      if (styleMode === 'glass') {
-        bgStyle = { backgroundColor: `${colors.secondary}B3` }; // 70%
-        borderClass = 'border border-white/20 backdrop-blur-md';
-      } else {
-        bgStyle = { backgroundColor: colors.secondary };
-      }
-      textStyle = { color: colors.secondaryForeground };
+      bgClass = 'bg-secondary';
+      textClass = 'text-secondary-foreground';
       break;
     case 'destructive':
-      if (styleMode === 'glass') {
-        bgStyle = { backgroundColor: `${colors.destructive}B3` };
-        borderClass = 'border border-white/20 backdrop-blur-md';
-      } else {
-        bgStyle = { backgroundColor: colors.destructive };
-      }
-      textStyle = { color: colors.destructiveForeground };
+      bgClass = 'bg-destructive';
+      textClass = 'text-destructive-foreground';
       break;
     case 'outline':
-      bgStyle = { backgroundColor: 'transparent', borderColor: colors.border, borderWidth: 1 };
-      textStyle = { color: colors.foreground };
+      bgClass = 'bg-transparent';
+      textClass = 'text-foreground';
+      borderClass = 'border border-border';
       break;
     case 'ghost':
-      bgStyle = { backgroundColor: 'transparent' };
-      textStyle = { color: colors.foreground };
+      bgClass = 'bg-transparent';
+      textClass = 'text-foreground';
       break;
   }
 
@@ -95,7 +62,7 @@ export const Button = React.memo(function Button({
       textSize = 'text-xs';
       break;
     case 'md':
-      sizeClass = 'h-10 px-4 py-2';
+      sizeClass = 'h-10 px-4';
       textSize = 'text-sm';
       break;
     case 'lg':
@@ -109,44 +76,38 @@ export const Button = React.memo(function Button({
 
   const isDisabled = isLoading || disabled;
 
-  // Spinner color: white on solid backgrounds, theme color on transparent
-  // Spinner color matches text class implicitly in React Native via inherited color,
-  // but since RN ActivityIndicator doesn't inherit text color automatically from className in all versions,
-  // we'll explicitly map it for the spinner.
-  const spinnerColor = variant === 'outline' || variant === 'ghost' ? colors.foreground : colors.primaryForeground;
+  // React Native ActivityIndicator color fallback
+  const spinnerColor = (variant === 'outline' || variant === 'ghost')
+    ? (isDark ? '#fafafa' : '#181614') // foreground
+    : '#ffffff'; // primary/destructive foreground
 
   return (
     <TouchableOpacity
       className={`
-        flex-row items-center justify-center
+        flex-row items-center justify-center rounded-[8px]
+        ${bgClass}
         ${borderClass}
-        ${radiusClass}
         ${sizeClass}
-        ${clayShadowClass}
         ${isDisabled ? 'opacity-50' : ''}
-        ${className || ''}
+        ${className}
       `}
-      style={[bgStyle, props.style]}
       disabled={isDisabled}
       activeOpacity={0.75}
+      style={{ minHeight: size === 'lg' ? 44 : size === 'sm' ? 36 : 40 }}
       {...props}
     >
       {isLoading ? (
-        <ActivityIndicator
-          size="small"
-          color={spinnerColor}
-        />
+        <ActivityIndicator size="small" color={spinnerColor} />
       ) : (
         <>
           {leftIcon && (
-            <View style={{ marginRight: 8 }}>
+            <View className="mr-2">
               {leftIcon}
             </View>
           )}
           {typeof children === 'string' ? (
             <Text
-              className={`font-semibold text-center ${textSize}`}
-              style={textStyle}
+              className={`font-semibold text-center ${textSize} ${textClass}`}
               numberOfLines={1}
             >
               {children}
@@ -155,7 +116,7 @@ export const Button = React.memo(function Button({
             children
           )}
           {rightIcon && (
-            <View style={{ marginLeft: 8 }}>
+            <View className="ml-2">
               {rightIcon}
             </View>
           )}

@@ -30,7 +30,7 @@ import { PulsingDot } from './PulsingDot';
 export function PublicFloatingDock() {
   const navigation = useNavigation<any>();
   const route = useRoute();
-  const { colors, styleMode } = useTheme();
+  const { colors, styleMode, isDark } = useTheme();
   const insets = useSafeAreaInsets();
   const isBackendOnline = usePinger(6 * 60 * 1000); // 6 mins
   const isNetworkOnline = useNetworkStatus();
@@ -39,6 +39,7 @@ export function PublicFloatingDock() {
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
   const currentRoute = route.name;
+
 
   const dockBottom = Math.max(insets.bottom, 8) + 8;
 
@@ -54,16 +55,8 @@ export function PublicFloatingDock() {
     const isActive = currentRoute === targetRoute;
     return (
       <TouchableOpacity
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'center',
-          height: 44,
-          paddingHorizontal: 14,
-          gap: 6,
-          borderRadius: 22,
-          backgroundColor: isActive ? `${colors.primary}22` : 'transparent',
-        }}
+        className={`flex-row items-center justify-center h-11 px-3.5 rounded-full ${isActive ? 'bg-primary/10' : ''}`}
+        style={{ gap: 6 }}
         onPress={() => {
           setIsMenuOpen(false);
           if (currentRoute !== targetRoute) navigation.navigate(targetRoute);
@@ -73,11 +66,7 @@ export function PublicFloatingDock() {
         <Icon size={20} color={isActive ? colors.primary : colors.mutedForeground} />
         {(!isMobile || isActive) && (
           <Text
-            style={{
-              color: isActive ? colors.primary : colors.mutedForeground,
-              fontWeight: '600',
-              fontSize: 14,
-            }}
+            className={`font-semibold text-sm ${isActive ? 'text-primary' : 'text-muted-foreground'}`}
           >
             {label}
           </Text>
@@ -98,15 +87,8 @@ export function PublicFloatingDock() {
     const isActive = currentRoute === targetRoute;
     return (
       <TouchableOpacity
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          gap: 12,
-          padding: 14,
-          borderRadius: 12,
-          marginBottom: 2,
-          backgroundColor: isActive ? `${colors.primary}18` : 'transparent',
-        }}
+        className={`flex-row items-center p-3.5 rounded-xl mb-0.5 ${isActive ? 'bg-primary/10' : ''}`}
+        style={{ gap: 12 }}
         onPress={() => {
           setIsMenuOpen(false);
           if (currentRoute !== targetRoute) navigation.navigate(targetRoute);
@@ -115,11 +97,7 @@ export function PublicFloatingDock() {
       >
         <Icon size={20} color={isActive ? colors.primary : colors.foreground} />
         <Text
-          style={{
-            color: isActive ? colors.primary : colors.foreground,
-            fontSize: 15,
-            fontWeight: isActive ? '700' : '500',
-          }}
+          className={`text-[15px] ${isActive ? 'font-bold text-primary' : 'font-medium text-foreground'}`}
         >
           {name}
         </Text>
@@ -127,47 +105,22 @@ export function PublicFloatingDock() {
     );
   };
 
-  let containerStyle: any = {
-    position: 'absolute',
-    bottom: dockBottom,
-    alignSelf: 'center',
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.border,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 8,
-    gap: 12,
-  };
-
-  let containerClass = "elevation-12 shadow-sm";
+  let containerClass = "bg-card border border-border shadow-sm";
 
   if (styleMode === 'clay') {
-    containerStyle.borderWidth = 0;
-    containerClass = "shadow-[0_15px_40px_rgba(0,0,0,0.25)]";
-    containerStyle.shadowColor = '#000';
-    containerStyle.shadowOffset = { width: 0, height: 12 };
-    containerStyle.shadowOpacity = 0.3;
-    containerStyle.shadowRadius = 24;
-    containerStyle.elevation = 16;
+    containerClass = "bg-card shadow-[0_15px_40px_rgba(0,0,0,0.25)]";
   } else if (styleMode === 'glass') {
     containerClass = "bg-background/40 backdrop-blur-3xl border border-white/10 shadow-lg shadow-black/20";
-    containerStyle.backgroundColor = 'transparent';
   } else if (styleMode === 'minimal') {
-    containerStyle.borderRadius = 0;
-    containerStyle.borderWidth = 2;
-    containerClass = "shadow-none";
+    containerClass = "bg-card border-2 border-border";
   }
 
   return (
     <>
       {/* Dock pill */}
       <View
-        className={containerClass}
-        style={containerStyle}
+        className={`absolute self-center flex-row items-center justify-center px-2 h-16 rounded-full ${containerClass}`}
+        style={{ bottom: dockBottom, gap: 12 }}
       >
         {/* Backend Pinger Dot (Blue/Orange) */}
         <PulsingDot
@@ -176,34 +129,20 @@ export function PublicFloatingDock() {
           accessibilityLabel={isBackendOnline ? 'Server Online' : 'Server Offline'}
         />
 
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <View className="flex-row items-center">
           <NavItem icon={Home} targetRoute="Home" label="Home" />
-          <NavItem icon={Dumbbell} targetRoute="Plans" label="Plans" />
           <NavItem icon={Users} targetRoute="MemberLogin" label="Member" />
           <NavItem icon={ShieldCheck} targetRoute="Login" label="Admin" />
         </View>
 
         <TouchableOpacity
-          style={{
-            height: 44,
-            paddingHorizontal: 18,
-            borderRadius: 22,
-            backgroundColor: colors.primary,
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: 8,
-          }}
+          className="h-11 px-4 rounded-full bg-primary flex-row items-center"
+          style={{ gap: 8 }}
           onPress={() => setIsMenuOpen(true)}
           activeOpacity={0.8}
         >
           <Menu size={18} color={colors.primaryForeground} />
-          <Text
-            style={{
-              color: colors.primaryForeground,
-              fontWeight: '700',
-              fontSize: 14,
-            }}
-          >
+          <Text className="text-primary-foreground font-bold text-sm">
             More
           </Text>
         </TouchableOpacity>
@@ -227,58 +166,25 @@ export function PublicFloatingDock() {
         <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' }} onPress={() => setIsMenuOpen(false)}>
           <Pressable>
             <View
+              className="bg-card rounded-t-[28px]"
               style={{
-                backgroundColor: colors.card,
-                borderTopLeftRadius: 28,
-                borderTopRightRadius: 28,
                 paddingTop: 8,
                 paddingBottom: Math.max(insets.bottom, 16) + 8,
                 paddingHorizontal: 16,
                 maxHeight: Dimensions.get('window').height * 0.75,
-                elevation: 24,
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: -4 },
-                shadowOpacity: 0.15,
-                shadowRadius: 20,
+                boxShadow: '0px -4px 20px rgba(0,0,0,0.15)',
               }}
             >
               {/* Drag handle */}
-              <View
-                style={{
-                  width: 40,
-                  height: 4,
-                  backgroundColor: colors.border,
-                  borderRadius: 2,
-                  alignSelf: 'center',
-                  marginBottom: 16,
-                }}
-              />
+              <View className="w-10 h-1 bg-border rounded-full self-center mb-4" />
 
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  marginBottom: 12,
-                  paddingHorizontal: 4,
-                }}
-              >
-                <Text
-                  style={{
-                    fontSize: 20,
-                    fontWeight: '800',
-                    color: colors.foreground,
-                  }}
-                >
+              <View className="flex-row justify-between items-center mb-3 px-1">
+                <Text className="text-xl font-extrabold text-foreground">
                   Menu
                 </Text>
                 <TouchableOpacity
                   onPress={() => setIsMenuOpen(false)}
-                  style={{
-                    padding: 8,
-                    borderRadius: 20,
-                    backgroundColor: colors.secondary,
-                  }}
+                  className="p-2 rounded-full bg-secondary"
                   activeOpacity={0.7}
                 >
                   <X size={18} color={colors.foreground} />

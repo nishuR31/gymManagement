@@ -1,12 +1,10 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   Modal,
   ScrollView,
-  Platform,
-  Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -19,7 +17,7 @@ import { Input } from '../components/ui/Input';
 import { EmptyState } from '../components/ui/EmptyState';
 import { StatusBadge } from '../components/ui/StatusBadge';
 import { SkeletonRows } from '../components/ui/Skeleton';
-import { ScreenWrapper, PageHeader } from '../components/layout/ScreenWrapper';
+import { ScreenWrapper } from '../components/layout/ScreenWrapper';
 import { useTheme } from '../hooks/useTheme';
 import { useAppSelector } from '../store/hooks';
 import * as memberApi from '../features/members/memberApi';
@@ -32,7 +30,6 @@ import type {
   MemberWorkoutPlanDto,
   MemberDietPlanDto,
   MembershipSubscriptionDto,
-  InvoiceDto,
   PaymentDto,
   MemberLoginSetupDto
 } from '@gym/shared';
@@ -49,7 +46,6 @@ export function MembersScreen() {
   const currentUser = useAppSelector((state) => state.auth.user);
   const isSuperAdmin = currentUser?.role === 'SUPER_ADMIN';
   const isAdmin = currentUser?.role === 'ADMIN' || currentUser?.role === 'SUPER_ADMIN';
-  const isStaff = currentUser?.role === 'STAFF';
   const canManageLifecycle = currentUser?.role === 'ADMIN' || currentUser?.role === 'SUPER_ADMIN' || currentUser?.role === 'STAFF';
 
   const [members, setMembers] = useState<MemberDto[]>([]);
@@ -65,7 +61,6 @@ export function MembersScreen() {
   const [memberWorkouts, setMemberWorkouts] = useState<MemberWorkoutPlanDto[]>([]);
   const [memberDiets, setMemberDiets] = useState<MemberDietPlanDto[]>([]);
   const [memberSubscriptions, setMemberSubscriptions] = useState<MembershipSubscriptionDto[]>([]);
-  const [memberInvoices, setMemberInvoices] = useState<InvoiceDto[]>([]);
   const [qrPayload, setQrPayload] = useState<string | null>(null);
   const [loginSetup, setLoginSetup] = useState<MemberLoginSetupDto | null>(null);
 
@@ -128,22 +123,20 @@ export function MembersScreen() {
     setMemberWorkouts([]);
     setMemberDiets([]);
     setMemberSubscriptions([]);
-    setMemberInvoices([]);
+
     setQrPayload(null);
     try {
-      const [qr, payments, workouts, diets, subscriptions, invoices] = await Promise.all([
+      const [qr, payments, workouts, diets, subscriptions] = await Promise.all([
         memberApi.getMemberQr(member.id).catch(() => null),
         paymentApi.listMemberPayments(member.id).catch(() => []),
         staffApi.listMemberWorkouts(member.id).catch(() => []),
         staffApi.listMemberDiets(member.id).catch(() => []),
         membershipApi.listMemberSubscriptions(member.id).catch(() => []),
-        paymentApi.listMemberInvoices(member.id).catch(() => []),
       ]);
       setMemberPayments(payments);
       setMemberWorkouts(workouts);
       setMemberDiets(diets);
       setMemberSubscriptions(subscriptions);
-      setMemberInvoices(invoices);
       if (qr) setQrPayload(qr.qrPayload);
     } catch {
       setQrPayload(null);
@@ -193,7 +186,7 @@ export function MembersScreen() {
             Management
           </Text>
           <Button variant="primary" size="sm" onPress={() => { setEditingMember(null); setIsFormVisible(true); }}>
-            <Text className="text-white font-bold">+ Member</Text>
+            + Member
           </Button>
         </View>
         <Text className="text-3xl font-black text-foreground leading-tight mb-1">

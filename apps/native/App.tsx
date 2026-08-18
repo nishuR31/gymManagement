@@ -1,7 +1,7 @@
 import 'react-native-reanimated';
 import './global.css';
 import { useEffect } from 'react';
-import { View, ActivityIndicator } from 'react-native';
+import { View, ActivityIndicator, useColorScheme } from 'react-native';
 import { Provider } from 'react-redux';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -41,7 +41,6 @@ import { ErrorBoundary } from './src/components/ErrorBoundary';
 import { loadApiBaseUrl, setAccessToken } from './src/services/api';
 import { registerForPushNotificationsAsync } from './src/services/notifications';
 
-import { themeColors } from './src/constants/colors';
 import { GlobalSettingsOverlay } from './src/components/layout/GlobalSettingsOverlay';
 
 const Stack = createNativeStackNavigator();
@@ -52,18 +51,22 @@ function RootApp() {
   const styleMode = useAppSelector((state) => state.theme.styleMode);
   const isLoaded = useAppSelector((state) => state.theme.isLoaded);
   const accessToken = useAppSelector((state) => state.auth.accessToken);
+  const systemColorScheme = useColorScheme();
+
+  // Resolve effective dark mode: if theme='system', follow OS preference
+  const isEffectiveDark = theme === 'system'
+    ? systemColorScheme === 'dark'
+    : theme === 'dark' || theme === 'amoled';
 
   useEffect(() => {
     setAccessToken(accessToken || null);
   }, [accessToken]);
 
-  const activeColors = themeColors[theme === 'dark' || theme === 'amoled' ? 'dark' : 'light'];
-
   const { setColorScheme } = require('nativewind').useColorScheme();
 
   useEffect(() => {
-    setColorScheme(theme === 'dark' || theme === 'amoled' ? 'dark' : 'light');
-  }, [theme, setColorScheme]);
+    setColorScheme(isEffectiveDark ? 'dark' : 'light');
+  }, [isEffectiveDark, setColorScheme]);
 
   useEffect(() => {
     loadApiBaseUrl()
@@ -83,10 +86,22 @@ function RootApp() {
     );
   }
 
+  const navTheme = {
+    dark: isEffectiveDark,
+    colors: {
+      primary: isEffectiveDark ? '#B9825A' : '#7A4E2D',
+      background: isEffectiveDark ? '#0C0A09' : '#FAFAF9',
+      card: isEffectiveDark ? '#151210' : '#FFFFFF',
+      text: isEffectiveDark ? '#FAFAF9' : '#181614',
+      border: isEffectiveDark ? '#292524' : '#E7E5E4',
+      notification: isEffectiveDark ? '#f87171' : '#ef4444',
+    },
+  };
+
   return (
     <SafeAreaProvider>
-      <View className={`flex-1 ${theme === 'dark' || theme === 'amoled' ? 'dark' : ''} ${theme === 'amoled' ? 'amoled' : ''} theme-${styleMode}`}>
-        <NavigationContainer>
+      <View className={`flex-1 bg-background ${isEffectiveDark ? 'dark' : ''} ${theme === 'amoled' ? 'amoled' : ''} theme-${styleMode}`}>
+        <NavigationContainer theme={navTheme}>
           <Stack.Navigator screenOptions={{
             headerShown: false,
           }}>
